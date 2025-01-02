@@ -1,24 +1,28 @@
 {
   "name": "websocket-server",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "A WebSocket server using TypeScript",
+  "main": "dist/server.js",
   "scripts": {
     "start": "node dist/server.js",
-    "dev": "ts-node src/server.ts",
+    "prestart": "npm run build",
+    "dev": "ts-node server.ts",
     "build": "tsc"
   },
-  "keywords": [],
+  "keywords": [
+    "websocket",
+    "typescript",
+    "socket.io"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@types/express": "^5.0.0",
     "cors": "^2.8.5",
-    "express": "^4.21.2",
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
-    "@types/node": "^22.10.3",
+    "@types/node": "^20.0.0",
+    "@types/socket.io": "^3.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   }
