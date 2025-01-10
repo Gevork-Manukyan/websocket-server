@@ -1,12 +1,14 @@
 // Command of Nature (C.O.N)
 
-import { gameId } from "../utils/types";
+import { ElementalCard, gameId, ItemCard } from "../utils/types";
 import { Player } from "./Player";
 
 export class ConGame {
     id: gameId;
     isStarted: boolean = false;
     players: Player[] = [];
+    creatureShop: ElementalCard[] = [];
+    itemShop: ItemCard[] = [];
 
     constructor(gameId: gameId) {
         this.id = gameId;
