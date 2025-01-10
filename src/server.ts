@@ -1,8 +1,16 @@
-import { Server, Socket } from 'socket.io'; // Import types from Socket.IO
+import express from 'express'; // Import Express
 import http from 'http'; // Import Node.js HTTP module
+import { Server, Socket } from 'socket.io'; // Import types from Socket.IO
+import { PORT } from './utils/constants';
 
-// Create an HTTP server
-const server = http.createServer();
+const app = express()
+const server = http.createServer(); // Create an HTTP server
+
+// Middleware to parse JSON requests
+app.use(express.json());
+// Allows for CORS
+// const cors = require('cors');
+// app.use(cors())
 
 // Initialize the WebSocket server with CORS settings
 const io = new Server(server, {
@@ -12,37 +20,21 @@ const io = new Server(server, {
     },
 });
 
-// Define the structure of the data sent in 'move' events
-interface MoveData {
-    x: number;
-    y: number;
-    [key: string]: any; // Allow additional properties
-}
+// Creates the gameplay namespace that will handle all gameplay connections
+const gameNamespace = io.of("/gameplay")
 
-// Handle new connections
-io.on('connection', (socket: Socket) => {
-    console.log('A user connected:', socket.id);
+gameNamespace.on('connection', (socket) => {
+    console.log('A player connected to the gameplay namespace');
 
-    // Listen for 'move' events from the client
-    socket.on('move', (data: MoveData) => {
-        const newData = {
-            ...data,
-            userId: socket.id, // Attach the user ID
-        };
-        console.log('Move received:', newData);
+    // Join Game Room
+    socket.on('join-game', (gameId) => {
+        socket.join(gameId); // Creates room if doesn't exist
+        console.log(`Player joined game room: ${gameId}`);
+    })
+})
 
-        // Broadcast the event to all other clients
-        socket.broadcast.emit('update', newData);
-    });
-
-    // Handle disconnection
-    socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
-    });
-});
 
 // Start the HTTP server
-const PORT = 3002; // Port for the WebSocket server
 server.listen(PORT, () => {
     console.log(`WebSocket server running on http://localhost:${PORT}`);
 });
