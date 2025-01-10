@@ -1,18 +1,5 @@
-import { CurrentGames, Game, Player } from "./types";
-
-/* ----- GAME ----- */
-export function createGame(gameId: Game["id"]): Game {
-  return {
-    id: gameId,
-    players: [],
-    addPlayer(player: Player) {
-      this.players.push(player);
-    },
-    removePlayer(playerId: Player["id"]) {
-      this.players = this.players.filter((item) => item.id !== playerId);
-    },
-  };
-}
+import { ConGame } from "../CONGame/ConGame";
+import { CurrentGames, Player } from "./types";
 
 /* ----- PLAYER ----- */
 export function createPlayer(socketId: Player["id"], gameHost = false): Player {
@@ -28,7 +15,7 @@ export function createPlayer(socketId: Player["id"], gameHost = false): Player {
 
 export function getPlayer(
   currentGames: CurrentGames,
-  gameId: Game["id"],
+  gameId: ConGame["id"],
   playerId: Player["id"]
 ) {
   return currentGames[gameId].players.find((player) => player.id === playerId);

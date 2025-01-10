@@ -1,13 +1,8 @@
+import { ConGame } from "../CONGame/ConGame";
+
 export type gameId = string;
 export type CurrentGames = {
-  [key: gameId]: Game;
-};
-
-export type Game = {
-  id: gameId;
-  players: Player[];
-  addPlayer: (player: Player) => void;
-  removePlayer: (playerId: Player["id"]) => void;
+  [key: gameId]: ConGame;
 };
 
 export type Player = {

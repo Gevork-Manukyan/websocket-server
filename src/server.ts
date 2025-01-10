@@ -2,8 +2,9 @@ import express from 'express'; // Import Express
 import http from 'http'; // Import Node.js HTTP module
 import { Server } from 'socket.io'; // Import types from Socket.IO
 import { PORT } from './utils/constants';
-import { CurrentGames, Game } from './utils/types';
-import { createGame, createPlayer, getPlayer } from './utils/utilities';
+import { CurrentGames } from './utils/types';
+import { createPlayer, getPlayer } from './utils/utilities';
+import { ConGame } from './CONGame/ConGame';
 
 const app = express()
 const server = http.createServer(); // Create an HTTP server
@@ -31,11 +32,11 @@ const gameNamespace = io.of("/gameplay")
 gameNamespace.on('connection', (socket) => {
     console.log('A player connected to the gameplay namespace');
 
-    socket.on('join-game', (gameId: Game['id']) => {
+    socket.on('join-game', (gameId: ConGame['id']) => {
         let gameRoom = currentGames[gameId]
         // Create game if doesn't exist
         if (!gameRoom) {
-            gameRoom = createGame(gameId)
+            gameRoom = new ConGame(gameId)
             gameRoom.addPlayer(createPlayer(socket.id, true)) // Make first player to join the host
         } else {
             gameRoom.addPlayer(createPlayer(socket.id))
@@ -45,7 +46,7 @@ gameNamespace.on('connection', (socket) => {
         console.log(`Player joined game: ${gameId}`);
     })
 
-    socket.on("toggle-ready-status", (gameId: Game['id']) => {
+    socket.on("toggle-ready-status", (gameId: ConGame['id']) => {
         const currPlayer = getPlayer(currentGames, gameId, socket.id);
         if (!currPlayer) {
             throw new Error(`Player with socket ID ${socket.id} not found in game ${gameId}`);
@@ -53,7 +54,7 @@ gameNamespace.on('connection', (socket) => {
         currPlayer.toggleReady();
     })
 
-    socket.on("start-game", (gameId: Game['id']) => {
+    socket.on("start-game", (gameId: ConGame['id']) => {
         // Only host can start game
         if (!getPlayer(currentGames, gameId, socket.id)?.isGameHost) return;
 
@@ -63,7 +64,7 @@ gameNamespace.on('connection', (socket) => {
         // TODO: Start the game
     })
 
-    socket.on("leave-game", (gameId: Game['id']) => {
+    socket.on("leave-game", (gameId: ConGame['id']) => {
         const currPlayerId = socket.id;
         currentGames[gameId].removePlayer(currPlayerId);
 
