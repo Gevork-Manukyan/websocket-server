@@ -2,8 +2,8 @@ import express from 'express'; // Import Express
 import http from 'http'; // Import Node.js HTTP module
 import { Server } from 'socket.io'; // Import types from Socket.IO
 import { PORT } from './utils/constants';
-import { CurrentGames, gameId, Player } from './utils/types';
-import { createGame, createPlayer } from './utils/utilities';
+import { CurrentGames, Game } from './utils/types';
+import { createGame, createPlayer, getPlayer } from './utils/utilities';
 
 const app = express()
 const server = http.createServer(); // Create an HTTP server
@@ -31,7 +31,7 @@ const gameNamespace = io.of("/gameplay")
 gameNamespace.on('connection', (socket) => {
     console.log('A player connected to the gameplay namespace');
 
-    socket.on('join-game', (gameId: gameId) => {
+    socket.on('join-game', (gameId: Game['id']) => {
         // Create game if doesn't exist
         if (!currentGames[gameId]) currentGames[gameId] = createGame(gameId)
         
@@ -41,7 +41,19 @@ gameNamespace.on('connection', (socket) => {
         console.log(`Player joined game: ${gameId}`);
     })
 
-    socket.on("leave-game", (gameId: gameId) => {
+    socket.on("toggle-ready-status", (gameId: Game['id']) => {
+        const currPlayer = getPlayer(currentGames, gameId, socket.id)
+        if (!currPlayer) {
+            throw new Error(`Player with socket ID ${socket.id} not found in game ${gameId}`);
+        }
+        currPlayer.readyStatus = !currPlayer.readyStatus
+    })
+
+    socket.on("start-game", (gameId: Game['id']) => {
+
+    })
+
+    socket.on("leave-game", (gameId: Game['id']) => {
         // filter out the player leaving
         const currPlayerId = socket.id;
         const gameRoom = currentGames[gameId];

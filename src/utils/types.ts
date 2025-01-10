@@ -10,4 +10,5 @@ export type Game = {
 
 export type Player = {
     id: string; // socket id
+    readyStatus: boolean;
 }
