@@ -32,33 +32,40 @@ gameNamespace.on('connection', (socket) => {
     console.log('A player connected to the gameplay namespace');
 
     socket.on('join-game', (gameId: Game['id']) => {
+        let gameRoom = currentGames[gameId]
         // Create game if doesn't exist
-        if (!currentGames[gameId]) currentGames[gameId] = createGame(gameId)
+        if (!gameRoom) {
+            gameRoom = createGame(gameId)
+            gameRoom.addPlayer(createPlayer(socket.id, true)) // Make first player to join the host
+        } else {
+            gameRoom.addPlayer(createPlayer(socket.id))
+        }
         
-        // Add new player to the game
-        currentGames[gameId].players.push(createPlayer(socket.id))
         socket.join(gameId); // Creates room if doesn't exist
         console.log(`Player joined game: ${gameId}`);
     })
 
     socket.on("toggle-ready-status", (gameId: Game['id']) => {
-        const currPlayer = getPlayer(currentGames, gameId, socket.id)
+        const currPlayer = getPlayer(currentGames, gameId, socket.id);
         if (!currPlayer) {
             throw new Error(`Player with socket ID ${socket.id} not found in game ${gameId}`);
         }
-        currPlayer.readyStatus = !currPlayer.readyStatus
+        currPlayer.toggleReady();
     })
 
     socket.on("start-game", (gameId: Game['id']) => {
+        // Only host can start game
+        if (!getPlayer(currentGames, gameId, socket.id)?.isGameHost) return;
 
+        // All players must be ready
+        if (!currentGames[gameId].players.every(player => player.isReady)) return;
+
+        // TODO: Start the game
     })
 
     socket.on("leave-game", (gameId: Game['id']) => {
-        // filter out the player leaving
         const currPlayerId = socket.id;
-        const gameRoom = currentGames[gameId];
-        const newPlayerList = gameRoom.players.filter(player => player.id !== currPlayerId);
-        currentGames[gameId] = { ...gameRoom, players: newPlayerList }
+        currentGames[gameId].removePlayer(currPlayerId);
 
         socket.leave(gameId);
         console.log(`Player ${currPlayerId} left game ${gameId}`)
