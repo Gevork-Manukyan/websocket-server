@@ -1,17 +1,7 @@
 import { ConGame } from "../CONGame/ConGame";
-import { CurrentGames, Player } from "./types";
+import { Player } from "../CONGame/Player";
+import { CurrentGames } from "./types";
 
-/* ----- PLAYER ----- */
-export function createPlayer(socketId: Player["id"], gameHost = false): Player {
-  return {
-    id: socketId,
-    isReady: false,
-    isGameHost: gameHost,
-    toggleReady() {
-      this.isReady = !this.isReady;
-    },
-  };
-}
 
 export function getPlayer(
   currentGames: CurrentGames,

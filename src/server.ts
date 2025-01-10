@@ -3,8 +3,9 @@ import http from 'http'; // Import Node.js HTTP module
 import { Server } from 'socket.io'; // Import types from Socket.IO
 import { PORT } from './utils/constants';
 import { CurrentGames } from './utils/types';
-import { createPlayer, getPlayer } from './utils/utilities';
+import { getPlayer } from './utils/utilities';
 import { ConGame } from './CONGame/ConGame';
+import { Player } from './CONGame/Player';
 
 const app = express()
 const server = http.createServer(); // Create an HTTP server
@@ -34,12 +35,13 @@ gameNamespace.on('connection', (socket) => {
 
     socket.on('join-game', (gameId: ConGame['id']) => {
         let gameRoom = currentGames[gameId]
+
         // Create game if doesn't exist
         if (!gameRoom) {
             gameRoom = new ConGame(gameId)
-            gameRoom.addPlayer(createPlayer(socket.id, true)) // Make first player to join the host
+            gameRoom.addPlayer(new Player(socket.id, true)) // Make first player to join the host
         } else {
-            gameRoom.addPlayer(createPlayer(socket.id))
+            gameRoom.addPlayer(new Player(socket.id))
         }
         
         socket.join(gameId); // Creates room if doesn't exist
@@ -48,20 +50,17 @@ gameNamespace.on('connection', (socket) => {
 
     socket.on("toggle-ready-status", (gameId: ConGame['id']) => {
         const currPlayer = getPlayer(currentGames, gameId, socket.id);
-        if (!currPlayer) {
-            throw new Error(`Player with socket ID ${socket.id} not found in game ${gameId}`);
-        }
+        if (!currPlayer) throw new Error(`Player with socket ID ${socket.id} not found in game ${gameId}`);
         currPlayer.toggleReady();
+
+        console.log(`Player ${currPlayer.id} is ${currPlayer.isReady ? 'ready!' : 'not ready.'}`)
     })
 
     socket.on("start-game", (gameId: ConGame['id']) => {
-        // Only host can start game
-        if (!getPlayer(currentGames, gameId, socket.id)?.isGameHost) return;
-
-        // All players must be ready
-        if (!currentGames[gameId].players.every(player => player.isReady)) return;
-
-        // TODO: Start the game
+        const isStarted = currentGames[gameId].startGame(socket.id)
+        if (!isStarted) return;
+        
+        console.log(`Game ${gameId} started!`)
     })
 
     socket.on("leave-game", (gameId: ConGame['id']) => {
