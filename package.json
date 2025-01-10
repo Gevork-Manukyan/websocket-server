@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "prestart": "npm run build",
-    "dev": "ts-node server.ts",
+    "dev": "ts-node src/server.ts",
     "build": "tsc"
   },
   "keywords": [
