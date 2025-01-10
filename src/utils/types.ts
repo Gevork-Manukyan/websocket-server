@@ -4,9 +4,10 @@ export type CurrentGames = {
 }
 
 export type Game = {
+    id: gameId;
     players: Player[];
 }
 
 export type Player = {
-    id: string;
+    id: string; // socket id
 }

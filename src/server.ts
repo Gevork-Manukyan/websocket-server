@@ -3,6 +3,7 @@ import http from 'http'; // Import Node.js HTTP module
 import { Server } from 'socket.io'; // Import types from Socket.IO
 import { PORT } from './utils/constants';
 import { CurrentGames, gameId, Player } from './utils/types';
+import { createGame, createPlayer } from './utils/utilities';
 
 const app = express()
 const server = http.createServer(); // Create an HTTP server
@@ -31,14 +32,24 @@ gameNamespace.on('connection', (socket) => {
     console.log('A player connected to the gameplay namespace');
 
     socket.on('join-game', (gameId: gameId) => {
+        // Create game if doesn't exist
+        if (!currentGames[gameId]) currentGames[gameId] = createGame(gameId)
+        
+        // Add new player to the game
+        currentGames[gameId].players.push(createPlayer(socket.id))
         socket.join(gameId); // Creates room if doesn't exist
-        console.log(`Player joined game room: ${gameId}`);
+        console.log(`Player joined game: ${gameId}`);
     })
 
-    socket.on("leave-room", (gameId: gameId, playerId: Player["id"]) => {
-        const newPlayerList = currentGames[gameId].players.filter(player => player.id !== playerId);
-        currentGames[gameId] = { ...currentGames[gameId], players: newPlayerList }
+    socket.on("leave-game", (gameId: gameId) => {
+        // filter out the player leaving
+        const currPlayerId = socket.id;
+        const gameRoom = currentGames[gameId];
+        const newPlayerList = gameRoom.players.filter(player => player.id !== currPlayerId);
+        currentGames[gameId] = { ...gameRoom, players: newPlayerList }
+
         socket.leave(gameId);
+        console.log(`Player ${currPlayerId} left game ${gameId}`)
     })
 
     socket.on('disconnect', () => {
