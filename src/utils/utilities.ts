@@ -1,7 +1,6 @@
-import { ConGame } from "../CONGame/ConGame";
-import { Player } from "../CONGame/Player";
-import { CurrentGames } from "./types";
-
+import { ConGame } from "../models/ConGame";
+import { Player } from "../models/Player";
+import { CurrentGames } from "../types/types";
 
 export function getPlayer(
   currentGames: CurrentGames,
