@@ -3,7 +3,6 @@ import http from "http"; // Import Node.js HTTP module
 import { Server } from "socket.io"; // Import types from Socket.IO
 import { PORT } from "./utils/constants";
 import { CurrentGames } from "./types/types";
-import { getPlayer } from "./utils/utilities";
 import { ConGame } from "./models/ConGame";
 import { Player } from "./models/Player";
 import { Character } from "./types";
@@ -48,7 +47,7 @@ gameNamespace.on("connection", (socket) => {
   });
 
   socket.on("toggle-ready-status", (gameId: ConGame["id"]) => {
-    const currPlayer = getPlayer(currentGames, gameId, socket.id);
+    const currPlayer = currentGames[gameId].getPlayer(socket.id)
     if (!currPlayer)
       throw new Error(
         `Player with socket ID ${socket.id} not found in game ${gameId}`
@@ -64,7 +63,7 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on("select-character", (gameId: ConGame["id"], character: Character) => {
     const isCharacterChosen = currentGames[gameId].setPlayerCharacter(socket.id, character)
-    
+
   })
 
   socket.on("start-game", (gameId: ConGame["id"]) => {

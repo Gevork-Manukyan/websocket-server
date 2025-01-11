@@ -17,6 +17,7 @@ export class Player {
   }
 
   toggleReady() {
+    if (!this.characterClass) return;
     this.isReady = !this.isReady;
   }
 }
