@@ -1,6 +1,6 @@
 // Command of Nature (C.O.N)
 
-import { ElementalCard, gameId, ItemCard } from "../types/shared-types";
+import { Character, ElementalCard, gameId, ItemCard } from "../types/shared-types";
 import { Player } from "./Player";
 
 export class ConGame {
@@ -24,21 +24,6 @@ export class ConGame {
     this.players = this.players.filter((item) => item.id !== playerId);
   }
 
-  startGame(playerId: Player["id"]): boolean {
-    // Only host can start game
-    if (!this.getPlayer(playerId).isGameHost) return false;
-
-    // All players must be ready
-    if (!this.players.every((player) => player.isReady)) return false;
-
-    // TODO: initlize game
-    this.team1.push(this.players[0]);
-    this.team2.push(this.players[1]);
-
-    this.isStarted = true;
-    return true;
-  }
-
   getPlayer(playerId: Player["id"]): Player {
     const player = this.players.find((item) => item.id === playerId);
     if (!player)
@@ -47,4 +32,31 @@ export class ConGame {
       );
     return player;
   }
+
+  setPlayerCharacter(playerId: Player["id"], character: Character): Boolean {
+    const isCharacterAvailable = this.players.every(player => player.characterClass !== character)
+    if (!isCharacterAvailable) return false;
+
+    this.getPlayer(playerId).characterClass = character
+    return true;
+  }
+
+  startGame(playerId: Player["id"]): boolean {
+    // Only host can start game
+    if (!this.getPlayer(playerId).isGameHost) return false;
+
+    // All players must be ready
+    if (!this.players.every((player) => player.isReady)) return false;
+
+    // TODO: initlize game
+    this.initializeTeams()
+
+    this.isStarted = true;
+    return true;
+  }
+
+  initializeTeams() {
+    this.team1.push(this.players[0]);
+    this.team2.push(this.players[1]);
+  } 
 }

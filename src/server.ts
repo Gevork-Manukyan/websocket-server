@@ -6,6 +6,7 @@ import { CurrentGames } from "./types/types";
 import { getPlayer } from "./utils/utilities";
 import { ConGame } from "./models/ConGame";
 import { Player } from "./models/Player";
+import { Character } from "./types";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -60,6 +61,11 @@ gameNamespace.on("connection", (socket) => {
       }`
     );
   });
+
+  socket.on("select-character", (gameId: ConGame["id"], character: Character) => {
+    const isCharacterChosen = currentGames[gameId].setPlayerCharacter(socket.id, character)
+    
+  })
 
   socket.on("start-game", (gameId: ConGame["id"]) => {
     const isStarted = currentGames[gameId].startGame(socket.id);
