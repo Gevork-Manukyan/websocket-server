@@ -3,6 +3,8 @@ export type {
     gameId,
     Element,
     Character,
+} from "./shared-types";
+export type {
     Card,
     ElementalCard,
     ElementalWarriorCard,
@@ -12,4 +14,4 @@ export type {
     AttackCard,
     UtilityCard,
     InstantCard,
-} from "./shared-types";
+} from "./card-types"
