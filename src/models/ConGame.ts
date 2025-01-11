@@ -1,6 +1,6 @@
 // Command of Nature (C.O.N)
 
-import { Character, ElementalCard, gameId, ItemCard } from "../types/shared-types";
+import { Character, ElementalCard, gameId, ItemCard } from "../types";
 import { Player } from "./Player";
 
 export class ConGame {
@@ -49,13 +49,14 @@ export class ConGame {
     if (!this.players.every((player) => player.isReady)) return false;
 
     // TODO: initlize game
-    this.initializeTeams()
+
+    this.createTeams()
 
     this.isStarted = true;
     return true;
   }
 
-  initializeTeams() {
+  createTeams() {
     this.team1.push(this.players[0]);
     this.team2.push(this.players[1]);
   } 

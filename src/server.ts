@@ -2,7 +2,7 @@ import express from "express"; // Import Express
 import http from "http"; // Import Node.js HTTP module
 import { Server } from "socket.io"; // Import types from Socket.IO
 import { PORT } from "./utils/constants";
-import { CurrentGames } from "./types/types";
+import { CurrentGames } from "./types";
 import { ConGame } from "./models/ConGame";
 import { Player } from "./models/Player";
 import { Character } from "./types";
