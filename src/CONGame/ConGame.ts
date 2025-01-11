@@ -7,6 +7,8 @@ export class ConGame {
     id: gameId;
     isStarted: boolean = false;
     players: Player[] = [];
+    team1: Player[] = [];
+    team2: Player[] = [];
     creatureShop: ElementalCard[] = [];
     itemShop: ItemCard[] = [];
 
@@ -30,6 +32,8 @@ export class ConGame {
         if (!this.players.every(player => player.isReady)) return false;
 
         // TODO: initlize game
+        this.team1.push(this.players[0])
+        this.team2.push(this.players[1])
 
 
         this.isStarted = true;
