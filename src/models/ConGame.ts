@@ -1,8 +1,8 @@
 // Command of Nature (C.O.N)
 
-import { Character, ElementalCard, gameId, ItemCard } from "../types";
+import { Sage, ElementalCard, gameId, ItemCard } from "../types";
 import { DropletDeck, LeafDeck, PebbleDeck, TwigDeck } from "../utils/constants";
-import { getCharacterDecklist } from "../utils/utilities";
+import { getSageDecklist } from "../utils/utilities";
 import { Player } from "./Player";
 
 export class ConGame {
@@ -35,11 +35,11 @@ export class ConGame {
     return player;
   }
 
-  setPlayerCharacter(playerId: Player["id"], character: Character): Boolean {
-    const isCharacterAvailable = this.players.every(player => player.characterClass !== character)
-    if (!isCharacterAvailable) return false;
+  setPlayerSage(playerId: Player["id"], sage: Sage): Boolean {
+    const isSageAvailable = this.players.every(player => player.sage !== sage)
+    if (!isSageAvailable) return false;
 
-    this.getPlayer(playerId).characterClass = character
+    this.getPlayer(playerId).sage = sage
     return true;
   }
 
@@ -68,15 +68,14 @@ export class ConGame {
    * Adds basic and item cards to all players' decks
    */
   initPlayerDecks() {
-    this.players.forEach(player => {
-      if (!player.characterClass) throw new Error(`Player ${player.id} requires a character selection.`)
-        
-      const playerClassDecklist = getCharacterDecklist(player.characterClass)
+    this.players.forEach(player => {        
+      const playerClassDecklist = getSageDecklist(player.sage)
+      player.deckList = playerClassDecklist;
       player.addCardsToDeck([...playerClassDecklist.basics, ...playerClassDecklist.items])
     })
   }
 
   chooseWarriors() {
-
+    
   }
 }

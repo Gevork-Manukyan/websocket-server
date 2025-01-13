@@ -1,5 +1,5 @@
 export type { CurrentGames } from "./types";
-export type { gameId, Element, Sage as Character } from "./shared-types";
+export type { gameId, Element, Sage } from "./shared-types";
 export type {
   Card,
   ElementalCard,

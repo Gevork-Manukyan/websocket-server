@@ -1,8 +1,10 @@
-import { Character } from "../types";
+import { Sage } from "../types";
 import { DropletDeck, LeafDeck, PebbleDeck, TwigDeck } from "./constants";
 
-export function getCharacterDecklist(character: Character) {
-      switch (character) {
+export function getSageDecklist(sage: Sage | null) {
+  if (!sage) throw new Error(`No chosen character`)
+
+      switch (sage) {
         case "Cedar":
           return TwigDeck;
         case "Gravel": 
@@ -12,6 +14,6 @@ export function getCharacterDecklist(character: Character) {
         case "Torrent":
           return DropletDeck;
         default:
-          throw new Error(`Unknown character class: ${character}`);
+          throw new Error(`Unknown character class: ${sage}`);
       }
 }

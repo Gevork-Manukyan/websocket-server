@@ -1,10 +1,11 @@
-import { Card, Character } from "../types";
+import { Card, Sage } from "../types";
 
 export class Player {
   id: string;
   isReady: boolean = false;
   isGameHost: boolean;
-  characterClass: Character | null = null;
+  sage: Sage | null = null;
+  deckList = {};
   gold: number = 0;
   level: number = 1;
   hand: Card[] = [];
@@ -17,7 +18,7 @@ export class Player {
   }
 
   toggleReady() {
-    if (!this.characterClass) return;
+    if (!this.sage) return;
     this.isReady = !this.isReady;
   }
 

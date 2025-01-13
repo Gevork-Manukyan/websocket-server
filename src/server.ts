@@ -5,7 +5,8 @@ import { PORT } from "./utils/constants";
 import { CurrentGames } from "./types";
 import { ConGame } from "./models/ConGame";
 import { Player } from "./models/Player";
-import { Character } from "./types";
+import { Sage } from "./types";
+import { GameEventEmitter } from "./services";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -24,6 +25,8 @@ const io = new Server(server, {
   },
 });
 
+// Init Variables
+const gameEventEmitter = new GameEventEmitter(io)
 const currentGames: CurrentGames = {};
 
 // Creates the gameplay namespace that will handle all gameplay connections
@@ -61,16 +64,17 @@ gameNamespace.on("connection", (socket) => {
     );
   });
 
-  socket.on("select-character", (gameId: ConGame["id"], character: Character) => {
-    const isCharacterChosen = currentGames[gameId].setPlayerCharacter(socket.id, character)
+  socket.on("select-character", (gameId: ConGame["id"], sage: Sage) => {
+    const isSageChosen = currentGames[gameId].setPlayerSage(socket.id, sage)
 
   })
 
   socket.on("start-game", (gameId: ConGame["id"]) => {
-    const isStarted = currentGames[gameId].startGame(socket.id);
-    if (!isStarted) return;
-
+    const gameRoom = currentGames[gameId];
+    const isStarted = gameRoom.startGame(socket.id);
     
+    if (!isStarted) return;
+    gameEventEmitter.emitPickWarriors(gameRoom.players)
 
     console.log(`Game ${gameId} started!`);
   });
