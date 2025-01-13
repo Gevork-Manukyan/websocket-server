@@ -38,4 +38,4 @@ export type AttackCard = ItemCard;
 
 export type UtilityCard = ItemCard;
 
-export type InstantCard = ItemCard;
+export type InstantCard = Omit<ItemCard, "rowRequirement">;

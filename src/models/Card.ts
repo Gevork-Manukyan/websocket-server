@@ -1,5 +1,5 @@
 import { ElementalCard, ElementalSage } from "../types";
-import { AttackCard, ElementalChampion, ElementalWarriorCard, StarterCard } from "../types/card-types";
+import { AttackCard, ElementalChampion, ElementalWarriorCard, InstantCard, StarterCard } from "../types/card-types";
 
 
 // ------------ SAGES ------------
@@ -797,6 +797,60 @@ export const ReinforcedImpact: AttackCard = {
 }
 
 // ------------ INSTANTS ------------
+export const DropletCharm: InstantCard & StarterCard = {
+    name: "Droplet Charm",
+    img: "",
+    price: 1,
+    ability: undefined,
+}
 
+export const LeafCharm: InstantCard & StarterCard = {
+    name: "Leaf Charm",
+    img: "",
+    price: 1,
+    ability: undefined,
+}
+
+export const PebbleCharm: InstantCard & StarterCard = {
+    name: "Pebble Charm",
+    img: "",
+    price: 1,
+    ability: undefined,
+}
+
+export const TwigCharm: InstantCard & StarterCard = {
+    name: "Twig Charm",
+    img: "",
+    price: 1,
+    ability: undefined,
+}
+
+export const NaturalRestoration: InstantCard & StarterCard = {
+    name: "Natural Restoration",
+    img: "",
+    price: 1,
+    ability: undefined,
+}
+
+export const MeleeShield: InstantCard = {
+    name: "Melee Shield",
+    img: "",
+    price: 3,
+    ability: undefined,
+}
+
+export const NaturalDefense: InstantCard = {
+    name: "Natural Defense",
+    img: "",
+    price: 3,
+    ability: undefined,
+}
+
+export const RangedBarrier: InstantCard = {
+    name: "Ranged Barrier",
+    img: "",
+    price: 3,
+    ability: undefined,
+}
 
 // ------------ UTILITIES ------------
