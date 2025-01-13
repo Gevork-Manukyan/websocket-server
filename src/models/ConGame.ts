@@ -50,7 +50,8 @@ export class ConGame {
 
     // TODO: initlize game
 
-    this.createTeams()
+    this.initPlayerDeck();
+    this.createTeams();
 
     this.isStarted = true;
     return true;
@@ -60,4 +61,8 @@ export class ConGame {
     this.team1.push(this.players[0]);
     this.team2.push(this.players[1]);
   } 
+
+  initPlayerDeck() {
+    
+  }
 }
