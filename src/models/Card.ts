@@ -1,8 +1,8 @@
 import { ElementalCard, ElementalSage } from "../types";
-import { StarterCard } from "../types/card-types";
+import { ElementalChampion, StarterCard } from "../types/card-types";
 
 
-// ------ SAGES ------
+// ------------ SAGES ------------
 export const Cedar: ElementalSage = {
     name: "Cedar",
     sage: "Cedar",
@@ -51,11 +51,158 @@ export const Torrent: ElementalSage = {
     rowRequirement: [1, 2, 3],
 }
 
-// ------ CHAMPIONS ------
+// ------------ CHAMPIONS ------------
+// *** Twigs ***
+export const VixVanguard: ElementalChampion = {
+    name: "Vix Vanguard",
+    price: 1,
+    img: "",
+    element: "twig",
+    attack: 3,
+    health: 6,
+    ability: undefined,
+    rowRequirement: [1],
+    levelRequirement: 4
+}
+
+export const HornedHollow: ElementalChampion = {
+    name: "Horned Hollow",
+    price: 1,
+    img: "",
+    element: "twig",
+    attack: 6,
+    health: 4,
+    ability: undefined,
+    rowRequirement: [1, 2],
+    levelRequirement: 6
+}
+
+export const CalamityLeopard: ElementalChampion = {
+    name: "Calamity Leopard",
+    price: 1,
+    img: "",
+    element: "twig",
+    attack: 3,
+    health: 8,
+    ability: undefined,
+    rowRequirement: [1, 2],
+    levelRequirement: 8
+}
+
+// *** Pebbles ***
+export const JadeTitan: ElementalChampion = {
+    name: "Jade Titan",
+    price: 1,
+    img: "",
+    element: "pebble",
+    attack: 3,
+    health: 5,
+    ability: undefined,
+    rowRequirement: [1],
+    levelRequirement: 4
+}
+
+export const BoulderhideBrute: ElementalChampion = {
+    name: "Boulderhide Brute",
+    price: 1,
+    img: "",
+    element: "pebble",
+    attack: 6,
+    health: 6,
+    ability: undefined,
+    rowRequirement: [1, 2],
+    levelRequirement: 6
+}
+
+export const OxenAvenger: ElementalChampion = {
+    name: "Oxen Avenger",
+    price: 1,
+    img: "",
+    element: "pebble",
+    attack: 8,
+    health: 7,
+    ability: undefined,
+    rowRequirement: [1, 2],
+    levelRequirement: 8
+}
+
+// *** Leafs ***
+export const AgileAssailant: ElementalChampion = {
+    name: "Agile Assailant",
+    price: 1,
+    img: "",
+    element: "leaf",
+    attack: 3,
+    health: 5,
+    ability: undefined,
+    rowRequirement: [2],
+    levelRequirement: 4
+}
+
+export const BobBlight: ElementalChampion = {
+    name: "Bob Blight",
+    price: 1,
+    img: "",
+    element: "leaf",
+    attack: 4,
+    health: 5,
+    ability: undefined,
+    rowRequirement: [1],
+    levelRequirement: 6
+}
+
+export const KomodoKin: ElementalChampion = {
+    name: "Komodo Kin",
+    price: 1,
+    img: "",
+    element: "leaf",
+    attack: 8,
+    health: 6,
+    ability: undefined,
+    rowRequirement: [1, 2],
+    levelRequirement: 8
+}
+
+// *** Droplets ***
+export const TideTurner: ElementalChampion = {
+    name: "Tide Turner",
+    price: 1,
+    img: "",
+    element: "droplet",
+    attack: 4,
+    health: 4,
+    ability: undefined,
+    rowRequirement: [1, 2],
+    levelRequirement: 4
+}
+
+export const KingCrustacean: ElementalChampion = {
+    name: "King Crustacean",
+    price: 1,
+    img: "",
+    element: "droplet",
+    attack: 3,
+    health: 7,
+    ability: undefined,
+    rowRequirement: [1, 2],
+    levelRequirement: 6
+}
+
+export const FrostfallEmperor: ElementalChampion = {
+    name: "Frostfall Emperor",
+    price: 1,
+    img: "",
+    element: "droplet",
+    attack: 2,
+    health: 12,
+    ability: undefined,
+    rowRequirement: [1],
+    levelRequirement: 8
+}
 
 
-// ------ BASICS ------
-// Twigs
+// ------------ BASICS ------------
+// *** Twigs ***
 export const Timber: ElementalCard & StarterCard = {
     name: "Timber",
     price: 1,
@@ -83,7 +230,7 @@ export const Willow: ElementalCard = {
     health: 3,
 }
 
-// Pebbles
+// *** Pebbles ***
 export const Cobble: ElementalCard & StarterCard = {
     name: "Cobble",
     price: 1,
@@ -111,7 +258,7 @@ export const Rocco: ElementalCard = {
     health: 3,
 }
 
-// Leafs
+// *** Leafs ***
 export const Sprout: ElementalCard & StarterCard = {
     name: "Sprout",
     price: 1,
@@ -139,9 +286,7 @@ export const Mush: ElementalCard = {
     health: 3,
 }
 
-
-
-// Droplets
+// *** Droplets ***
 export const Dribble: ElementalCard & StarterCard = {
     name: "Dribble",
     price: 1,
@@ -169,13 +314,16 @@ export const Wade: ElementalCard = {
     health: 3,
 }
 
-// ------ WARRIORS ------
+// ------------ WARRIORS ------------
+// *** Twigs ***
+// *** Pebbles ***
+// *** Leafs ***
+// *** Droplets ***
+
+// ------------ ATTACKS ------------
 
 
-// ------ ATTACKS ------
+// ------------ INSTANTS ------------
 
 
-// ------ INSTANTS ------
-
-
-// ------ UTILITIES ------
+// ------------ UTILITIES ------------
