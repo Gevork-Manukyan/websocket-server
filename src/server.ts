@@ -64,7 +64,7 @@ gameNamespace.on("connection", (socket) => {
     );
   });
 
-  socket.on("select-character", (gameId: ConGame["id"], sage: Sage) => {
+  socket.on("select-sage", (gameId: ConGame["id"], sage: Sage) => {
     const isSageChosen = currentGames[gameId].setPlayerSage(socket.id, sage)
 
   })
@@ -78,6 +78,10 @@ gameNamespace.on("connection", (socket) => {
 
     console.log(`Game ${gameId} started!`);
   });
+
+  socket.on("chose-warriors", (gameId: ConGame['id'], choice) => {
+    //TODO: decide how to recieve choices
+  })
 
   socket.on("leave-game", (gameId: ConGame["id"]) => {
     const currPlayerId = socket.id;

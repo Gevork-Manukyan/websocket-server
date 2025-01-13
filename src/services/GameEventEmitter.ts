@@ -1,6 +1,5 @@
 import { Server } from "socket.io";
 import { Player } from "../models";
-import { getSageDecklist } from "../utils/utilities";
 
 export class GameEventEmitter {
     private io: Server;

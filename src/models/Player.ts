@@ -5,7 +5,7 @@ export class Player {
   isReady: boolean = false;
   isGameHost: boolean;
   sage: Sage | null = null;
-  deckList = {};
+  deckList = {}; // TODO: Define Decklist type
   gold: number = 0;
   level: number = 1;
   hand: Card[] = [];
