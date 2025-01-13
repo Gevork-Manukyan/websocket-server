@@ -36,6 +36,6 @@ export type ItemCard = Card & AbilityCard;
 
 export type AttackCard = ItemCard;
 
-export type UtilityCard = ItemCard;
+export type UtilityCard = Omit<ItemCard, "rowRequirement">;
 
 export type InstantCard = Omit<ItemCard, "rowRequirement">;

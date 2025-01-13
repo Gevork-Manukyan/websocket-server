@@ -1,5 +1,5 @@
 import { ElementalCard, ElementalSage } from "../types";
-import { AttackCard, ElementalChampion, ElementalWarriorCard, InstantCard, StarterCard } from "../types/card-types";
+import { AttackCard, ElementalChampion, ElementalWarriorCard, InstantCard, StarterCard, UtilityCard } from "../types/card-types";
 
 
 // ------------ SAGES ------------
@@ -854,3 +854,30 @@ export const RangedBarrier: InstantCard = {
 }
 
 // ------------ UTILITIES ------------
+export const ElementalIncantation: UtilityCard = {
+    name: "Elemental Incantation",
+    img: "",
+    price: 5,
+    ability: undefined,
+}
+
+export const ElementalSwap: UtilityCard = {
+    name: "Elemental Swap",
+    img: "",
+    price: 2,
+    ability: undefined,
+}
+
+export const ExchangeOfNature: UtilityCard = {
+    name: "Exchange of Nature",
+    img: "",
+    price: 2,
+    ability: undefined,
+}
+
+export const Obliterate: UtilityCard = {
+    name: "Obliterate",
+    img: "",
+    price: 5,
+    ability: undefined,
+}
