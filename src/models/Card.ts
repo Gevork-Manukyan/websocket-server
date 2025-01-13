@@ -1,5 +1,5 @@
 import { ElementalCard, ElementalSage } from "../types";
-import { ElementalChampion, ElementalWarriorCard, StarterCard } from "../types/card-types";
+import { AttackCard, ElementalChampion, ElementalWarriorCard, StarterCard } from "../types/card-types";
 
 
 // ------------ SAGES ------------
@@ -716,7 +716,85 @@ export const WhirlWhipper: ElementalWarriorCard = {
 }
 
 // ------------ ATTACKS ------------
+export const CloseStrike: AttackCard & StarterCard = {
+    name: "Close Strike",
+    img: "",
+    price: 1,
+    ability: undefined,
+    rowRequirement: [1]
+}
 
+export const FarStrike: AttackCard & StarterCard = {
+    name: "Far Strike",
+    img: "",
+    price: 1,
+    ability: undefined,
+    rowRequirement: [1, 2]
+}
+
+export const DistantDoubleStrike: AttackCard = {
+    name: "Distant Double Strike",
+    img: "",
+    price: 3,
+    ability: undefined,
+    rowRequirement: [1, 2]
+}
+
+export const FarsightFrenzy: AttackCard = {
+    name: "Farsight Frenzy",
+    img: "",
+    price: 3,
+    ability: undefined,
+    rowRequirement: [1, 2, 3]
+}
+
+export const FocusedFury: AttackCard = {
+    name: "Focused Fury",
+    img: "",
+    price: 2,
+    ability: undefined,
+    rowRequirement: [1]
+}
+
+export const MagicEtherStrike: AttackCard = {
+    name: "Magic Ether Strike",
+    img: "",
+    price: 5,
+    ability: undefined,
+    rowRequirement: [1]
+}
+
+export const NaturesWrath: AttackCard = {
+    name: "Nature's Wrath",
+    img: "",
+    price: 2,
+    ability: undefined,
+    rowRequirement: [1]
+}
+
+export const PrimitiveStrike: AttackCard = {
+    name: "Primitive Strike",
+    img: "",
+    price: 3,
+    ability: undefined,
+    rowRequirement: [1, 2]
+}
+
+export const ProjectileBlast: AttackCard = {
+    name: "Projectile Blast",
+    img: "",
+    price: 2,
+    ability: undefined,
+    rowRequirement: [1, 2]
+}
+
+export const ReinforcedImpact: AttackCard = {
+    name: "Reinforced Impact",
+    img: "",
+    price: 2,
+    ability: undefined,
+    rowRequirement: [1]
+}
 
 // ------------ INSTANTS ------------
 

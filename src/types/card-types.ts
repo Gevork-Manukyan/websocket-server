@@ -10,16 +10,18 @@ export type StarterCard = {
     price: 1;
 }
 
+export type AbilityCard = {
+  ability: undefined;
+  rowRequirement: (1 | 2 | 3)[];
+}
+
 export type ElementalCard = Card & {
   element: Element;
   attack: number;
   health: number;
 };
 
-export type ElementalWarriorCard = ElementalCard & {
-  ability: undefined;
-  rowRequirement: (1 | 2 | 3)[];
-};
+export type ElementalWarriorCard = ElementalCard & AbilityCard;
 
 export type ElementalChampion = ElementalWarriorCard & StarterCard & {
   levelRequirement: 4 | 6 | 8;
@@ -30,7 +32,7 @@ export type ElementalSage = ElementalCard &
     sage: Sage;
   };
 
-export type ItemCard = Card;
+export type ItemCard = Card & AbilityCard;
 
 export type AttackCard = ItemCard;
 
