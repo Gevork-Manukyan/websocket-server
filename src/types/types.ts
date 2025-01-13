@@ -1,6 +1,10 @@
 import { ConGame } from "../models/ConGame";
-import { gameId } from "./shared-types";
 
 export type CurrentGames = {
   [key: gameId]: ConGame;
 };
+
+export type gameId = string;
+
+export type Element = "twig" | "pebble" | "leaf" | "droplet";
+export type Sage = "Cedar" | "Gravel" | "Porella" | "Torrent";

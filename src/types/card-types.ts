@@ -1,4 +1,4 @@
-import { Element, Sage } from "./shared-types";
+import { Element, Sage } from "./types";
 
 export type Card = {
   name: string;
