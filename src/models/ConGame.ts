@@ -1,6 +1,8 @@
 // Command of Nature (C.O.N)
 
 import { Character, ElementalCard, gameId, ItemCard } from "../types";
+import { DropletDeck, LeafDeck, PebbleDeck, TwigDeck } from "../utils/constants";
+import { getCharacterDecklist } from "../utils/utilities";
 import { Player } from "./Player";
 
 export class ConGame {
@@ -50,8 +52,8 @@ export class ConGame {
 
     // TODO: initlize game
 
-    this.initPlayerDeck();
     this.createTeams();
+    this.initPlayerDecks();
 
     this.isStarted = true;
     return true;
@@ -62,7 +64,19 @@ export class ConGame {
     this.team2.push(this.players[1]);
   } 
 
-  initPlayerDeck() {
-    
+  /**
+   * Adds basic and item cards to all players' decks
+   */
+  initPlayerDecks() {
+    this.players.forEach(player => {
+      if (!player.characterClass) throw new Error(`Player ${player.id} requires a character selection.`)
+        
+      const playerClassDecklist = getCharacterDecklist(player.characterClass)
+      player.addCardsToDeck([...playerClassDecklist.basics, ...playerClassDecklist.items])
+    })
+  }
+
+  chooseWarriors() {
+
   }
 }

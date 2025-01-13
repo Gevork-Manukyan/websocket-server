@@ -70,6 +70,8 @@ gameNamespace.on("connection", (socket) => {
     const isStarted = currentGames[gameId].startGame(socket.id);
     if (!isStarted) return;
 
+    
+
     console.log(`Game ${gameId} started!`);
   });
 

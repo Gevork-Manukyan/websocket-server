@@ -20,4 +20,12 @@ export class Player {
     if (!this.characterClass) return;
     this.isReady = !this.isReady;
   }
+
+  addCardToDeck(card: Card) {
+    this.deck.push(card)
+  }
+
+  addCardsToDeck(cards: Card[]) {
+    this.deck = this.deck.concat(cards)
+  }
 }
