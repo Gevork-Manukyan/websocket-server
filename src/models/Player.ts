@@ -1,11 +1,12 @@
 import { Card, Sage } from "../types";
+import { Decklist } from "../types/types";
 
 export class Player {
   id: string;
   isReady: boolean = false;
   isGameHost: boolean;
   sage: Sage | null = null;
-  deckList = {}; // TODO: Define Decklist type
+  deckList: Decklist | null = null;
   gold: number = 0;
   level: number = 1;
   hand: Card[] = [];

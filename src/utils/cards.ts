@@ -1,5 +1,5 @@
-import { ElementalCard, ElementalSage } from "../../types";
-import { AttackCard, ElementalChampion, ElementalWarriorCard, InstantCard, StarterCard, UtilityCard } from "../../types/card-types";
+import { ElementalCard, ElementalSage } from "../types";
+import { AttackCard, ElementalChampion, ElementalWarriorCard, InstantCard, StarterCard, UtilityCard } from "../types";
 
 
 // ------------ SAGES ------------
