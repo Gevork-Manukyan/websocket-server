@@ -2,7 +2,7 @@ import express from "express"; // Import Express
 import http from "http"; // Import Node.js HTTP module
 import { Server } from "socket.io"; // Import types from Socket.IO
 import { PORT } from "./utils/constants";
-import { CurrentGames } from "./types";
+import { CurrentGames, ElementalWarriorCard } from "./types";
 import { ConGame } from "./models/ConGame";
 import { Player } from "./models/Player";
 import { Sage } from "./types";
@@ -79,8 +79,19 @@ gameNamespace.on("connection", (socket) => {
     console.log(`Game ${gameId} started!`);
   });
 
-  socket.on("chose-warriors", (gameId: ConGame['id'], choice) => {
-    //TODO: decide how to recieve choices
+  socket.on("chose-warriors", (gameId: ConGame['id'], choices: [ElementalWarriorCard, ElementalWarriorCard]) => {
+    currentGames[gameId].getPlayer(socket.id).chooseWarriors(choices);
+    
+    // TODO: Emit to player to choose battlefield layout
+  })
+
+  socket.on("finished-setup", (gameId: ConGame['id']) => {
+    const gameRoom = currentGames[gameId];
+    gameRoom.numPlayersFinishedSetup++;
+
+    if (gameRoom.numPlayersFinishedSetup === gameRoom.players.length)
+      // TODO: Go to choosing who is first and emit to players who is first
+      return;
   })
 
   socket.on("leave-game", (gameId: ConGame["id"]) => {

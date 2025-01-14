@@ -8,6 +8,8 @@ import { Player } from "./Player";
 export class ConGame {
   id: gameId;
   isStarted: boolean = false;
+  numPlayersReady: number = 0;
+  numPlayersFinishedSetup: number = 0;
   players: Player[] = [];
   team1: Player[] = [];
   team2: Player[] = [];

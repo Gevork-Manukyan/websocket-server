@@ -17,9 +17,13 @@ export class GameEventEmitter {
     }
   
     emitPickWarriors(players: Player[]) {
-        players.forEach(player => {
-            this.emitToPlayer(player.id, "pick-warriors", player.deckList);
-        })
+      players.forEach(player => {
+        this.emitToPlayer(player.id, "pick-warriors", player.deckList);
+      })
+    }
+
+    emitArrangeBattlefield() {
+      // TODO: takes in players current battlefield and emits to player
     }
   }
   

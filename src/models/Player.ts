@@ -1,4 +1,4 @@
-import { Card, Sage } from "../types";
+import { Card, ElementalWarriorCard, Sage } from "../types";
 import { Decklist } from "../types/types";
 
 export class Player {
@@ -29,5 +29,15 @@ export class Player {
 
   addCardsToDeck(cards: Card[]) {
     this.deck = this.deck.concat(cards)
+  }
+
+  chooseWarriors([choice1, choice2]: [ElementalWarriorCard, ElementalWarriorCard]) {
+    // Add the non-chosen card to the deck
+    this.deckList?.warriors.forEach(card => {
+      if ((card.name !== choice1.name) || (card.name !== choice2.name))
+        this.addCardToDeck(card);
+    })
+
+    //TODO: add other two cards to the battlefield
   }
 }
