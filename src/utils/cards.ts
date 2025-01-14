@@ -1,5 +1,6 @@
 import { ElementalCard, ElementalSage } from "../types";
 import { AttackCard, ElementalChampion, ElementalWarriorCard, InstantCard, StarterCard, UtilityCard } from "../types";
+import { AttackStarterCard, ElementalStarterCard, ElementalWarriorStarterCard, InstantStarterCard } from "../types/card-types";
 
 
 // ------------ SAGES ------------
@@ -203,7 +204,7 @@ export const FrostfallEmperor: ElementalChampion = {
 
 // ------------ BASICS ------------
 // *** Twigs ***
-export const Timber: ElementalCard & StarterCard = {
+export const Timber: ElementalStarterCard = {
     name: "Timber",
     price: 1,
     element: "twig",
@@ -231,7 +232,7 @@ export const Willow: ElementalCard = {
 }
 
 // *** Pebbles ***
-export const Cobble: ElementalCard & StarterCard = {
+export const Cobble: ElementalStarterCard = {
     name: "Cobble",
     price: 1,
     element: "pebble",
@@ -259,7 +260,7 @@ export const Rocco: ElementalCard = {
 }
 
 // *** Leafs ***
-export const Sprout: ElementalCard & StarterCard = {
+export const Sprout: ElementalStarterCard = {
     name: "Sprout",
     price: 1,
     element: "leaf",
@@ -287,7 +288,7 @@ export const Mush: ElementalCard = {
 }
 
 // *** Droplets ***
-export const Dribble: ElementalCard & StarterCard = {
+export const Dribble: ElementalStarterCard = {
     name: "Dribble",
     price: 1,
     element: "droplet",
@@ -316,7 +317,7 @@ export const Wade: ElementalCard = {
 
 // ------------ WARRIORS ------------
 // *** Twigs ***
-export const AcornSquire: ElementalWarriorCard & StarterCard = {
+export const AcornSquire: ElementalWarriorStarterCard = {
     name: "Acorn Squire",
     img: "",
     price: 1,
@@ -327,7 +328,7 @@ export const AcornSquire: ElementalWarriorCard & StarterCard = {
     rowRequirement: [1, 2]
 }
 
-export const QuillThornback: ElementalWarriorCard & StarterCard = {
+export const QuillThornback: ElementalWarriorStarterCard = {
     name: "Quill Thornback",
     img: "",
     price: 1,
@@ -338,7 +339,7 @@ export const QuillThornback: ElementalWarriorCard & StarterCard = {
     rowRequirement: [1]
 }
 
-export const SlumberJack: ElementalWarriorCard & StarterCard = {
+export const SlumberJack: ElementalWarriorStarterCard = {
     name: "Slumber Jack",
     img: "",
     price: 1,
@@ -416,7 +417,7 @@ export const OakLumbertron: ElementalWarriorCard = {
 }
 
 // *** Pebbles ***
-export const GeoWeasel: ElementalWarriorCard & StarterCard = {
+export const GeoWeasel: ElementalWarriorStarterCard = {
     name: "Geo Weasel",
     img: "",
     price: 1,
@@ -427,7 +428,7 @@ export const GeoWeasel: ElementalWarriorCard & StarterCard = {
     rowRequirement: [1]
 }
 
-export const GraniteRampart: ElementalWarriorCard & StarterCard = {
+export const GraniteRampart: ElementalWarriorStarterCard = {
     name: "Granite Rampart",
     img: "",
     price: 1,
@@ -438,7 +439,7 @@ export const GraniteRampart: ElementalWarriorCard & StarterCard = {
     rowRequirement: [1, 2]
 }
 
-export const OnyxBearer: ElementalWarriorCard & StarterCard = {
+export const OnyxBearer: ElementalWarriorStarterCard = {
     name: "Onyx Bearer",
     img: "",
     price: 1,
@@ -516,7 +517,7 @@ export const TerrainTumbler: ElementalWarriorCard = {
 }
   
 // *** Leafs ***
-export const BotanicFangs: ElementalWarriorCard & StarterCard = {
+export const BotanicFangs: ElementalWarriorStarterCard = {
     name: "Botanic Fangs",
     img: "",
     price: 1,
@@ -527,7 +528,7 @@ export const BotanicFangs: ElementalWarriorCard & StarterCard = {
     rowRequirement: [1, 2]
 }
 
-export const PetalMage: ElementalWarriorCard & StarterCard = {
+export const PetalMage: ElementalWarriorStarterCard = {
     name: "Petal Mage",
     img: "",
     price: 1,
@@ -538,7 +539,7 @@ export const PetalMage: ElementalWarriorCard & StarterCard = {
     rowRequirement: [2]
 }
 
-export const ThornFencer: ElementalWarriorCard & StarterCard = {
+export const ThornFencer: ElementalWarriorStarterCard = {
     name: "Thorn Fencer",
     img: "",
     price: 1,
@@ -616,7 +617,7 @@ export const ShrubBeetle: ElementalWarriorCard = {
 }
 
 // *** Droplets ***
-export const CoastalCoyote: ElementalWarriorCard & StarterCard = {
+export const CoastalCoyote: ElementalWarriorStarterCard = {
     name: "Coastal Coyote",
     img: "",
     price: 1,
@@ -627,7 +628,7 @@ export const CoastalCoyote: ElementalWarriorCard & StarterCard = {
     rowRequirement: [1, 2]
 }
 
-export const RiptideTiger: ElementalWarriorCard & StarterCard = {
+export const RiptideTiger: ElementalWarriorStarterCard = {
     name: "Riptide Tiger",
     img: "",
     price: 1,
@@ -638,7 +639,7 @@ export const RiptideTiger: ElementalWarriorCard & StarterCard = {
     rowRequirement: [1]
 }
 
-export const RiverRogue: ElementalWarriorCard & StarterCard = {
+export const RiverRogue: ElementalWarriorStarterCard = {
     name: "River Rogue",
     img: "",
     price: 1,
@@ -716,7 +717,7 @@ export const WhirlWhipper: ElementalWarriorCard = {
 }
 
 // ------------ ATTACKS ------------
-export const CloseStrike: AttackCard & StarterCard = {
+export const CloseStrike: AttackStarterCard = {
     name: "Close Strike",
     img: "",
     price: 1,
@@ -724,7 +725,7 @@ export const CloseStrike: AttackCard & StarterCard = {
     rowRequirement: [1]
 }
 
-export const FarStrike: AttackCard & StarterCard = {
+export const FarStrike: AttackStarterCard = {
     name: "Far Strike",
     img: "",
     price: 1,
@@ -797,35 +798,35 @@ export const ReinforcedImpact: AttackCard = {
 }
 
 // ------------ INSTANTS ------------
-export const DropletCharm: InstantCard & StarterCard = {
+export const DropletCharm: InstantStarterCard = {
     name: "Droplet Charm",
     img: "",
     price: 1,
     ability: undefined,
 }
 
-export const LeafCharm: InstantCard & StarterCard = {
+export const LeafCharm: InstantStarterCard = {
     name: "Leaf Charm",
     img: "",
     price: 1,
     ability: undefined,
 }
 
-export const PebbleCharm: InstantCard & StarterCard = {
+export const PebbleCharm: InstantStarterCard = {
     name: "Pebble Charm",
     img: "",
     price: 1,
     ability: undefined,
 }
 
-export const TwigCharm: InstantCard & StarterCard = {
+export const TwigCharm: InstantStarterCard = {
     name: "Twig Charm",
     img: "",
     price: 1,
     ability: undefined,
 }
 
-export const NaturalRestoration: InstantCard & StarterCard = {
+export const NaturalRestoration: InstantStarterCard = {
     name: "Natural Restoration",
     img: "",
     price: 1,

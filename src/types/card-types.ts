@@ -21,7 +21,11 @@ export type ElementalCard = Card & {
   health: number;
 };
 
+export type ElementalStarterCard = ElementalCard & StarterCard;
+
 export type ElementalWarriorCard = ElementalCard & AbilityCard;
+
+export type ElementalWarriorStarterCard = ElementalWarriorCard & StarterCard;
 
 export type ElementalChampion = ElementalWarriorCard & StarterCard & {
   levelRequirement: 4 | 6 | 8;
@@ -32,10 +36,14 @@ export type ElementalSage = ElementalCard &
     sage: Sage;
   };
 
-export type ItemCard = Card & AbilityCard;
+export type ItemCard = Card & Omit<AbilityCard, "rowRequirement">;
 
-export type AttackCard = ItemCard;
+export type AttackCard = Card & AbilityCard;
 
-export type UtilityCard = Omit<ItemCard, "rowRequirement">;
+export type AttackStarterCard = AttackCard & StarterCard;
 
-export type InstantCard = Omit<ItemCard, "rowRequirement">;
+export type UtilityCard = ItemCard;
+
+export type InstantCard = ItemCard;
+
+export type InstantStarterCard = InstantCard & StarterCard;

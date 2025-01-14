@@ -17,6 +17,6 @@ export type Decklist = {
     level8: ElementalChampion;
   },
   warriors: ElementalWarriorCard[];
-  basics: ElementalCard;
+  basics: ElementalCard[];
   items: ItemCard[];
 }

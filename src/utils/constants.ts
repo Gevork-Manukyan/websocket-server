@@ -1,9 +1,11 @@
+import { ElementalStarterCard } from "../types/card-types";
+import { Decklist } from "../types/types";
 import { AcornSquire, CalamityLeopard, Cedar, HornedHollow, QuillThornback, SlumberJack, Timber, VixVanguard } from "./";
 import { AgileAssailant, BobBlight, BotanicFangs, BoulderhideBrute, CloseStrike, CoastalCoyote, Cobble, Dribble, DropletCharm, FarStrike, FrostfallEmperor, GeoWeasel, GraniteRampart, Gravel, JadeTitan, KingCrustacean, KomodoKin, LeafCharm, NaturalRestoration, OnyxBearer, OxenAvenger, PebbleCharm, PetalMage, Porella, RiptideTiger, RiverRogue, Sprout, ThornFencer, TideTurner, Torrent, TwigCharm } from "./cards";
 
 export const PORT = 3002; // Port for the WebSocket server
 
-export const TwigDeck = {
+export const TwigDeck: Decklist = {
     sage: Cedar,
     champions: {
         level4: VixVanguard,
@@ -11,11 +13,11 @@ export const TwigDeck = {
         level8: CalamityLeopard,
     },
     warriors: [AcornSquire, QuillThornback, SlumberJack],
-    basics: Array(4).fill(Timber),
+    basics: Array<ElementalStarterCard>(4).fill(Timber),
     items: [CloseStrike, CloseStrike, FarStrike, NaturalRestoration, TwigCharm]
 }
 
-export const PebbleDeck = {
+export const PebbleDeck: Decklist = {
     sage: Gravel,
     champions: {
         level4: JadeTitan,
@@ -23,11 +25,11 @@ export const PebbleDeck = {
         level8: OxenAvenger,
     },
     warriors: [GeoWeasel, GraniteRampart, OnyxBearer],
-    basics: Array(4).fill(Cobble),
+    basics: Array<ElementalStarterCard>(4).fill(Cobble),
     items: [CloseStrike, CloseStrike, FarStrike, NaturalRestoration, PebbleCharm]
 }
 
-export const LeafDeck = {
+export const LeafDeck: Decklist = {
     sage: Porella,
     champions: {
         level4: AgileAssailant,
@@ -35,11 +37,11 @@ export const LeafDeck = {
         level8: KomodoKin,
     },
     warriors: [BotanicFangs, PetalMage, ThornFencer],
-    basics: Array(4).fill(Sprout),
+    basics: Array<ElementalStarterCard>(4).fill(Sprout),
     items: [CloseStrike, CloseStrike, FarStrike, NaturalRestoration, LeafCharm]
 }
 
-export const DropletDeck = {
+export const DropletDeck: Decklist = {
     sage: Torrent,
     champions: {
         level4: TideTurner,
@@ -47,6 +49,6 @@ export const DropletDeck = {
         level8: FrostfallEmperor,
     },
     warriors: [CoastalCoyote, RiptideTiger, RiverRogue],
-    basics: Array(4).fill(Dribble),
+    basics: Array<ElementalStarterCard>(4).fill(Dribble),
     items: [CloseStrike, CloseStrike, FarStrike, NaturalRestoration, DropletCharm]
 }
