@@ -21,6 +21,7 @@ export class ConGame {
   }
 
   addPlayer(player: Player) {
+
     this.players.push(player);
   }
 
@@ -41,7 +42,7 @@ export class ConGame {
     const isSageAvailable = this.players.every(player => player.sage !== sage)
     if (!isSageAvailable) return false;
 
-    this.getPlayer(playerId).sage = sage
+    this.getPlayer(playerId).setSage(sage)
     return true;
   }
 
@@ -66,15 +67,8 @@ export class ConGame {
     this.team2.push(this.players[1]);
   } 
 
-  /**
-   * Adds basic and item cards to all players' decks
-   */
   initPlayerDecks() {
-    this.players.forEach(player => {        
-      const playerClassDecklist = getSageDecklist(player.sage)
-      player.deckList = playerClassDecklist;
-      player.addCardsToDeck([...playerClassDecklist.basics, ...playerClassDecklist.items])
-    })
+    this.players.forEach(player => player.initDeck())
   }
 
   chooseWarriors() {

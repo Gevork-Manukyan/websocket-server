@@ -13,7 +13,7 @@ export const TwigDeck: Decklist = {
         level8: CalamityLeopard,
     },
     warriors: [AcornSquire, QuillThornback, SlumberJack],
-    basics: Array<ElementalStarterCard>(4).fill(Timber),
+    basic: Timber,
     items: [CloseStrike, CloseStrike, FarStrike, NaturalRestoration, TwigCharm]
 }
 
@@ -25,7 +25,7 @@ export const PebbleDeck: Decklist = {
         level8: OxenAvenger,
     },
     warriors: [GeoWeasel, GraniteRampart, OnyxBearer],
-    basics: Array<ElementalStarterCard>(4).fill(Cobble),
+    basic: Cobble,
     items: [CloseStrike, CloseStrike, FarStrike, NaturalRestoration, PebbleCharm]
 }
 
@@ -37,7 +37,7 @@ export const LeafDeck: Decklist = {
         level8: KomodoKin,
     },
     warriors: [BotanicFangs, PetalMage, ThornFencer],
-    basics: Array<ElementalStarterCard>(4).fill(Sprout),
+    basic: Sprout,
     items: [CloseStrike, CloseStrike, FarStrike, NaturalRestoration, LeafCharm]
 }
 
@@ -49,6 +49,6 @@ export const DropletDeck: Decklist = {
         level8: FrostfallEmperor,
     },
     warriors: [CoastalCoyote, RiptideTiger, RiverRogue],
-    basics: Array<ElementalStarterCard>(4).fill(Dribble),
+    basic: Dribble,
     items: [CloseStrike, CloseStrike, FarStrike, NaturalRestoration, DropletCharm]
 }

@@ -95,7 +95,7 @@ export class Battlefield {
     }
 
     private updateBattlefield() {
-
+        //TODO: implement
     }
 }
 

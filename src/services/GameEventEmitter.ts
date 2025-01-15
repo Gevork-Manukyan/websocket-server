@@ -18,7 +18,7 @@ export class GameEventEmitter {
   
     emitPickWarriors(players: Player[]) {
       players.forEach(player => {
-        this.emitToPlayer(player.id, "pick-warriors", player.deckList);
+        this.emitToPlayer(player.id, "pick-warriors", player.decklist);
       })
     }
 

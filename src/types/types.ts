@@ -1,5 +1,5 @@
 import { ConGame } from "../models/ConGame";
-import { ElementalCard, ElementalChampion, ElementalSage, ElementalWarriorCard, ItemCard } from "./card-types";
+import { ElementalChampion, ElementalSage, ElementalStarterCard, ElementalWarriorCard, ItemCard } from "./card-types";
 
 export type gameId = string;
 export type Element = "twig" | "pebble" | "leaf" | "droplet";
@@ -17,6 +17,6 @@ export type Decklist = {
     level8: ElementalChampion;
   },
   warriors: ElementalWarriorCard[];
-  basics: ElementalCard[];
+  basic: ElementalStarterCard;
   items: ItemCard[];
 }
