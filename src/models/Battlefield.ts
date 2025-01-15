@@ -30,14 +30,40 @@ export class Battlefield {
     private initTwoPlayerBattlefield(fieldArray: ElementalCard[]) {
         if (fieldArray.length !== TWO_PLAYER_SPACE_MAX) throw new Error("Invalid amount of cards for 2-Player Game")
 
-        const row_3_3 = new BattlefieldSpace(6, fieldArray[5], null, null);
-        const row_3_2 = new BattlefieldSpace(5, fieldArray[4], null, null);
-        const row_3_1 = new BattlefieldSpace(4, fieldArray[3], null, null);
+        let row_1_1, row_2_1, row_2_2, row_3_1, row_3_2, row_3_3;
 
-        const row_2_2 = new BattlefieldSpace(3, fieldArray[2], row_3_2, row_3_3);
-        const row_2_1 = new BattlefieldSpace(2, fieldArray[1], row_3_1, row_3_2);
+        row_3_3 = new BattlefieldSpace(8, fieldArray[8], {
+            TL: row_2_2,
+            L: row_3_2,
+        });
+        row_3_2 = new BattlefieldSpace(7, fieldArray[7], {
+            TL: row_2_1,
+            TR: row_2_2,
+            L: row_3_1,
+            R: row_3_3,
+        });
+        row_3_1 = new BattlefieldSpace(6, fieldArray[6], {
+            TR: row_2_1,
+            R: row_3_2,
+        });
 
-        const row_1_1 = new BattlefieldSpace(1, fieldArray[0], row_2_1, row_2_2);
+        row_2_2 = new BattlefieldSpace(4, fieldArray[3], {
+            TL: row_1_1,
+            L: row_2_1,
+            BL: row_3_2,
+            BR: row_3_3,
+        });
+        row_2_1 = new BattlefieldSpace(3, fieldArray[2], {
+            TR: row_1_1,
+            R: row_2_2,
+            BL: row_3_1,
+            BR: row_3_2,
+        });
+
+        row_1_1 = new BattlefieldSpace(1, fieldArray[0], {
+            BL: row_2_1,
+            BR: row_2_2,
+        });
 
         this.rootSpace = row_1_1;
         this.fieldArray = [row_1_1, row_2_1, row_2_2, row_3_1, row_3_2, row_3_3];
@@ -49,23 +75,91 @@ export class Battlefield {
     private initFourPlayerBattlefield(fieldArray: ElementalCard[]) {
         if (fieldArray.length !== FOUR_PLAYER_SPACE_MAX) throw new Error("Invalid amount of cards for 4-Player Game")
 
-        const row_3_4 = new BattlefieldSpace(9, fieldArray[8], null, null);
-        const row_3_3 = new BattlefieldSpace(8, fieldArray[7], null, null);
-        const row_3_2 = new BattlefieldSpace(7, fieldArray[6], null, null);
-        const row_3_1 = new BattlefieldSpace(6, fieldArray[5], null, null);
+        let row_1_1, row_1_2, row_2_1, row_2_2, row_2_3, row_2_4, row_3_1, row_3_2, row_3_3, row_3_4, row_3_5, row_3_6;
 
-        const row_2_4 = new BattlefieldSpace(5, fieldArray[5], row_3_3, row_3_4);
-        const row_2_3 = new BattlefieldSpace(5, fieldArray[4], row_3_3, row_3_4);
-        const row_2_2 = new BattlefieldSpace(4, fieldArray[3], row_3_2, row_3_3);
-        const row_2_1 = new BattlefieldSpace(3, fieldArray[2], row_3_1, row_3_2);
+        row_3_6 = new BattlefieldSpace(9, fieldArray[11], {
+            TL: row_2_4,
+            L: row_3_5,
+        });
+        row_3_5 = new BattlefieldSpace(9, fieldArray[10], {
+            TL: row_2_3, 
+            T: row_2_4,
+            L: row_3_4,
+            R: row_3_6,
+        });
+        row_3_4 = new BattlefieldSpace(9, fieldArray[9], {
+            TL: row_2_2,
+            T: row_2_3,
+            TR: row_2_4,
+            L: row_3_3,
+            R: row_3_5,
+        });
+        row_3_3 = new BattlefieldSpace(8, fieldArray[8], {
+            TL: row_2_1,
+            T: row_2_2,
+            TR: row_2_3,
+            L: row_3_2,
+            R: row_3_4,
+        });
+        row_3_2 = new BattlefieldSpace(7, fieldArray[7], {
+            T: row_2_1,
+            TR: row_2_2,
+            L: row_3_1,
+            R: row_3_3,
+        });
+        row_3_1 = new BattlefieldSpace(6, fieldArray[6], {
+            TR: row_2_1,
+            R: row_3_2,
+        });
 
-        const row_1_2 = new BattlefieldSpace(2, fieldArray[1], row_2_2, row_2_3);
-        const row_1_1 = new BattlefieldSpace(1, fieldArray[0], row_2_1, row_2_2);
+        row_2_4 = new BattlefieldSpace(5, fieldArray[5], {
+            TR: row_1_2,
+            L: row_2_3,
+            BL: row_3_4,
+            B: row_3_5,
+            BR: row_3_6,
+        });
+        row_2_3 = new BattlefieldSpace(5, fieldArray[4], {
+            TL: row_1_1,
+            T: row_1_2,
+            L: row_2_2,
+            R: row_2_4,
+            BL: row_3_3,
+            B: row_3_4,
+            BR: row_3_5,
+        });
+        row_2_2 = new BattlefieldSpace(4, fieldArray[3], {
+            T: row_1_1,
+            TR: row_1_2,
+            L: row_2_1,
+            R: row_2_3,
+            BL: row_3_2,
+            B: row_3_3,
+            BR: row_3_4,
+        });
+        row_2_1 = new BattlefieldSpace(3, fieldArray[2], {
+            TR: row_1_1,
+            R: row_2_2,
+            BL: row_3_1,
+            B: row_3_2,
+            BR: row_3_3,
+        });
 
-        const root = new BattlefieldSpace(1, null, row_1_1, row_1_2);
+        row_1_2 = new BattlefieldSpace(2, fieldArray[1], {
+            L: row_1_1,
+            BL: row_2_2,
+            B: row_2_3,
+            BR: row_2_4,
+        });
+        row_1_1 = new BattlefieldSpace(1, fieldArray[0], {
+            R: row_1_2,
+            BL: row_2_1,
+            B: row_2_2,
+            BR: row_2_3,
+        });
 
-        this.rootSpace = root;
-        this.fieldArray = [row_1_1, row_1_2, row_2_1, row_2_2, row_2_3, row_3_1, row_3_2, row_3_3, row_3_4];
+        this.rootSpace = row_1_1;
+        this.fieldArray = [row_1_1, row_1_2, row_2_1, row_2_2, row_2_3, row_2_4, row_3_1, row_3_2, row_3_3, row_3_4, row_3_5, row_3_6];
     }
 
     getBattlefieldSpace<T extends SpaceOptions>(spaceNumber: T) {
@@ -114,14 +208,14 @@ export class BattlefieldSpace {
     spaceNumber: SpaceOptions;
     value: ElementalCard | null;
     connections: {
-        TL: BattlefieldSpace | null; 
-        T: BattlefieldSpace | null;
-        TR: BattlefieldSpace | null;
-        L: BattlefieldSpace | null;
-        R: BattlefieldSpace | null;
-        BL: BattlefieldSpace | null;
-        B: BattlefieldSpace | null;
-        BR: BattlefieldSpace | null;
+        TL?: BattlefieldSpace | null; 
+        T?: BattlefieldSpace | null;
+        TR?: BattlefieldSpace | null;
+        L?: BattlefieldSpace | null;
+        R?: BattlefieldSpace | null;
+        BL?: BattlefieldSpace | null;
+        B?: BattlefieldSpace | null;
+        BR?: BattlefieldSpace | null;
     }
 
     constructor(spaceNumber: SpaceOptions, value: BattlefieldSpace['value'], connections?: BattlefieldSpace['connections']) {

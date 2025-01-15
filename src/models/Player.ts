@@ -8,7 +8,7 @@ export class Player {
   isReady: boolean = false;
   isGameHost: boolean;
   sage: Sage | null = null;
-  battlefield: Battlefield;
+  battlefield: Battlefield; //TODO: battlefield must exist on ConGame and there should only be two: one for each team
   decklist: Decklist | null = null;
   gold: number = 0;
   level: number = 1;
