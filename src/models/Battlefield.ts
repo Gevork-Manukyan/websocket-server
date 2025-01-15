@@ -24,9 +24,6 @@ export class Battlefield {
         throw new Error("Invalid Field Size");
     }
 
-    // Formulas
-    // Left: row + value
-    // Right: row + value + 1
     private initTwoPlayerBattlefield(fieldArray: ElementalCard[]) {
         if (fieldArray.length !== TWO_PLAYER_SPACE_MAX) throw new Error("Invalid amount of cards for 2-Player Game")
 
@@ -69,9 +66,6 @@ export class Battlefield {
         this.fieldArray = [row_1_1, row_2_1, row_2_2, row_3_1, row_3_2, row_3_3];
     }
 
-    // Formulas (wrong)
-    // Left: row + value + 1
-    // Right: row + value + 2
     private initFourPlayerBattlefield(fieldArray: ElementalCard[]) {
         if (fieldArray.length !== FOUR_PLAYER_SPACE_MAX) throw new Error("Invalid amount of cards for 4-Player Game")
 
@@ -178,8 +172,6 @@ export class Battlefield {
         if (targetSpace.value === null) throw new Error("Cannot remove an empty space")
         const targetCard = targetSpace.value
         targetSpace.value = null
-
-        this.updateBattlefield()
         return targetCard;
     }
 
@@ -188,6 +180,10 @@ export class Battlefield {
         const space2 = this.getBattlefieldSpace(space2Number)
 
         if (space1 === null || space2 === null) throw new Error(`Cannot swap null battlefield space(s): ${space1Number} $ ${space2Number}`)
+
+        const space1Value = space1.value
+        space1.setValue(space2.value)
+        space2.setValue(space1Value)
     }
 
     private validateSpaceNumber(spaceNumber: SpaceOptions): asserts spaceNumber is TwoPlayerSpaceOptions | FourPlayerSpaceOptions {
