@@ -5,7 +5,7 @@ type FourPlayerSpaceOptions = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 type SpaceOptions = TwoPlayerSpaceOptions | FourPlayerSpaceOptions
 
 export class Battlefield {
-    private fieldGraph: BattlefieldSpace;
+    rootSpace: BattlefieldSpace;
     private fieldArray: (BattlefieldSpace)[]
     private numPlayers: 2 | 4;
 
@@ -37,7 +37,7 @@ export class Battlefield {
 
         const row_1_1 = new BattlefieldSpace(1, fieldArray[0], row_2_1, row_2_2);
 
-        this.fieldGraph = row_1_1;
+        this.rootSpace = row_1_1;
         this.fieldArray = [row_1_1, row_2_1, row_2_2, row_3_1, row_3_2, row_3_3];
     }
 
@@ -61,98 +61,37 @@ export class Battlefield {
 
         const row_0 = new BattlefieldSpace(1, null, row_1_1, row_1_2);
 
-        this.fieldGraph = row_0;
+        this.rootSpace = row_0;
         this.fieldArray = [row_1_1, row_1_2, row_2_1, row_2_2, row_2_3, row_3_1, row_3_2, row_3_3, row_3_4];
     }
 
-    getCardAtSpace<T extends SpaceOptions>(space: T) {
-        if (this.numPlayers === 2 && space > 6) {
-            throw new Error(`Invalid space ${space} for a 2-player game`);
-        }
-        if (this.numPlayers === 4 && space > 9) {
-            throw new Error(`Invalid space ${space} for a 4-player game`);
-        }
-    
-        return this.fieldArray[space - 1];
+    getBattlefieldSpace<T extends SpaceOptions>(spaceNumber: T) {
+        this.validateSpaceNumber(spaceNumber)
+        return this.fieldArray[spaceNumber - 1];
     }
 
     addCard(card: ElementalCard, spaceNumber: SpaceOptions) {
+        const targetSpace = this.getBattlefieldSpace(spaceNumber)
+        if (targetSpace.value !== null) throw new Error("Cannot add a card to a space with an existing card")
+        targetSpace.value = card;
+    }
+
+    removeCard(spaceNumber: SpaceOptions) {
+        const targetSpace = this.getBattlefieldSpace(spaceNumber)
+        if (targetSpace.value === null) throw new Error("Cannot remove an empty space")
+        const targetCard = targetSpace.value
+        targetSpace.value = null
+
+        this.updateBattlefield()
+        return targetCard;
+    }
+
+    private validateSpaceNumber(spaceNumber: SpaceOptions): asserts spaceNumber is TwoPlayerSpaceOptions | FourPlayerSpaceOptions {
         const maxSpaceNumber = this.numPlayers === 2 ? 6 : 9;
+    
         if (spaceNumber < 1 || spaceNumber > maxSpaceNumber) {
             throw new Error(`Invalid space for ${this.numPlayers}-player battlefield: ${spaceNumber}`);
         }
-        
-        const targetSpace = this.getCardAtSpace(spaceNumber)
-        if (targetSpace !== null) throw new Error("Cannot add a card to a space with an existing card")
-
-        this.numPlayers === 2
-        ? this.addCardTwoPlayer(card, targetSpace)
-        : this.addCardFourPlayer(card, targetSpace)
-    }
-
-    private addCardTwoPlayer(card: ElementalCard, battlefieldSpace: BattlefieldSpace) {
-        let left;
-        let right;
-        const spaceNumber = battlefieldSpace.spaceNumber
-
-        switch (spaceNumber) {
-            case 1: 
-                left = this.fieldArray[1];
-                right = this.fieldArray[2];
-                break;
-            case 2:
-                left = this.fieldArray[3];
-                right = this.fieldArray[4];
-                break;
-            case 3: 
-                left = this.fieldArray[4];
-                right = this.fieldArray[5];
-                break;
-            default: 
-                left = null;
-                right = null;
-        }
-
-        const targetSpace = this.fieldArray[spaceNumber - 1];
-        
-    }
-
-    private addCardFourPlayer(card: ElementalCard, spaceNumber: FourPlayerSpaceOptions) {
-        let left; 
-        let right;
-
-        switch (spaceNumber) {
-            case 1: 
-                left = this.fieldArray[1];
-                right = this.fieldArray[2];
-                break;
-            case 2:
-                left = this.fieldArray[3];
-                right = this.fieldArray[4];
-                break;
-            case 3: 
-                left = this.fieldArray[4];
-                right = this.fieldArray[5];
-                break;
-            default: 
-                left = null;
-                right = null;
-        }
-
-        this.fieldArray[spaceNumber - 1] = new BattlefieldSpace(spaceNumber, card, left, right);
-    }
-
-    removeCard(card: ElementalCard, spaceNumber) {
-        this.numPlayers === 2 ? this.removeCardTwoPlayer() : this.removeCardFourPlayer();
-        this.updateBattlefield()
-    }
-
-    private removeCardTwoPlayer() {
-
-    }
-
-    private removeCardFourPlayer() {
-        
     }
 
     private updateBattlefield() {
@@ -170,6 +109,24 @@ export class BattlefieldSpace {
         this.spaceNumber = spaceNumber;
         this.value = value;
         this.left = left;
+        this.right = right;
+    }
+
+    setBattlefieldSpace(space: BattlefieldSpace) {
+        this.value = space.value;
+        this.left = space.left;
+        this.right = space.right;
+    }
+
+    setValue(value: BattlefieldSpace['value']) {
+        this.value = value;
+    }
+
+    setLeft(left: BattlefieldSpace['left']) {
+        this.left = left;
+    }
+
+    setRight(right: BattlefieldSpace['right']) {
         this.right = right;
     }
 }
