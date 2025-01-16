@@ -1,3 +1,4 @@
+import { ElementalWarriorCard } from "../types";
 import { Decklist } from "../types/types";
 import { Battlefield } from "./Battlefield";
 import { Player } from "./Player";
@@ -40,8 +41,16 @@ export class Team {
     initBattlefield(decklists: Decklist[]) {
         const [decklist1, decklist2] = decklists;
 
+        // 2 Players (1 team member)
+        if (this.teamSize === 1) {
+            const basicStarter = decklist1.basic;
+            this.battlefield.addCard(basicStarter, 1)
+            this.battlefield.addCard(basicStarter, 2)
+            this.battlefield.addCard(basicStarter, 3)
+            this.battlefield.addCard(decklist1.sage, 5)
+        }
         // 4 Players (2 team members)
-        if (decklist2 !== undefined) {
+        else if (decklist2 !== undefined && this.teamNumber === 2) {
             const basicStarter1 = decklist1.basic
             const basicStarter2 = decklist2.basic
 
@@ -54,15 +63,30 @@ export class Team {
             this.battlefield.addCard(basicStarter2, 6)
 
             this.battlefield.addCard(decklist1.sage, 8)
-            this.battlefield.addCard(decklist2.sage, 9)
+            this.battlefield.addCard(decklist2.sage, 11)
         }
-        // 2 Players (1 team member)
-        else {
-            const basicStarter = decklist1.basic;
-            this.battlefield.addCard(basicStarter, 1)
-            this.battlefield.addCard(basicStarter, 2)
-            this.battlefield.addCard(basicStarter, 3)
-            this.battlefield.addCard(decklist1.sage, 5)
+    }
+
+    initWarriors(choices: [ElementalWarriorCard, ElementalWarriorCard]) {
+        if (this.teamNumber === 1) {
+            this.battlefield.addCard(choices[0], 4)
+            this.battlefield.addCard(choices[0], 6)
+        } else {
+            this.initWarriors2Decks(choices)
+        }
+    }
+
+    private initWarriors2Decks(choices: [ElementalWarriorCard, ElementalWarriorCard]) {
+        const [choice1, choice2] = choices;
+        
+        // If cards given are same class as left sage then place on left side
+        if (choice1.element === this.battlefield.getCard(8)?.element) {
+            this.battlefield.addCard(choice1, 7)
+            this.battlefield.addCard(choice2, 9)
+        }
+        else if (choice1.element === this.battlefield.getCard(9)?.element) {
+            this.battlefield.addCard(choice1, 10)
+            this.battlefield.addCard(choice2, 12)
         }
     }
   }

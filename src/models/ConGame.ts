@@ -57,7 +57,9 @@ export class ConGame {
 
   joinTeam(playerId: Player['id'], teamNumber: Team['teamNumber']) {
     const teamSelected = teamNumber === 1 ? this.team1 : this.team2;
-    teamSelected.addPlayerToTeam(this.getPlayer(playerId))
+    const player = this.getPlayer(playerId);
+    teamSelected.addPlayerToTeam(player);
+    player.setTeam(teamSelected);
   }
 
   startGame(playerId: Player["id"]) {
@@ -86,6 +88,6 @@ export class ConGame {
 
   chooseWarriors(playerId: Player["id"], choices: [ElementalWarriorCard, ElementalWarriorCard]) {
     const player = this.getPlayer(playerId)
-
+    player.team!.initWarriors(choices)
   }
 }

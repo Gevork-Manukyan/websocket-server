@@ -156,9 +156,13 @@ export class Battlefield {
         this.fieldArray = [row_1_1, row_1_2, row_2_1, row_2_2, row_2_3, row_2_4, row_3_1, row_3_2, row_3_3, row_3_4, row_3_5, row_3_6];
     }
 
-    getBattlefieldSpace<T extends SpaceOptions>(spaceNumber: T) {
+    private getBattlefieldSpace<T extends SpaceOptions>(spaceNumber: T) {
         this.validateSpaceNumber(spaceNumber)
         return this.fieldArray[spaceNumber - 1];
+    }
+
+    getCard(spaceNumber: SpaceOptions) {
+        return this.getBattlefieldSpace(spaceNumber).value;
     }
 
     addCard(card: ElementalCard, spaceNumber: SpaceOptions) {
