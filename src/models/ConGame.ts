@@ -88,6 +88,20 @@ export class ConGame {
 
   chooseWarriors(playerId: Player["id"], choices: [ElementalWarriorCard, ElementalWarriorCard]) {
     const player = this.getPlayer(playerId)
+    const decklist = player.getDecklist()!
+    const [choice1, choice2] = choices
+
+    if (
+      choice1.element !== decklist.sage.element ||
+      choice2.element !== decklist.sage.element
+    ) throw new Error("Invalid cards passed for chosen deck")
+    
     player.team!.initWarriors(choices)
+
+    // Add the non-chosen card to the player's deck
+    decklist.warriors.forEach(card => {
+      if ((card.name !== choice1.name) || (card.name !== choice2.name))
+        player.addCardToDeck(card);
+    })
   }
 }

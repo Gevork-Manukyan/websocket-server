@@ -58,15 +58,4 @@ export class Player {
     const basicStarter = decklist.basic
     this.addCardsToDeck([basicStarter, ...decklist.items])
   }
-
-  chooseWarriors([choice1, choice2]: [ElementalWarriorCard, ElementalWarriorCard]) {
-    // Add the non-chosen card to the deck
-    this.decklist?.warriors.forEach(card => {
-      if ((card.name !== choice1.name) || (card.name !== choice2.name))
-        this.addCardToDeck(card);
-    })
-
-    // this.battlefield.addCard(choice1, 4)
-    // this.battlefield.addCard(choice2, 6)
-  }
 }
