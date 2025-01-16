@@ -34,12 +34,12 @@ const gameNamespace = io.of("/gameplay");
 gameNamespace.on("connection", (socket) => {
   console.log("A player connected to the gameplay namespace");
 
-  socket.on("join-game", (gameId: ConGame["id"]) => {
+  socket.on("join-game", (gameId: ConGame["id"], numPlayers: ConGame['numPlayersTotal']) => {
     let gameRoom = currentGames[gameId];
 
     // Create game if doesn't exist
     if (!gameRoom) {
-      gameRoom = new ConGame(gameId);
+      gameRoom = new ConGame(gameId, numPlayers);
       gameRoom.addPlayer(new Player(socket.id, true)); // Make first player to join the host
     } else {
       gameRoom.addPlayer(new Player(socket.id));
@@ -67,6 +67,10 @@ gameNamespace.on("connection", (socket) => {
   socket.on("select-sage", (gameId: ConGame["id"], sage: Sage) => {
     const isSageChosen = currentGames[gameId].setPlayerSage(socket.id, sage)
 
+  })
+
+  socket.on("join-team", (gameId: ConGame['id'], team: 1 | 2) => {
+    currentGames[gameId].joinTeam(socket.id, team);
   })
 
   socket.on("start-game", (gameId: ConGame["id"]) => {
