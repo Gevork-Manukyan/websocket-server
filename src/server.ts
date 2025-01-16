@@ -75,16 +75,15 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on("start-game", (gameId: ConGame["id"]) => {
     const gameRoom = currentGames[gameId];
-    const isStarted = gameRoom.startGame(socket.id);
-    
-    if (!isStarted) return;
+    gameRoom.startGame(socket.id);    
     gameEventEmitter.emitPickWarriors(gameRoom.players)
 
+    gameRoom.setStarted(true);
     console.log(`Game ${gameId} started!`);
   });
 
   socket.on("chose-warriors", (gameId: ConGame['id'], choices: [ElementalWarriorCard, ElementalWarriorCard]) => {
-    currentGames[gameId].getPlayer(socket.id).chooseWarriors(choices);
+    currentGames[gameId].chooseWarriors(socket.id, choices);
     
     // TODO: Emit to player to choose battlefield layout
   })

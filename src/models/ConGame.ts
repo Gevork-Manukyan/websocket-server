@@ -1,35 +1,34 @@
 // Command of Nature (C.O.N)
 
-import { Sage, ElementalCard, gameId, ItemCard } from "../types";
+import { Sage, ElementalCard, gameId, ItemCard, ElementalWarriorCard } from "../types";
+import { Decklist } from "../types/types";
 import { Battlefield } from "./Battlefield";
 import { Player } from "./Player";
-
-type Team = {
-  players: Player[];
-  battlefield: Battlefield;
-}
+import { Team } from "./Team";
 
 export class ConGame {
   id: gameId;
-  isStarted: boolean = false;
+  isStarted: Boolean = false;
   numPlayersTotal: 2 | 4;
   numPlayersReady: number = 0;
   numPlayersFinishedSetup: number = 0;
   players: Player[] = [];
-  team1: Team = {
-    players: [],
-    battlefield: new Battlefield([])
-  };
-  team2: Team = {
-    players: [],
-    battlefield: new Battlefield([])
-  };
+  team1: Team;
+  team2: Team;
   creatureShop: ElementalCard[] = [];
   itemShop: ItemCard[] = [];
 
   constructor(gameId: ConGame['id'], numPlayers: ConGame['numPlayersTotal']) {
     this.id = gameId;
     this.numPlayersTotal = numPlayers;
+    
+    const teamSize = numPlayers / 2;
+    this.team1 = new Team(teamSize as Team['teamSize'])
+    this.team2 = new Team(teamSize as Team['teamSize'])
+  }
+
+  setStarted(value: Boolean) {
+    this.isStarted = value;
   }
 
   addPlayer(player: Player) {
@@ -56,14 +55,12 @@ export class ConGame {
     this.getPlayer(playerId).setSage(sage)
   }
 
-  joinTeam(playerId: Player['id'], team: 1 | 2) {
-    const teamSelected = team === 1 ? this.team1 : this.team2;
-
-    if (teamSelected.players.length === (this.numPlayersTotal / 2)) throw new Error(`Team ${team} is full`);
-    teamSelected.players.push(this.getPlayer(playerId))
+  joinTeam(playerId: Player['id'], teamNumber: Team['teamNumber']) {
+    const teamSelected = teamNumber === 1 ? this.team1 : this.team2;
+    teamSelected.addPlayerToTeam(this.getPlayer(playerId))
   }
 
-  startGame(playerId: Player["id"]): Boolean {
+  startGame(playerId: Player["id"]) {
     // Only host can start game
     if (!this.getPlayer(playerId).isGameHost) throw new Error(`Only the host can start the game`);
 
@@ -72,16 +69,23 @@ export class ConGame {
 
     // TODO: initlize game
     this.initPlayerDecks();
-
-    this.isStarted = true;
-    return true;
+    this.initPlayerFields();
   }
 
   initPlayerDecks() {
     this.players.forEach(player => player.initDeck())
   }
 
-  chooseWarriors() {
-    
+  initPlayerFields() {
+    const team1Decklists = this.team1.getAllPlayerDecklists()
+    const team2Decklists = this.team2.getAllPlayerDecklists()
+
+    this.team1.initBattlefield(team1Decklists)
+    this.team2.initBattlefield(team2Decklists)
+  }
+
+  chooseWarriors(playerId: Player["id"], choices: [ElementalWarriorCard, ElementalWarriorCard]) {
+    const player = this.getPlayer(playerId)
+
   }
 }
