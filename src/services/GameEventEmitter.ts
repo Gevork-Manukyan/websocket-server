@@ -21,9 +21,5 @@ export class GameEventEmitter {
         this.emitToPlayer(player.id, "pick-warriors", player.decklist);
       })
     }
-
-    emitArrangeBattlefield() {
-      // TODO: takes in players current battlefield and emits to player
-    }
   }
   

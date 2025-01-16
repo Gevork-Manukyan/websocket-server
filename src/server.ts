@@ -78,6 +78,8 @@ gameNamespace.on("connection", (socket) => {
     gameRoom.startGame(socket.id);    
     gameEventEmitter.emitPickWarriors(gameRoom.players)
 
+    // TODO: coin flip for who is first. Players decide play order if 4 players
+
     gameRoom.setStarted(true);
     console.log(`Game ${gameId} started!`);
   });
