@@ -7,7 +7,8 @@
     "start": "node dist/server.js",
     "prestart": "npm run build",
     "dev": "ts-node src/server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest"
   },
   "keywords": [
     "websocket",
