@@ -4,25 +4,16 @@ import { Battlefield } from "./Battlefield";
 import { Player } from "./Player";
 
 export class Team {
-    private static instanceCount = 0;
-    teamNumber: 1 | 2;
-    teamSize: 1 | 2;
     players: Player[];
     battlefield: Battlefield;
+    private teamNumber: 1 | 2;
+    private teamSize: 1 | 2;
   
-    constructor(teamSize: Team['teamSize']) {
-        if (Team.instanceCount >= 2) 
-            throw new Error("Only two instances of Team are allowed")
-        Team.instanceCount++;
-        this.teamNumber = Team.instanceCount as Team['teamNumber'];
+    constructor(teamSize: Team['teamSize'], teamNumber: Team['teamNumber']) {
         this.players = [];
         this.battlefield = new Battlefield(teamSize);
+        this.teamNumber = teamNumber;
         this.teamSize = teamSize;
-    }
-
-    // Method to reset the instance count if necessary
-    static resetInstanceCount() {
-        Team.instanceCount = 0;
     }
 
     addPlayerToTeam(player: Player) {
