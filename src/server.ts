@@ -40,12 +40,13 @@ gameNamespace.on("connection", (socket) => {
     // Create game if doesn't exist
     if (!gameRoom) {
       gameRoom = new ConGame(gameId, numPlayers);
-      gameRoom.addPlayer(new Player(socket.id, true)); // Make first player to join the host
+      gameRoom.addPlayer(new Player(socket.id, true)); // First player to join is the host
     } else {
       gameRoom.addPlayer(new Player(socket.id));
     }
 
-    socket.join(gameId); // Creates room if doesn't exist
+    socket.join(gameId);
+    socket.emit("join-game-success")
     console.log(`Player joined game: ${gameId}`);
   });
 
@@ -112,12 +113,11 @@ gameNamespace.on("connection", (socket) => {
   });
 });
 
-
-// Start the server only if this file is run directly
-if (require.main === module) {
+// Start the server if not in test mode
+if (process.env.NODE_ENV !== "test") {
   server.listen(PORT, () => {
     console.log(`WebSocket server running on http://localhost:${PORT}`);
   });
-} 
+}
 
-export { app, server, io };
+export { server, io, app }

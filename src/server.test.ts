@@ -1,28 +1,58 @@
-import { io as Client, Socket } from "socket.io-client";
-import { server, io } from "./server";
-import { AddressInfo } from "net";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import Client, { Socket } from "socket.io-client";
+import { PORT } from "./utils/constants"; // Your actual constant file
+import { app, server, io } from "./server"; // Import your server.ts logic
 
 let clientSocket: Socket;
 
 beforeAll((done) => {
-  // Start the server
-  const address = server.listen().address() as AddressInfo;
-  const port = address.port;
-
-  // Connect a client to the server
-  clientSocket = Client(`http://localhost:${port}/gameplay`, {
-    transports: ["websocket"],
+  // Start the server (ensure it’s tied to your real server.ts code)
+  server.listen(PORT, () => {
+    // Connect the client to the same server
+    clientSocket = Client(`http://localhost:${PORT}/gameplay`, {
+        transports: ['websocket']
+    }); // Connect to the "/gameplay" namespace
+    clientSocket.on("connect", done); // Wait until the connection is established
   });
-
-  clientSocket.on("connect", done); // Wait for connection
 });
 
 afterAll(() => {
-  io.close(); // Close Socket.IO server
-  server.close(); // Close HTTP server
-  clientSocket.close(); // Disconnect the client
+  server.close(); // Close the server
+  clientSocket.close(); // Close the client socket
 });
 
-test("Client can connect to the gameplay namespace", () => {
+test("should establish a socket connection", () => {
   expect(clientSocket.connected).toBe(true);
 });
+
+test("should handle a 'join-game' event", (done) => {
+  const testGameId = "123";
+  const numPlayers = 4;
+
+  clientSocket.emit("join-game", testGameId, numPlayers);
+
+  // Since we're using the real server logic, the event should trigger the actual server code
+  clientSocket.on("connect", () => {
+    console.log("Client connected");
+  });
+
+  clientSocket.on("join-game-success", () => {
+    console.log("The game was joined successfully!");
+    done();
+  });
+});
+
+test("should log player disconnection when client disconnects", (done) => {
+    const logSpy = jest.spyOn(console, "log");
+  
+    // Disconnect the client
+    clientSocket.disconnect();
+  
+    setTimeout(() => {
+      expect(logSpy).toHaveBeenCalledWith("Player disconnected from gameplay namespace");
+      logSpy.mockRestore();
+      done();
+    }, 100); // Small delay to ensure the server processes the disconnect
+});
+  
