@@ -16,7 +16,7 @@ export class Team {
         Team.instanceCount++;
         this.teamNumber = Team.instanceCount as Team['teamNumber'];
         this.players = [];
-        this.battlefield = new Battlefield([]);
+        this.battlefield = new Battlefield(teamSize);
         this.teamSize = teamSize;
     }
 
