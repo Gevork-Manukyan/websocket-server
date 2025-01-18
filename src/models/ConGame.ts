@@ -23,8 +23,8 @@ export class ConGame {
     this.numPlayersTotal = numPlayers;
     
     const teamSize = numPlayers / 2;
-    this.team1 = new Team(teamSize as Team['teamSize'])
-    this.team2 = new Team(teamSize as Team['teamSize'])
+    this.team1 = new Team(teamSize as Team['teamSize'], 1)
+    this.team2 = new Team(teamSize as Team['teamSize'], 2)
   }
 
   setStarted(value: Boolean) {
