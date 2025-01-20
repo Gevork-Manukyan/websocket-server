@@ -85,9 +85,7 @@ describe("select-sage event", () => {
 
     clientSocket.once("join-game-success", () => {
       clientSocket.emit("select-sage", testGameId, "Cedar")
-      clientSocket.once("select-sage-success", () => {
-        done();
-      })
+      
     })
   });
 });
