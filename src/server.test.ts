@@ -1,6 +1,6 @@
 import Client, { Socket } from "socket.io-client";
-import { PORT } from "./utils/constants"; // Your actual constant file
 import { server } from "./server"; // Import your server.ts logic
+import { PORT } from "./utils/config";
 
 // Mock the currentGames variable to ensure it's reset for each test
 jest.mock("./server", () => {

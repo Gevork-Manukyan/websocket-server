@@ -1,9 +1,9 @@
-import { ElementalStarterCard } from "../types/card-types";
 import { Decklist } from "../types/types";
 import { AcornSquire, CalamityLeopard, Cedar, HornedHollow, QuillThornback, SlumberJack, Timber, VixVanguard } from "./";
 import { AgileAssailant, BobBlight, BotanicFangs, BoulderhideBrute, CloseStrike, CoastalCoyote, Cobble, Dribble, DropletCharm, FarStrike, FrostfallEmperor, GeoWeasel, GraniteRampart, Gravel, JadeTitan, KingCrustacean, KomodoKin, LeafCharm, NaturalRestoration, OnyxBearer, OxenAvenger, PebbleCharm, PetalMage, Porella, RiptideTiger, RiverRogue, Sprout, ThornFencer, TideTurner, Torrent, TwigCharm } from "./cards";
+import { NODE_ENV } from './config';
 
-export const PORT = 3002; // Port for the WebSocket server
+export const IS_PRODUCTION = NODE_ENV === "production"
 
 export const TwigDeck: Decklist = {
     sage: Cedar,

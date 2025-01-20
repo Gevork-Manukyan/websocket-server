@@ -1,14 +1,14 @@
 import express from "express"; // Import Express
 import http from "http"; // Import Node.js HTTP module
 import { Server } from "socket.io"; // Import types from Socket.IO
-import { PORT } from "./utils/constants";
-import { CurrentGames, ElementalWarriorCard } from "./types";
+import { ElementalWarriorCard } from "./types";
 import { ConGame } from "./models/ConGame";
 import { Player } from "./models/Player";
 import { Sage } from "./types";
 import { GameEventEmitter } from "./services";
 import { gameStateManager } from "./services/GameStateManager";
-require('dotenv').config();
+import { IS_PRODUCTION } from "./utils/constants";
+import { PORT } from "./utils/config";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -110,7 +110,7 @@ gameNamespace.on("connection", (socket) => {
 });
 
 // Start the server if not in test mode
-if (process.env.NODE_ENV !== "test") {
+if (IS_PRODUCTION) {
   server.listen(PORT, () => {
     console.log(`WebSocket server running on http://localhost:${PORT}`);
   });
