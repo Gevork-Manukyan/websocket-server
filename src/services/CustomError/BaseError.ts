@@ -1,4 +1,4 @@
-class CustomError extends Error {
+export class CustomError extends Error {
     code;
     status; 
 
@@ -11,9 +11,9 @@ class CustomError extends Error {
 
 /**
  * Use this for handling invalid input from the client.
- * ex) throw new ValidationError("Invalid sage name", "sage");
+ * @example throw new ValidationError("Invalid sage name", "sage");
  */
-class ValidationError extends CustomError {
+export class ValidationError extends CustomError {
     field;
 
     constructor(message: string, field: string) {
@@ -25,7 +25,7 @@ class ValidationError extends CustomError {
 /**
  * Handle scenarios where users are not authenticated.
  */
-class AuthenticationError extends CustomError {
+export class AuthenticationError extends CustomError {
     constructor(message = "Authentication required") {
       super(message, "AUTHENTICATION_ERROR", 401);
     }
@@ -34,7 +34,7 @@ class AuthenticationError extends CustomError {
 /**
  * Handle scenarios where users are not authenticated or lack necessary permissions.
  */
-class AuthorizationError extends CustomError {
+export class AuthorizationError extends CustomError {
     constructor(message = "Access denied") {
       super(message, "AUTHORIZATION_ERROR", 403);
     }
@@ -42,9 +42,9 @@ class AuthorizationError extends CustomError {
 
 /**
  * When a requested resource, such as a game or player, doesn’t exist.
- * ex) throw new NotFoundError("Game", gameId);
+ * @example throw new NotFoundError("Game", gameId);
  */
-class NotFoundError extends CustomError {
+export class NotFoundError extends CustomError {
     resource;
     identifier;
 
@@ -58,7 +58,7 @@ class NotFoundError extends CustomError {
 /**
  * When an operation cannot be completed due to a conflict, such as trying to select an already chosen sage.
  */
-class ConflictError extends CustomError {
+export class ConflictError extends CustomError {
     constructor(message = "Conflict detected") {
       super(message, "CONFLICT_ERROR", 409);
     }
@@ -67,7 +67,7 @@ class ConflictError extends CustomError {
 /**
  * For unexpected server-side issues.
  */
-class InternalServerError extends CustomError {
+export class InternalServerError extends CustomError {
     constructor(message = "An internal server error occurred") {
       super(message, "INTERNAL_SERVER_ERROR", 500);
     }
@@ -76,9 +76,8 @@ class InternalServerError extends CustomError {
 /**
  * For issues related to connectivity or transport.
  */
-class NetworkError extends CustomError {
+export class NetworkError extends CustomError {
     constructor(message = "A network error occurred") {
       super(message, "NETWORK_ERROR", 503);
     }
 }
-  
