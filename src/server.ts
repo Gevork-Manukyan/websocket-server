@@ -49,6 +49,11 @@ gameNamespace.on("connection", (socket) => {
     console.log(`Player joined game: ${gameId}`);
   });
 
+  socket.on("select-sage", (gameId: ConGame["id"], sage: Sage) => {
+    const isSageChosen = gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage)
+    socket.emit("select-sage-success")
+  })
+
   socket.on("toggle-ready-status", (gameId: ConGame["id"]) => {
     const currPlayer = gameStateManager.getGame(gameId).getPlayer(socket.id)
     if (!currPlayer) throw new Error(`Player with socket ID ${socket.id} not found in game ${gameId}`);
@@ -63,11 +68,6 @@ gameNamespace.on("connection", (socket) => {
       socket.emit("ready-status__not-ready");
     }
   });
-
-  socket.on("select-sage", (gameId: ConGame["id"], sage: Sage) => {
-    const isSageChosen = gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage)
-    socket.emit("select-sage-success")
-  })
 
   socket.on("join-team", (gameId: ConGame['id'], team: 1 | 2) => {
     gameStateManager.getGame(gameId).joinTeam(socket.id, team);

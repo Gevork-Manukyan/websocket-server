@@ -2,8 +2,11 @@ import Client, { Socket } from "socket.io-client";
 import { server } from "./server"; // Import your server.ts logic
 import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
+import { Player } from "./models";
 
 let clientSocket: Socket;
+const testGameId = "test-game";
+const numPlayers = 2;
 
 beforeAll((done) => {
   // Start the server (ensure it’s tied to your real server.ts code)
@@ -23,9 +26,6 @@ afterAll(() => {
 
 beforeEach(() => {
   gameStateManager.resetGameStateManager();
-});
-
-afterEach(() => {
   clientSocket.removeAllListeners();
 });
 
@@ -35,12 +35,8 @@ test("should establish a socket connection", () => {
 
 describe("join-game event", () => {
   test("should handle a 'join-game' event for 2 players", (done) => {
-    const testGameId = "test-game";
-    const numPlayers = 2;
-
     clientSocket.emit("join-game", testGameId, numPlayers);
 
-    // Since we're using the real server logic, the event should trigger the actual server code
     clientSocket.once("connect", () => {
       console.log("Client connected");
     });
@@ -52,12 +48,10 @@ describe("join-game event", () => {
   });
 
   test("should handle a 'join-game' event for 4 players", (done) => {
-    const testGameId = "test-game";
     const numPlayers = 4;
 
     clientSocket.emit("join-game", testGameId, numPlayers);
 
-    // Since we're using the real server logic, the event should trigger the actual server code
     clientSocket.once("connect", () => {
       console.log("Client connected");
     });
@@ -69,60 +63,70 @@ describe("join-game event", () => {
   });
 });
 
-describe("toggle-ready-status event", () => {
-  test("should make player ready if they are not ready", (done) => {
-    const testGameId = "test-game";
-    const numPlayers = 2;
-
-    // Step 1: Join a game to set up initial state
+describe("select-sage event", () => {
+  beforeEach(() => {
     clientSocket.emit("join-game", testGameId, numPlayers);
+  })
 
-    // Step 2: Wait for the "join-game-success" event to ensure player joined
+  test("should select sage", (done) => {
     clientSocket.once("join-game-success", () => {
-      // Step 2.5: Select a Sage
-      clientSocket.emit("select-sage", testGameId, "Cedar");
-
+      clientSocket.emit("select-sage", testGameId, "Cedar")
       clientSocket.once("select-sage-success", () => {
-        // Step 3: Emit the "toggle-ready-status" event
-        clientSocket.emit("toggle-ready-status", testGameId);
+        done();
+      })
+    })
+  });
 
-        // Step 4: Listen for the "ready-status__ready" event
-        clientSocket.once("ready-status__ready", () => {
-          console.log("Player is now ready!");
-          done();
-        });
+  test("should Error if selected sage is already picked", (done) => {
+    const player2 = new Player("player2")
+    const game = gameStateManager.getGame(testGameId)
+    game.addPlayer(player2)
+    game.setPlayerSage(player2.id, "Cedar")
+
+    clientSocket.once("join-game-success", () => {
+      clientSocket.emit("select-sage", testGameId, "Cedar")
+      clientSocket.once("select-sage-success", () => {
+        done();
+      })
+    })
+  });
+});
+
+describe("toggle-ready-status event", () => {
+  beforeEach(() => {
+    clientSocket.emit("join-game", testGameId, numPlayers);
+    clientSocket.on("join-game-success", () => {
+      clientSocket.emit("select-sage", testGameId, "Cedar");
+    });
+  });
+
+  test("should make player ready if they are not ready", (done) => {
+    clientSocket.once("select-sage-success", () => {
+      clientSocket.emit("toggle-ready-status", testGameId);
+
+      clientSocket.once("ready-status__ready", () => {
+        console.log("Player is now ready!");
+        done();
       });
     });
   });
 
   test("should make player not ready if they are ready", (done) => {
-    const testGameId = "test-game";
-    const numPlayers = 2;
+    clientSocket.once("select-sage-success", () => {
+      // Step 3: Emit the "toggle-ready-status" event
+      clientSocket.emit("toggle-ready-status", testGameId);
 
-    // Step 1: Join a game to set up initial state
-    clientSocket.emit("join-game", testGameId, numPlayers);
+      // Step 4: Listen for the "ready-status__ready" event
+      clientSocket.once("ready-status__ready", () => {
+        console.log("Player is now ready!");
 
-    // Step 2: Wait for the "join-game-success" event to ensure player joined
-    clientSocket.once("join-game-success", () => {
-      // Step 2.5: Select a Sage
-      clientSocket.emit("select-sage", testGameId, "Gravel");
-
-      clientSocket.once("select-sage-success", () => {
-        // Step 3: Emit the "toggle-ready-status" event
+        // Step 5: Emit "toggle-ready-status" again to toggle back
         clientSocket.emit("toggle-ready-status", testGameId);
 
-        // Step 4: Listen for the "ready-status__ready" event
-        clientSocket.once("ready-status__ready", () => {
-          console.log("Player is now ready!");
-
-          // Step 5: Emit "toggle-ready-status" again to toggle back
-          clientSocket.emit("toggle-ready-status", testGameId);
-
-          // Step 6: Listen for the "ready-status__not-ready" event
-          clientSocket.once("ready-status__not-ready", () => {
-            console.log("Player is now not ready!");
-            done();
-          });
+        // Step 6: Listen for the "ready-status__not-ready" event
+        clientSocket.once("ready-status__not-ready", () => {
+          console.log("Player is now not ready!");
+          done();
         });
       });
     });
