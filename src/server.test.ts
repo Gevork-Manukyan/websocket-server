@@ -1,8 +1,7 @@
 import Client, { Socket } from "socket.io-client";
-import { PORT } from "./utils/constants"; // Your actual constant file
 import { server } from "./server"; // Import your server.ts logic
+import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
-import { ConGame } from "./models";
 
 let clientSocket: Socket;
 
