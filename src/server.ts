@@ -8,6 +8,7 @@ import { Player } from "./models/Player";
 import { Sage } from "./types";
 import { GameEventEmitter } from "./services";
 import { gameStateManager } from "./services/GameStateManager";
+require('dotenv').config();
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
