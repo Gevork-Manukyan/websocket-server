@@ -18,9 +18,9 @@ class GameStateManager {
         return this.currentGames[gameId];
     }
 
-    addGame(gameId: gameId, game: ConGame) {
-        this.currentGames[gameId] = game;
-        return this.currentGames[gameId]
+    addGame(game: ConGame) {
+        this.currentGames[game.id] = game;
+        return this.currentGames[game.id]
     }
 
     deleteGame(gameId: gameId) {

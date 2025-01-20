@@ -25,8 +25,6 @@ const io = new Server(server, {
     methods: ["GET", "POST"], // Allowed HTTP methods
   },
 });
-
-// Init Variables
 const gameEventEmitter = new GameEventEmitter(io)
 
 // Creates the gameplay namespace that will handle all gameplay connections
@@ -39,7 +37,7 @@ gameNamespace.on("connection", (socket) => {
 
     // Create game if doesn't exist
     if (!gameRoom) {
-      gameRoom = new ConGame(gameId, numPlayers);
+      gameRoom = gameStateManager.addGame(new ConGame(gameId, numPlayers));
       gameRoom.addPlayer(new Player(socket.id, true)); // First player to join is the host
     } else {
       gameRoom.addPlayer(new Player(socket.id));
@@ -56,13 +54,18 @@ gameNamespace.on("connection", (socket) => {
     
     currPlayer.toggleReady();
 
-    if (currPlayer.isReady) socket.emit("ready-status__ready")
-    else socket.emit("ready-status__not-ready")
+    if (currPlayer.isReady) {
+      // console.log(`Player ${socket.id} is now ready`);
+      socket.emit("ready-status__ready");
+    } else {
+      // console.log(`Player ${socket.id} is now not ready`);
+      socket.emit("ready-status__not-ready");
+    }
   });
 
   socket.on("select-sage", (gameId: ConGame["id"], sage: Sage) => {
     const isSageChosen = gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage)
-
+    socket.emit("select-sage-success")
   })
 
   socket.on("join-team", (gameId: ConGame['id'], team: 1 | 2) => {

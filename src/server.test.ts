@@ -1,15 +1,8 @@
 import Client, { Socket } from "socket.io-client";
 import { PORT } from "./utils/constants"; // Your actual constant file
 import { server } from "./server"; // Import your server.ts logic
-
-// Mock the currentGames variable to ensure it's reset for each test
-jest.mock("./server", () => {
-    const originalModule = jest.requireActual("./server");
-    return {
-      ...originalModule,
-      currentGames: {}, // Provide a fresh instance for each test
-    };
-});
+import { gameStateManager } from "./services/GameStateManager";
+import { ConGame } from "./models";
 
 let clientSocket: Socket;
 
@@ -28,6 +21,14 @@ afterAll(() => {
   server.close(); // Close the server
   clientSocket.close(); // Close the client socket
 });
+
+beforeEach(() => {
+    gameStateManager.resetGameStateManager();
+})
+
+afterEach(() => {
+    clientSocket.
+})
 
 test("should establish a socket connection", () => {
   expect(clientSocket.connected).toBe(true);
@@ -79,13 +80,20 @@ describe("toggle-ready-status event", () => {
 
         // Step 2: Wait for the "join-game-success" event to ensure player joined
         clientSocket.on("join-game-success", () => {
-            // Step 3: Emit the "toggle-ready-status" event
-            clientSocket.emit("toggle-ready-status", testGameId)
 
-            // Step 4: Listen for the "ready-status__ready" event
-            clientSocket.on("ready-status__ready", () => {
-                console.log("Player is now ready!");
-                done();
+            // Step 2.5: Select a Sage
+            clientSocket.emit("select-sage", testGameId, "Cedar")
+
+            clientSocket.on("select-sage-success", () => {
+
+                // Step 3: Emit the "toggle-ready-status" event
+                clientSocket.emit("toggle-ready-status", testGameId)
+    
+                // Step 4: Listen for the "ready-status__ready" event
+                clientSocket.on("ready-status__ready", () => {
+                    console.log("Player is now ready!");
+                    done();
+                })
             })
         })
     })
@@ -99,20 +107,27 @@ describe("toggle-ready-status event", () => {
 
         // Step 2: Wait for the "join-game-success" event to ensure player joined
         clientSocket.on("join-game-success", () => {
-            // Step 3: Emit the "toggle-ready-status" event
-            clientSocket.emit("toggle-ready-status", testGameId)
 
-            // Step 4: Listen for the "ready-status__ready" event
-            clientSocket.on("ready-status__ready", () => {
-                console.log("Player is now ready!");
-                
-                // Step 5: Emit "toggle-ready-status" again to toggle back
+            // Step 2.5: Select a Sage
+            clientSocket.emit("select-sage", testGameId, "Gravel")
+
+            clientSocket.on("select-sage-success", () => {
+
+                // Step 3: Emit the "toggle-ready-status" event
                 clientSocket.emit("toggle-ready-status", testGameId)
 
-                // Step 6: Listen for the "ready-status__not-ready" event
-                clientSocket.on("ready-status__not-ready", () => {
-                    console.log("Player is now not ready!");
-                    done();
+                // Step 4: Listen for the "ready-status__ready" event
+                clientSocket.on("ready-status__ready", () => {
+                    console.log("Player is now ready!");
+                    
+                    // Step 5: Emit "toggle-ready-status" again to toggle back
+                    clientSocket.emit("toggle-ready-status", testGameId)
+
+                    // Step 6: Listen for the "ready-status__not-ready" event
+                    clientSocket.on("ready-status__not-ready", () => {
+                        console.log("Player is now not ready!");
+                        done();
+                    })
                 })
             })
         })
