@@ -27,78 +27,103 @@ const io = new Server(server, {
     methods: ["GET", "POST"], // Allowed HTTP methods
   },
 });
-const gameEventEmitter = new GameEventEmitter(io)
+const gameEventEmitter = new GameEventEmitter(io);
 
 // Creates the gameplay namespace that will handle all gameplay connections
 const gameNamespace = io.of("/gameplay");
 gameNamespace.on("connection", (socket) => {
+  function socketCallback(
+    eventName: string,
+    fn: (...args: any[]) => Promise<void>
+  ) {
+    return handleSocketError(socket, eventName, fn);
+  }
 
-  socket.on("join-game", handleSocketError(socket, "join-game", async (gameId: ConGame["id"], numPlayers: ConGame['numPlayersTotal']) => {
-    let gameRoom = gameStateManager.getGame(gameId);
+  socket.on(
+    "join-game",
+    socketCallback("join-game", async (gameId, numPlayers) => {
+      let gameRoom = gameStateManager.getGame(gameId);
 
-    // Create game if doesn't exist
-    if (!gameRoom) {
-      gameRoom = gameStateManager.addGame(new ConGame(gameId, numPlayers));
-      gameRoom.addPlayer(new Player(socket.id, true)); // First player to join is the host
-    } else {
-      gameRoom.addPlayer(new Player(socket.id));
-    }
+      // Create game if doesn't exist
+      if (!gameRoom) {
+        gameRoom = gameStateManager.addGame(new ConGame(gameId, numPlayers));
+        gameRoom.addPlayer(new Player(socket.id, true)); // First player to join is the host
+      } else {
+        gameRoom.addPlayer(new Player(socket.id));
+      }
 
-    socket.join(gameId);
-    socket.emit("join-game-success")
-  }));
+      socket.join(gameId);
+      socket.emit("join-game-success");
+    })
+  );
 
-  socket.on("select-sage", handleSocketError(socket, "select-sage", async (gameId: ConGame["id"], sage: Sage) => {
-    gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage)
-    socket.emit("select-sage-success")
-  }))
+  socket.on(
+    "select-sage",
+    socketCallback("select-sage", async (gameId: ConGame["id"], sage: Sage) => {
+      gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage);
+      socket.emit("select-sage-success");
+    })
+  );
 
-  socket.on("toggle-ready-status", handleSocketError(socket, "toggle-ready-status", async (gameId: ConGame["id"]) => {
-    const currPlayer = gameStateManager.getGame(gameId).getPlayer(socket.id)
-    currPlayer.toggleReady();
+  socket.on(
+    "toggle-ready-status",
+    socketCallback("toggle-ready-status", async (gameId: ConGame["id"]) => {
+      const currPlayer = gameStateManager.getGame(gameId).getPlayer(socket.id);
+      currPlayer.toggleReady();
 
-    if (currPlayer.isReady) {
-      socket.emit("ready-status__ready");
-    } else {
-      socket.emit("ready-status__not-ready");
-    }
-  }));
+      if (currPlayer.isReady) {
+        socket.emit("ready-status__ready");
+      } else {
+        socket.emit("ready-status__not-ready");
+      }
+    })
+  );
 
-  socket.on("join-team", (gameId: ConGame['id'], team: 1 | 2) => {
-    gameStateManager.getGame(gameId).joinTeam(socket.id, team);
-  })
+  socket.on(
+    "join-team",
+    socketCallback("join-team", async (gameId: ConGame["id"], team: 1 | 2) => {
+      gameStateManager.getGame(gameId).joinTeam(socket.id, team);
+    })
+  );
 
-  socket.on("start-game", (gameId: ConGame["id"]) => {
-    const gameRoom = gameStateManager.getGame(gameId);
-    gameRoom.startGame(socket.id);    
-    gameEventEmitter.emitPickWarriors(gameRoom.players)
+  socket.on(
+    "start-game",
+    socketCallback("start-game", async (gameId: ConGame["id"]) => {
+      const gameRoom = gameStateManager.getGame(gameId);
+      gameRoom.startGame(socket.id);
+      gameEventEmitter.emitPickWarriors(gameRoom.players);
 
-    // TODO: coin flip for who is first. Players decide play order if 4 players
+      // TODO: coin flip for who is first. Players decide play order if 4 players
 
-    gameRoom.setStarted(true);
-  });
+      gameRoom.setStarted(true);
+    })
+  );
 
-  socket.on("chose-warriors", (gameId: ConGame['id'], choices: [ElementalWarriorCard, ElementalWarriorCard]) => {
-    gameStateManager.getGame(gameId).chooseWarriors(socket.id, choices);
-    
-    // TODO: Emit to player to choose battlefield layout
-  })
+  socket.on(
+    "chose-warriors",
+    socketCallback("chose-warriors", async (gameId: ConGame["id"], choices: [ElementalWarriorCard, ElementalWarriorCard]) => {
+        gameStateManager.getGame(gameId).chooseWarriors(socket.id, choices);
 
-  socket.on("finished-setup", (gameId: ConGame['id']) => {
+        // TODO: Emit to player to choose battlefield layout
+      }
+    )
+  );
+
+  socket.on("finished-setup", socketCallback("finished-setup", async (gameId: ConGame["id"]) => {
     const gameRoom = gameStateManager.getGame(gameId);
     gameRoom.numPlayersFinishedSetup++;
 
     if (gameRoom.numPlayersFinishedSetup === gameRoom.players.length)
       // TODO: Go to choosing who is first and emit to players who is first
       return;
-  })
+  }));
 
-  socket.on("leave-game", (gameId: ConGame["id"]) => {
+  socket.on("leave-game", socketCallback("leave-game", async (gameId: ConGame["id"]) => {
     const currPlayerId = socket.id;
     gameStateManager.getGame(gameId).removePlayer(currPlayerId);
 
     socket.leave(gameId);
-  });
+  }));
 });
 
 // Start the server if not in test mode
@@ -108,4 +133,4 @@ if (IS_PRODUCTION) {
   });
 }
 
-export { server, io, app }
+export { server, io, app };
