@@ -57,8 +57,6 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on("toggle-ready-status", (gameId: ConGame["id"]) => {
     const currPlayer = gameStateManager.getGame(gameId).getPlayer(socket.id)
-    if (!currPlayer) throw new Error(`Player with socket ID ${socket.id} not found in game ${gameId}`);
-    
     currPlayer.toggleReady();
 
     if (currPlayer.isReady) {

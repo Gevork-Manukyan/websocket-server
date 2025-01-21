@@ -1,5 +1,6 @@
 // Command of Nature (C.O.N)
 
+import { NotFoundError } from "../services/CustomError/BaseError";
 import { Sage, ElementalCard, gameId, ItemCard, ElementalWarriorCard } from "../types";
 import { Decklist } from "../types/types";
 import { Battlefield } from "./Battlefield";
@@ -42,9 +43,12 @@ export class ConGame {
   getPlayer(playerId: Player["id"]): Player {
     const player = this.players.find((item) => item.id === playerId);
     if (!player)
-      throw new Error(
+      throw new NotFoundError(
+        "Player",
+        playerId,
         `Player with socket ID ${playerId} not found in game ${this.id}`
       );
+      
     return player;
   }
 
