@@ -32,7 +32,6 @@ const gameEventEmitter = new GameEventEmitter(io)
 // Creates the gameplay namespace that will handle all gameplay connections
 const gameNamespace = io.of("/gameplay");
 gameNamespace.on("connection", (socket) => {
-  console.log("A player connected to the gameplay namespace");
 
   socket.on("join-game", handleSocketError(socket, "join-game", async (gameId: ConGame["id"], numPlayers: ConGame['numPlayersTotal']) => {
     let gameRoom = gameStateManager.getGame(gameId);
@@ -47,7 +46,6 @@ gameNamespace.on("connection", (socket) => {
 
     socket.join(gameId);
     socket.emit("join-game-success")
-    console.log(`Player joined game: ${gameId}`);
   }));
 
   socket.on("select-sage", handleSocketError(socket, "select-sage", async (gameId: ConGame["id"], sage: Sage) => {
@@ -55,18 +53,16 @@ gameNamespace.on("connection", (socket) => {
     socket.emit("select-sage-success")
   }))
 
-  socket.on("toggle-ready-status", (gameId: ConGame["id"]) => {
+  socket.on("toggle-ready-status", handleSocketError(socket, "toggle-ready-status", async (gameId: ConGame["id"]) => {
     const currPlayer = gameStateManager.getGame(gameId).getPlayer(socket.id)
     currPlayer.toggleReady();
 
     if (currPlayer.isReady) {
-      // console.log(`Player ${socket.id} is now ready`);
       socket.emit("ready-status__ready");
     } else {
-      // console.log(`Player ${socket.id} is now not ready`);
       socket.emit("ready-status__not-ready");
     }
-  });
+  }));
 
   socket.on("join-team", (gameId: ConGame['id'], team: 1 | 2) => {
     gameStateManager.getGame(gameId).joinTeam(socket.id, team);
@@ -80,7 +76,6 @@ gameNamespace.on("connection", (socket) => {
     // TODO: coin flip for who is first. Players decide play order if 4 players
 
     gameRoom.setStarted(true);
-    console.log(`Game ${gameId} started!`);
   });
 
   socket.on("chose-warriors", (gameId: ConGame['id'], choices: [ElementalWarriorCard, ElementalWarriorCard]) => {
@@ -103,11 +98,6 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.getGame(gameId).removePlayer(currPlayerId);
 
     socket.leave(gameId);
-    console.log(`Player ${currPlayerId} left game ${gameId}`);
-  });
-
-  socket.on("disconnect", () => {
-    console.log(`Player disconnected from gameplay namespace`);
   });
 });
 
