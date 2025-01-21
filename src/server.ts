@@ -9,6 +9,7 @@ import { GameEventEmitter } from "./services";
 import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
+import { handleSocketError } from "./utils/utilities";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -33,7 +34,7 @@ const gameNamespace = io.of("/gameplay");
 gameNamespace.on("connection", (socket) => {
   console.log("A player connected to the gameplay namespace");
 
-  socket.on("join-game", (gameId: ConGame["id"], numPlayers: ConGame['numPlayersTotal']) => {
+  socket.on("join-game", handleSocketError(socket, "join-game", async (gameId: ConGame["id"], numPlayers: ConGame['numPlayersTotal']) => {
     let gameRoom = gameStateManager.getGame(gameId);
 
     // Create game if doesn't exist
@@ -47,12 +48,12 @@ gameNamespace.on("connection", (socket) => {
     socket.join(gameId);
     socket.emit("join-game-success")
     console.log(`Player joined game: ${gameId}`);
-  });
+  }));
 
-  socket.on("select-sage", (gameId: ConGame["id"], sage: Sage) => {
-    const isSageChosen = gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage)
+  socket.on("select-sage", handleSocketError(socket, "select-sage", async (gameId: ConGame["id"], sage: Sage) => {
+    gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage)
     socket.emit("select-sage-success")
-  })
+  }))
 
   socket.on("toggle-ready-status", (gameId: ConGame["id"]) => {
     const currPlayer = gameStateManager.getGame(gameId).getPlayer(socket.id)

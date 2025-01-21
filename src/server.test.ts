@@ -3,6 +3,7 @@ import { server } from "./server"; // Import your server.ts logic
 import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
 import { Player } from "./models";
+import { CustomError } from "./services/CustomError/BaseError";
 
 let clientSocket: Socket;
 const testGameId = "test-game";
@@ -20,11 +21,11 @@ beforeAll((done) => {
 });
 
 afterAll(() => {
-  server.close(); // Close the server
-  clientSocket.close(); // Close the client socket
+  // server.close(); // Close the server
+  // clientSocket.close(); // Close the client socket
 });
 
-beforeEach(() => {
+afterEach(() => {
   gameStateManager.resetGameStateManager();
   clientSocket.removeAllListeners();
 });
@@ -78,14 +79,20 @@ describe("select-sage event", () => {
   });
 
   test("should Error if selected sage is already picked", (done) => {
-    const player2 = new Player("player2")
-    const game = gameStateManager.getGame(testGameId)
-    game.addPlayer(player2)
-    game.setPlayerSage(player2.id, "Cedar")
+    clientSocket.once("join-game-success", () => {
+      const player2 = new Player("player2")
+      const game = gameStateManager.getGame(testGameId)
+      game.addPlayer(player2)
+      game.setPlayerSage(player2.id, "Cedar")
+    })
+
 
     clientSocket.once("join-game-success", () => {
       clientSocket.emit("select-sage", testGameId, "Cedar")
-      
+      clientSocket.once("select-sage-error", (error: CustomError) => {
+        console.log(error.message)
+        done();
+      })
     })
   });
 });
