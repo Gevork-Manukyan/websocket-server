@@ -53,7 +53,7 @@ gameNamespace.on("connection", (socket) => {
       }
 
       socket.join(gameId);
-      socket.emit("join-game-success");
+      socket.emit("join-game--success");
     })
   );
 
@@ -61,20 +61,23 @@ gameNamespace.on("connection", (socket) => {
     "select-sage",
     socketCallback("select-sage", async (gameId: ConGame["id"], sage: Sage) => {
       gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage);
-      socket.emit("select-sage-success");
+      socket.emit("select-sage--success");
     })
   );
 
   socket.on(
     "toggle-ready-status",
-    socketCallback("toggle-ready-status", async (gameId: ConGame["id"]) => {
-      const currPlayer = gameStateManager.getGame(gameId).getPlayer(socket.id);
+    socketCallback("toggle-ready--status", async (gameId: ConGame["id"]) => {
+      const game = gameStateManager.getGame(gameId)
+      const currPlayer = game.getPlayer(socket.id);
       currPlayer.toggleReady();
 
       if (currPlayer.isReady) {
-        socket.emit("ready-status__ready");
+        game.incrementPlayersReady()
+        socket.emit("ready-status--ready");
       } else {
-        socket.emit("ready-status__not-ready");
+        game.decrementPlayersReady()
+        socket.emit("ready-status--not-ready");
       }
     })
   );

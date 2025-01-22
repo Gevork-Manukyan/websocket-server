@@ -1,3 +1,5 @@
+import { ValidationError } from "../services/CustomError/BaseError";
+import { NullSpaceError } from "../services/CustomError/GameError";
 import { ElementalCard } from "../types";
 
 type TwoPlayerSpaceOptions = 1 | 2 | 3 | 4 | 5 | 6;
@@ -152,13 +154,13 @@ export class Battlefield {
 
     addCard(card: ElementalCard, spaceNumber: SpaceOptions) {
         const targetSpace = this.getBattlefieldSpace(spaceNumber)
-        if (targetSpace.value !== null) throw new Error("Cannot add a card to a space with an existing card")
+        if (targetSpace.value !== null) throw new ValidationError("Cannot add a card to a space with an existing card", "INVALID_INPUT")
         targetSpace.value = card;
     }
 
     removeCard(spaceNumber: SpaceOptions) {
         const targetSpace = this.getBattlefieldSpace(spaceNumber)
-        if (targetSpace.value === null) throw new Error("Cannot remove an empty space")
+        if (targetSpace.value === null) throw new NullSpaceError(spaceNumber, `Cannot remove an empty space: ${spaceNumber}`)
         const targetCard = targetSpace.value
         targetSpace.value = null
         return targetCard;
@@ -168,7 +170,10 @@ export class Battlefield {
         const space1 = this.getBattlefieldSpace(space1Number)
         const space2 = this.getBattlefieldSpace(space2Number)
 
-        if (space1 === null || space2 === null) throw new Error(`Cannot swap null battlefield space(s): ${space1Number} $ ${space2Number}`)
+        if (space1 === null || space2 === null) {
+            const nullSpace = space1 === null ? space1Number : space2Number
+            throw new NullSpaceError(nullSpace, `Cannot swap null battlefield space: ${nullSpace}`)
+        }
 
         const space1Value = space1.value
         space1.setValue(space2.value)
@@ -179,7 +184,7 @@ export class Battlefield {
         const maxSpaceNumber = this.numPlayersOnTeam === 2 ? TWO_PLAYER_SPACE_MAX : FOUR_PLAYER_SPACE_MAX;
     
         if (spaceNumber < 1 || spaceNumber > maxSpaceNumber) {
-            throw new Error(`Invalid space for ${this.numPlayersOnTeam}-player battlefield: ${spaceNumber}`);
+            throw new ValidationError(`Invalid space for ${this.numPlayersOnTeam}-player battlefield: ${spaceNumber}`, "INVALID_INPUT");
         }
     }
 

@@ -1,3 +1,4 @@
+import { ConflictError } from "../services/CustomError/BaseError";
 import { ElementalWarriorCard } from "../types";
 import { Decklist } from "../types/types";
 import { Battlefield } from "./Battlefield";
@@ -17,7 +18,7 @@ export class Team {
     }
 
     addPlayerToTeam(player: Player) {
-        if (this.players.length === (this.teamSize)) throw new Error(`Team ${this.teamNumber} is full`);
+        if (this.players.length === (this.teamSize)) throw new ConflictError(`Team ${this.teamNumber} is full`);
         this.players.push(player)
     }
 

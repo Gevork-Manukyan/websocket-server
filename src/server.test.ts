@@ -42,7 +42,7 @@ describe("join-game event", () => {
       console.log("Client connected");
     });
 
-    clientSocket.once("join-game-success", () => {
+    clientSocket.once("join-game--success", () => {
       console.log("The game was joined successfully!");
       done();
     });
@@ -57,7 +57,7 @@ describe("join-game event", () => {
       console.log("Client connected");
     });
 
-    clientSocket.once("join-game-success", () => {
+    clientSocket.once("join-game--success", () => {
       console.log("The game was joined successfully!");
       done();
     });
@@ -70,16 +70,16 @@ describe("select-sage event", () => {
   })
 
   test("should select sage", (done) => {
-    clientSocket.once("join-game-success", () => {
+    clientSocket.once("join-game--success", () => {
       clientSocket.emit("select-sage", testGameId, "Cedar")
-      clientSocket.once("select-sage-success", () => {
+      clientSocket.once("select-sage--success", () => {
         done();
       })
     })
   });
 
   test("should Error if selected sage is already picked", (done) => {
-    clientSocket.once("join-game-success", () => {
+    clientSocket.once("join-game--success", () => {
       const player2 = new Player("player2")
       const game = gameStateManager.getGame(testGameId)
       game.addPlayer(player2)
@@ -87,9 +87,9 @@ describe("select-sage event", () => {
     })
 
 
-    clientSocket.once("join-game-success", () => {
+    clientSocket.once("join-game--success", () => {
       clientSocket.emit("select-sage", testGameId, "Cedar")
-      clientSocket.once("select-sage-error", (error: CustomError) => {
+      clientSocket.once("select-sage--error", (error: CustomError) => {
         console.log(error.message)
         done();
       })
@@ -100,7 +100,7 @@ describe("select-sage event", () => {
 describe("toggle-ready-status event", () => {
   beforeEach(() => {
     clientSocket.emit("join-game", testGameId, numPlayers);
-    clientSocket.on("join-game-success", () => {
+    clientSocket.on("join-game--success", () => {
       clientSocket.emit("select-sage", testGameId, "Cedar");
     });
   });
@@ -109,7 +109,7 @@ describe("toggle-ready-status event", () => {
     clientSocket.once("select-sage-success", () => {
       clientSocket.emit("toggle-ready-status", testGameId);
 
-      clientSocket.once("ready-status__ready", () => {
+      clientSocket.once("ready-status--ready", () => {
         console.log("Player is now ready!");
         done();
       });
@@ -122,14 +122,14 @@ describe("toggle-ready-status event", () => {
       clientSocket.emit("toggle-ready-status", testGameId);
 
       // Step 4: Listen for the "ready-status__ready" event
-      clientSocket.once("ready-status__ready", () => {
+      clientSocket.once("ready-status--ready", () => {
         console.log("Player is now ready!");
 
         // Step 5: Emit "toggle-ready-status" again to toggle back
         clientSocket.emit("toggle-ready-status", testGameId);
 
         // Step 6: Listen for the "ready-status__not-ready" event
-        clientSocket.once("ready-status__not-ready", () => {
+        clientSocket.once("ready-status--not-ready", () => {
           console.log("Player is now not ready!");
           done();
         });

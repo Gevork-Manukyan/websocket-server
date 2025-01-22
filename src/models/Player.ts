@@ -1,3 +1,4 @@
+import { ValidationError } from "../services/CustomError/BaseError";
 import { Card, ElementalWarriorCard, Sage } from "../types";
 import { Decklist } from "../types/types";
 import { getSageDecklist } from "../utils/utilities";
@@ -51,7 +52,7 @@ export class Player {
   }
 
   initDeck() {
-    if (!this.sage) throw new Error("Cannot initialize the deck. The sage has not been set.")
+    if (!this.sage) throw new ValidationError("Cannot initialize the deck. The sage has not been set.", "sage")
     this.setDecklist(getSageDecklist(this.sage))
 
     const decklist = this.decklist!

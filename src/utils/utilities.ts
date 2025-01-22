@@ -1,10 +1,11 @@
 import { Socket } from "socket.io";
 import { Sage } from "../types";
 import { DropletDeck, LeafDeck, PebbleDeck, TwigDeck } from "./constants";
-import { CustomError } from "../services/CustomError/BaseError";
+import { CustomError, ValidationError } from "../services/CustomError/BaseError";
+import { InvalidSageError } from "../services/CustomError/GameError";
 
 export function getSageDecklist(sage: Sage | null) {
-  if (!sage) throw new Error(`No chosen character`)
+  if (!sage) throw new ValidationError(`No chosen sage`, "sage")
 
       switch (sage) {
         case "Cedar":
@@ -16,7 +17,7 @@ export function getSageDecklist(sage: Sage | null) {
         case "Torrent":
           return DropletDeck;
         default:
-          throw new Error(`Unknown character class: ${sage}`);
+          throw new InvalidSageError(sage);
       }
 }
 
@@ -31,7 +32,7 @@ export function handleSocketError(
     } catch (error) {
       const { message, code, ...rest } = error as CustomError;
 
-      socket.emit(`${eventName}-error`, {
+      socket.emit(`${eventName}--error`, {
         code: code || "INTERNAL_ERROR",
         message: message || "An unexpected error occurred.",
         ...rest

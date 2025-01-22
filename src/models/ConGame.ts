@@ -1,9 +1,8 @@
 // Command of Nature (C.O.N)
 
-import { NotFoundError } from "../services/CustomError/BaseError";
+import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
+import { HostOnlyActionError, PlayersNotReadyError, SageUnavailableError } from "../services/CustomError/GameError";
 import { Sage, ElementalCard, gameId, ItemCard, ElementalWarriorCard } from "../types";
-import { Decklist } from "../types/types";
-import { Battlefield } from "./Battlefield";
 import { Player } from "./Player";
 import { Team } from "./Team";
 
@@ -12,7 +11,7 @@ export class ConGame {
   isStarted: Boolean = false;
   numPlayersTotal: 2 | 4;
   numPlayersReady: number = 0;
-  numPlayersFinishedSetup: number = 0;
+  numPlayersFinishedSetup: number = 0; // TODO: never incremended/decremented
   players: Player[] = [];
   team1: Team;
   team2: Team;
@@ -54,7 +53,7 @@ export class ConGame {
 
   setPlayerSage(playerId: Player["id"], sage: Sage) {
     const isSageAvailable = this.players.every(player => player.sage !== sage)
-    if (!isSageAvailable) throw new Error("Selected Sage is unavailable");
+    if (!isSageAvailable) throw new SageUnavailableError(sage);
 
     this.getPlayer(playerId).setSage(sage)
   }
@@ -66,12 +65,22 @@ export class ConGame {
     player.setTeam(teamSelected);
   }
 
+  incrementPlayersReady() {
+    this.numPlayersReady++
+    return this.numPlayersReady
+  }
+
+  decrementPlayersReady() {
+    this.numPlayersReady--
+    return this.numPlayersReady
+  }
+
   startGame(playerId: Player["id"]) {
     // Only host can start game
-    if (!this.getPlayer(playerId).isGameHost) throw new Error(`Only the host can start the game`);
+    if (!this.getPlayer(playerId).isGameHost) throw new HostOnlyActionError(`start the game`);
 
     // All players must be ready
-    if (!this.players.every((player) => player.isReady)) throw new Error(`All players must be ready before starting game`)
+    if (this.numPlayersReady !== this.numPlayersTotal) throw new PlayersNotReadyError(this.numPlayersReady, this.numPlayersTotal)
 
     // TODO: initlize game
     this.initPlayerDecks();
@@ -98,7 +107,7 @@ export class ConGame {
     if (
       choice1.element !== decklist.sage.element ||
       choice2.element !== decklist.sage.element
-    ) throw new Error("Invalid cards passed for chosen deck")
+    ) throw new ValidationError("Invalid warriors passed for chosen deck", "INVALID_INPUT")
     
     player.team!.initWarriors(choices)
 
