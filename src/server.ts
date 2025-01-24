@@ -1,6 +1,6 @@
-import express from "express"; // Import Express
-import http from "http"; // Import Node.js HTTP module
-import { Server } from "socket.io"; // Import types from Socket.IO
+import express from "express"; 
+import http from "http"; 
+import { Server } from "socket.io";
 import { ElementalWarriorCard } from "./types";
 import { ConGame } from "./models/ConGame";
 import { Player } from "./models/Player";
@@ -14,9 +14,7 @@ import { handleSocketError } from "./utils/utilities";
 const app = express();
 const server = http.createServer(); // Create an HTTP server
 
-// Middleware to parse JSON requests
 app.use(express.json());
-// Allows for CORS
 // const cors = require('cors');
 // app.use(cors())
 
@@ -42,14 +40,14 @@ gameNamespace.on("connection", (socket) => {
   socket.on(
     "join-game",
     socketCallback("join-game", async (gameId, numPlayers) => {
-      let gameRoom = gameStateManager.getGame(gameId);
+      let game = gameStateManager.getGame(gameId);
 
       // Create game if doesn't exist
-      if (!gameRoom) {
-        gameRoom = gameStateManager.addGame(new ConGame(gameId, numPlayers));
-        gameRoom.addPlayer(new Player(socket.id, true)); // First player to join is the host
+      if (!game) {
+        game = gameStateManager.addGame(new ConGame(gameId, numPlayers));
+        game.addPlayer(new Player(socket.id, true)); // First player to join is the host
       } else {
-        gameRoom.addPlayer(new Player(socket.id));
+        game.addPlayer(new Player(socket.id));
       }
 
       socket.join(gameId);
@@ -92,13 +90,13 @@ gameNamespace.on("connection", (socket) => {
   socket.on(
     "start-game",
     socketCallback("start-game", async (gameId: ConGame["id"]) => {
-      const gameRoom = gameStateManager.getGame(gameId);
-      gameRoom.startGame(socket.id);
-      gameEventEmitter.emitPickWarriors(gameRoom.players);
+      const game = gameStateManager.getGame(gameId);
+      game.startGame(socket.id);
+      gameEventEmitter.emitPickWarriors(game.players);
 
       // TODO: coin flip for who is first. Players decide play order if 4 players
 
-      gameRoom.setStarted(true);
+      game.setStarted(true);
     })
   );
 
@@ -113,10 +111,10 @@ gameNamespace.on("connection", (socket) => {
   );
 
   socket.on("finished-setup", socketCallback("finished-setup", async (gameId: ConGame["id"]) => {
-    const gameRoom = gameStateManager.getGame(gameId);
-    gameRoom.numPlayersFinishedSetup++;
+    const game = gameStateManager.getGame(gameId);
+    game.numPlayersFinishedSetup++;
 
-    if (gameRoom.numPlayersFinishedSetup === gameRoom.players.length)
+    if (game.numPlayersFinishedSetup === game.players.length)
       // TODO: Go to choosing who is first and emit to players who is first
       return;
   }));

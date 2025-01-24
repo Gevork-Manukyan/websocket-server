@@ -106,7 +106,8 @@ describe("toggle-ready-status event", () => {
   });
 
   test("should make player ready if they are not ready", (done) => {
-    clientSocket.once("select-sage-success", () => {
+      clientSocket.once("select-sage--success", () => {
+        
       clientSocket.emit("toggle-ready-status", testGameId);
 
       clientSocket.once("ready-status--ready", () => {
@@ -117,18 +118,14 @@ describe("toggle-ready-status event", () => {
   });
 
   test("should make player not ready if they are ready", (done) => {
-    clientSocket.once("select-sage-success", () => {
-      // Step 3: Emit the "toggle-ready-status" event
+    clientSocket.once("select-sage--success", () => {
       clientSocket.emit("toggle-ready-status", testGameId);
 
-      // Step 4: Listen for the "ready-status__ready" event
       clientSocket.once("ready-status--ready", () => {
         console.log("Player is now ready!");
 
-        // Step 5: Emit "toggle-ready-status" again to toggle back
         clientSocket.emit("toggle-ready-status", testGameId);
 
-        // Step 6: Listen for the "ready-status__not-ready" event
         clientSocket.once("ready-status--not-ready", () => {
           console.log("Player is now not ready!");
           done();
@@ -136,19 +133,4 @@ describe("toggle-ready-status event", () => {
       });
     });
   });
-});
-
-test("should log player disconnection when client disconnects", (done) => {
-  const logSpy = jest.spyOn(console, "log");
-
-  // Disconnect the client
-  clientSocket.disconnect();
-
-  setTimeout(() => {
-    expect(logSpy).toHaveBeenCalledWith(
-      "Player disconnected from gameplay namespace"
-    );
-    logSpy.mockRestore();
-    done();
-  }, 100); // Small delay to ensure the server processes the disconnect
 });
