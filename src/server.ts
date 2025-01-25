@@ -84,8 +84,13 @@ gameNamespace.on("connection", (socket) => {
     "join-team",
     socketCallback("join-team", async (gameId: ConGame["id"], team: 1 | 2) => {
       gameStateManager.getGame(gameId).joinTeam(socket.id, team);
+      socket.emit("join-team--success")
     })
   );
+
+  socket.on("clear-teams", socketCallback("clear-teams", async (gameId: ConGame["id"]) => {
+    // TODO: remove all players from all teams. Only the host can do this
+  }))
 
   socket.on(
     "start-game",

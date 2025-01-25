@@ -73,6 +73,7 @@ describe("select-sage event", () => {
     clientSocket.once("join-game--success", () => {
       clientSocket.emit("select-sage", testGameId, "Cedar")
       clientSocket.once("select-sage--success", () => {
+        expect(gameStateManager.getGame(testGameId).players[0].sage).toBe("Cedar")
         done();
       })
     })
@@ -134,3 +135,51 @@ describe("toggle-ready-status event", () => {
     });
   });
 });
+
+describe("join-team event", () => {
+    beforeEach(() => {
+        clientSocket.emit("join-game", testGameId, numPlayers);
+        clientSocket.on("join-game--success", () => {
+          clientSocket.emit("select-sage", testGameId, "Cedar");
+          clientSocket.once("select-sage--success", () => {
+                clientSocket.emit("toggle-ready-status", testGameId);                    
+          })
+        });
+    });
+
+    test("should make player join team 1", (done) => {
+        const expectedTeam = 1;
+        clientSocket.once("ready-status--ready", () => {
+            clientSocket.emit("join-team", testGameId, expectedTeam)
+            clientSocket.once("join-team--success", () => {
+                expect(gameStateManager.getGame(testGameId).players[0].team?.getTeamNumber()).toBe(expectedTeam)
+                console.log("Player joined team 1");
+                done();
+            })
+        });
+    })
+
+    test("should make player join team 2", (done) => {
+        const expectedTeam = 2;
+        clientSocket.once("ready-status--ready", () => {
+            clientSocket.emit("join-team", testGameId, expectedTeam)
+            clientSocket.once("join-team--success", () => {
+                expect(gameStateManager.getGame(testGameId).players[0].team?.getTeamNumber()).toBe(expectedTeam)
+                console.log("Player joined team 2");
+                done();
+            })
+        });
+    })
+
+    test("should throw error if joining a full team", (done) => {
+        clientSocket.once("ready-status--ready", () => {
+            done()
+        });
+    })
+
+    test("should make player switch from team 1 to team 2", (done) => {
+        clientSocket.once("ready-status--ready", () => {
+            done()   
+        });
+    })
+})

@@ -17,6 +17,14 @@ export class Team {
         this.teamSize = teamSize;
     }
 
+    getTeamNumber() {
+        return this.teamNumber;
+    }
+
+    getTeamSize() {
+        return this.teamSize;
+    }
+
     addPlayerToTeam(player: Player) {
         if (this.players.length === (this.teamSize)) throw new ConflictError(`Team ${this.teamNumber} is full`);
         this.players.push(player)
