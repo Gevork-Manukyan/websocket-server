@@ -1,5 +1,7 @@
 import { ValidationError } from "../services/CustomError/BaseError";
-import { Cedar, Gravel } from "../utils";
+import { Cedar, Gravel, Timber } from "../utils";
+import { CloseStrike, FarStrike, NaturalRestoration, TwigCharm } from "../utils/cards";
+import { TwigDeck } from "../utils/constants";
 import { Player } from "./Player";
 
 const testPlayerId = "testId123"
@@ -76,6 +78,25 @@ describe("adding cards to deck", () => {
         const player = new Player(testPlayerId)
         player.addCardsToDeck([Cedar, Gravel])
         expect(player.deck).toStrictEqual([Cedar, Gravel])
+        done()
+    })
+})
+
+describe("initDeck method", () => {
+    test("should throw error if player is not ready", (done) => {
+        const player = new Player(testPlayerId)
+        expect(() => player.initDeck()).toThrow(ValidationError)
+        done()
+    })
+
+    test("should properly init deck", (done) => {
+        const player = new Player(testPlayerId)
+        player.setSage("Cedar")
+        player.toggleReady()
+        player.initDeck()
+
+        expect(player.decklist).toStrictEqual(TwigDeck)
+        expect(player.deck).toStrictEqual([Timber, CloseStrike, CloseStrike, FarStrike, NaturalRestoration, TwigCharm])
         done()
     })
 })
