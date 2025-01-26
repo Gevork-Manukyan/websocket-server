@@ -30,6 +30,10 @@ export class Team {
         this.players.push(player)
     }
 
+    removePlayerFromTeam(player: Player) {
+        this.players = this.players.filter(currPlayer => currPlayer.id !== player.id)
+    }
+
     getAllPlayerDecklists() {
         return this.players.map(player => {
             const decklist = player.getDecklist();

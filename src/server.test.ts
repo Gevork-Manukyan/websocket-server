@@ -148,11 +148,11 @@ describe("join-team event", () => {
     });
 
     test("should make player join team 1", (done) => {
-        const expectedTeam = 1;
+        const expectedTeamNumber = 1;
         clientSocket.once("ready-status--ready", () => {
-            clientSocket.emit("join-team", testGameId, expectedTeam)
+            clientSocket.emit("join-team", testGameId, expectedTeamNumber)
             clientSocket.once("join-team--success", () => {
-                expect(gameStateManager.getGame(testGameId).players[0].team?.getTeamNumber()).toBe(expectedTeam)
+                expect(gameStateManager.getGame(testGameId).players[0].team?.getTeamNumber()).toBe(expectedTeamNumber)
                 console.log("Player joined team 1");
                 done();
             })
@@ -160,11 +160,11 @@ describe("join-team event", () => {
     })
 
     test("should make player join team 2", (done) => {
-        const expectedTeam = 2;
+        const expectedTeamNumber = 2;
         clientSocket.once("ready-status--ready", () => {
-            clientSocket.emit("join-team", testGameId, expectedTeam)
+            clientSocket.emit("join-team", testGameId, expectedTeamNumber)
             clientSocket.once("join-team--success", () => {
-                expect(gameStateManager.getGame(testGameId).players[0].team?.getTeamNumber()).toBe(expectedTeam)
+                expect(gameStateManager.getGame(testGameId).players[0].team?.getTeamNumber()).toBe(expectedTeamNumber)
                 console.log("Player joined team 2");
                 done();
             })
@@ -172,14 +172,37 @@ describe("join-team event", () => {
     })
 
     test("should throw error if joining a full team", (done) => {
+        const expectedTeamNumber = 1;
+        const addPlayer2 = () => {
+            const player2 = new Player("player2")
+            const game = gameStateManager.getGame(testGameId)
+            game.addPlayer(player2)
+            game.joinTeam(player2.id, expectedTeamNumber)
+        }
+
         clientSocket.once("ready-status--ready", () => {
-            done()
+            addPlayer2()
+            clientSocket.emit("join-team", testGameId, expectedTeamNumber)
+            clientSocket.once("join-team--error", () => {
+                done();
+            })        
         });
     })
 
     test("should make player switch from team 1 to team 2", (done) => {
+        const expectedTeamNumberFirst = 1;
+        const expectedTeamNumberSecond = 2;
         clientSocket.once("ready-status--ready", () => {
-            done()   
+            clientSocket.emit("join-team", testGameId, expectedTeamNumberFirst)
+            clientSocket.once("join-team--success", () => {
+                expect(gameStateManager.getGame(testGameId).players[0].team?.getTeamNumber()).toBe(expectedTeamNumberFirst)
+                
+                clientSocket.emit("join-team", testGameId, expectedTeamNumberSecond)
+                clientSocket.once("join-team--success", () => {
+                    expect(gameStateManager.getGame(testGameId).players[0].team?.getTeamNumber()).toBe(expectedTeamNumberSecond)
+                    done()
+                })
+            })
         });
     })
 })

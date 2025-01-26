@@ -61,6 +61,11 @@ export class ConGame {
   joinTeam(playerId: Player['id'], teamNumber: Team['teamNumber']) {
     const teamSelected = teamNumber === 1 ? this.team1 : this.team2;
     const player = this.getPlayer(playerId);
+
+    // Check if already on team
+    const currTeam = player.team;
+    if (currTeam !== null) currTeam.removePlayerFromTeam(player)
+
     teamSelected.addPlayerToTeam(player);
     player.setTeam(teamSelected);
   }
