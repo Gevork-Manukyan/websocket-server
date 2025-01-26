@@ -1,4 +1,4 @@
-import { ConflictError } from "../services/CustomError/BaseError";
+import { ConflictError, NotFoundError } from "../services/CustomError/BaseError";
 import { ElementalWarriorCard } from "../types";
 import { Decklist } from "../types/types";
 import { Battlefield } from "./Battlefield";
@@ -37,7 +37,7 @@ export class Team {
     getAllPlayerDecklists() {
         return this.players.map(player => {
             const decklist = player.getDecklist();
-            if (decklist === null) throw Error(`Player ${player.id} decklist not set`)
+            if (decklist === null) throw new NotFoundError("Decklist", player.id, `Player ${player.id}'s decklist is not set`);
             return decklist;    
         });
     }
