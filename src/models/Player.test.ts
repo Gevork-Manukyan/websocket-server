@@ -1,4 +1,5 @@
 import { ValidationError } from "../services/CustomError/BaseError";
+import { Cedar, Gravel } from "../utils";
 import { Player } from "./Player";
 
 const testPlayerId = "testId123"
@@ -52,6 +53,29 @@ describe("toggleReady method", () => {
     test("should throw error if sage is not set when trying to toggle ready", (done) => {
         const player = new Player(testPlayerId)
         expect(() => player.toggleReady()).toThrow(ValidationError)
+        done()
+    })
+})
+
+describe("adding cards to deck", () => {
+    test("should add a single card (using addCardToDeck)", (done) => {
+        const player = new Player(testPlayerId)
+        player.addCardToDeck(Cedar)
+        expect(player.deck).toStrictEqual([Cedar])
+        done()
+    })
+
+    test("should add a single card (using addCardsToDeck)", (done) => {
+        const player = new Player(testPlayerId)
+        player.addCardsToDeck([Cedar])
+        expect(player.deck).toStrictEqual([Cedar])
+        done()
+    })
+
+    test("should add a multiple cards", (done) => {
+        const player = new Player(testPlayerId)
+        player.addCardsToDeck([Cedar, Gravel])
+        expect(player.deck).toStrictEqual([Cedar, Gravel])
         done()
     })
 })
