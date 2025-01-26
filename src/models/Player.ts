@@ -39,7 +39,7 @@ export class Player {
   }
 
   toggleReady() {
-    if (!this.sage) return;
+    if (!this.sage) throw new ValidationError("Cannot toggle ready. The sage has not been set.", "sage");
     this.isReady = !this.isReady;
   }
 
@@ -52,7 +52,7 @@ export class Player {
   }
 
   initDeck() {
-    if (!this.sage) throw new ValidationError("Cannot initialize the deck. The sage has not been set.", "sage")
+    if (!this.isReady) throw new ValidationError("Cannot initialize the deck. Player is not ready", "isReady")
     this.setDecklist(getSageDecklist(this.sage))
 
     const decklist = this.decklist!
