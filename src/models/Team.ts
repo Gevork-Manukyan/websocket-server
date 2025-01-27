@@ -72,9 +72,11 @@ export class Team {
     }
 
     initWarriors(choices: [ElementalWarriorCard, ElementalWarriorCard]) {
-        if (this.teamNumber === 1) {
-            this.battlefield.addCard(choices[0], 4)
-            this.battlefield.addCard(choices[0], 6)
+        const [choice1, choice2] = choices;
+
+        if (this.teamSize === 1) {
+            this.battlefield.addCard(choice1, 4)
+            this.battlefield.addCard(choice2, 6)
         } else {
             this.initWarriors2Decks(choices)
         }
@@ -88,7 +90,7 @@ export class Team {
             this.battlefield.addCard(choice1, 7)
             this.battlefield.addCard(choice2, 9)
         }
-        else if (choice1.element === this.battlefield.getCard(9)?.element) {
+        else if (choice1.element === this.battlefield.getCard(11)?.element) {
             this.battlefield.addCard(choice1, 10)
             this.battlefield.addCard(choice2, 12)
         }

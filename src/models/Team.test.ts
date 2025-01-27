@@ -1,5 +1,5 @@
 import { ConflictError, NotFoundError } from "../services/CustomError/BaseError"
-import { Cedar, Porella, Sprout, Timber } from "../utils"
+import { AcornSquire, Cedar, Porella, QuillThornback, Sprout, Timber } from "../utils"
 import { LeafDeck, TwigDeck } from "../utils/constants"
 import { Battlefield } from "./Battlefield"
 import { Player } from "./Player"
@@ -124,5 +124,35 @@ describe("initBattlefield method", () => {
 })
 
 describe("initWarriors method", () => {
+    test("should initialize warriors for one-player team", () => {
+        const team = new Team(1, 1);
+        team.initWarriors([AcornSquire, QuillThornback])
 
+        expect(team.battlefield.addCard).toHaveBeenCalledWith(AcornSquire, 4)
+        expect(team.battlefield.addCard).toHaveBeenCalledWith(QuillThornback, 6)
+    })
+
+    test("should initialize warriors for two-player team (left side)", () => {
+        const team = new Team(2, 1);
+
+        team.battlefield.getCard = jest
+        .fn()
+        .mockImplementation((position) => (position === 8 ? Cedar : null));
+
+        team.initWarriors([AcornSquire, QuillThornback])
+        expect(team.battlefield.addCard).toHaveBeenCalledWith(AcornSquire, 7)
+        expect(team.battlefield.addCard).toHaveBeenCalledWith(QuillThornback, 9)
+    })
+
+    test("should initialize warriors for two-player team (right side)", () => {
+        const team = new Team(2, 1);
+
+        team.battlefield.getCard = jest
+        .fn()
+        .mockImplementation((position) => (position === 11 ? Cedar : null));
+
+        team.initWarriors([AcornSquire, QuillThornback])
+        expect(team.battlefield.addCard).toHaveBeenCalledWith(AcornSquire, 10)
+        expect(team.battlefield.addCard).toHaveBeenCalledWith(QuillThornback, 12)
+    })
 })
