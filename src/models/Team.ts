@@ -54,7 +54,7 @@ export class Team {
             this.battlefield.addCard(decklist1.sage, 5)
         }
         // 4 Players (2 team members)
-        else if (decklist2 !== undefined && this.teamNumber === 2) {
+        else if (decklist2 !== undefined && this.teamSize === 2) {
             const basicStarter1 = decklist1.basic
             const basicStarter2 = decklist2.basic
 
