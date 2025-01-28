@@ -1,5 +1,5 @@
 import Client, { Socket } from "socket.io-client";
-import { server } from "./server"; // Import your server.ts logic
+import { server } from "./server";
 import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
 import { Player } from "./models";
@@ -8,6 +8,8 @@ import { CustomError } from "./services/CustomError/BaseError";
 let clientSocket: Socket;
 const testGameId = "test-game";
 const numPlayers = 2;
+
+// TODO: replace all uses of other classes with mock implementations
 
 beforeAll((done) => {
   // Start the server (ensure it’s tied to your real server.ts code)

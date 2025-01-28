@@ -2,11 +2,11 @@ import { ValidationError } from "../services/CustomError/BaseError";
 import { NullSpaceError } from "../services/CustomError/GameError";
 import { ElementalCard } from "../types";
 
-type TwoPlayerSpaceOptions = 1 | 2 | 3 | 4 | 5 | 6;
-const TWO_PLAYER_SPACE_MAX = 6;
-type FourPlayerSpaceOptions = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-const FOUR_PLAYER_SPACE_MAX = 12;
-type SpaceOptions = TwoPlayerSpaceOptions | FourPlayerSpaceOptions
+type OnePlayerSpaceOptions = 1 | 2 | 3 | 4 | 5 | 6;
+const ONE_PLAYER_SPACE_MAX = 6;
+type TwoPlayerSpaceOptions = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+const TWO_PLAYER_SPACE_MAX = 12;
+type SpaceOptions = OnePlayerSpaceOptions | TwoPlayerSpaceOptions
 
 export class Battlefield {
     private fieldArray: (BattlefieldSpace)[] = [];
@@ -14,10 +14,10 @@ export class Battlefield {
 
     constructor(numPlayersOnTeam: Battlefield['numPlayersOnTeam']) {
         this.numPlayersOnTeam = numPlayersOnTeam;
-        numPlayersOnTeam === 1 ? this.initTwoPlayerBattlefield() : this.initFourPlayerBattlefield();
+        numPlayersOnTeam === 1 ? this.initOnePlayerBattlefield() : this.initTwoPlayerBattlefield();
     }
 
-    private initTwoPlayerBattlefield() {
+    private initOnePlayerBattlefield() {
         let row_1_1, row_2_1, row_2_2, row_3_1, row_3_2, row_3_3;
 
         row_3_3 = new BattlefieldSpace(8, null, {
@@ -56,7 +56,7 @@ export class Battlefield {
         this.fieldArray = [row_1_1, row_2_1, row_2_2, row_3_1, row_3_2, row_3_3];
     }
 
-    private initFourPlayerBattlefield() {
+    private initTwoPlayerBattlefield() {
         let row_1_1, row_1_2, row_2_1, row_2_2, row_2_3, row_2_4, row_3_1, row_3_2, row_3_3, row_3_4, row_3_5, row_3_6;
 
         row_3_6 = new BattlefieldSpace(9, null, {
@@ -180,8 +180,8 @@ export class Battlefield {
         space2.setValue(space1Value)
     }
 
-    private validateSpaceNumber(spaceNumber: SpaceOptions): asserts spaceNumber is TwoPlayerSpaceOptions | FourPlayerSpaceOptions {
-        const maxSpaceNumber = this.numPlayersOnTeam === 2 ? TWO_PLAYER_SPACE_MAX : FOUR_PLAYER_SPACE_MAX;
+    private validateSpaceNumber(spaceNumber: SpaceOptions): asserts spaceNumber is OnePlayerSpaceOptions | TwoPlayerSpaceOptions {
+        const maxSpaceNumber = this.numPlayersOnTeam === 1 ? ONE_PLAYER_SPACE_MAX : TWO_PLAYER_SPACE_MAX;
     
         if (spaceNumber < 1 || spaceNumber > maxSpaceNumber) {
             throw new ValidationError(`Invalid space for ${this.numPlayersOnTeam}-player battlefield: ${spaceNumber}`, "INVALID_INPUT");
