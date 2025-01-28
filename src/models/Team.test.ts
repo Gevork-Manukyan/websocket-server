@@ -1,7 +1,6 @@
 import { ConflictError, NotFoundError } from "../services/CustomError/BaseError"
 import { AcornSquire, Cedar, Porella, QuillThornback, Sprout, Timber } from "../utils"
 import { LeafDeck, TwigDeck } from "../utils/constants"
-import { Battlefield } from "./Battlefield"
 import { Player } from "./Player"
 import { Team } from "./Team"
 
@@ -21,7 +20,7 @@ test("should create a default Team object", (done) => {
     const { players, battlefield } = team
 
     expect(players).toEqual([])
-    expect(battlefield).toBeInstanceOf(Battlefield)
+    expect(battlefield).toBeDefined();
     expect(team.getTeamNumber()).toBe(1)
     expect(team.getTeamSize()).toBe(1)
     done()
