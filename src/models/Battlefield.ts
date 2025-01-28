@@ -158,7 +158,7 @@ export class Battlefield {
         targetSpace.value = card;
     }
 
-    removeCard(spaceNumber: SpaceOptions) {
+    removeCard(spaceNumber: SpaceOptions): ElementalCard {
         const targetSpace = this.getBattlefieldSpace(spaceNumber)
         if (targetSpace.value === null) throw new NullSpaceError(spaceNumber, `Cannot remove an empty space: ${spaceNumber}`)
         const targetCard = targetSpace.value
@@ -167,10 +167,12 @@ export class Battlefield {
     }
 
     swapCards(space1Number: SpaceOptions, space2Number: SpaceOptions) {
+        if (space1Number === space2Number) throw new ValidationError("Cannot swap a card with itself", "spaceNumber");
+
         const space1 = this.getBattlefieldSpace(space1Number)
         const space2 = this.getBattlefieldSpace(space2Number)
 
-        if (space1 === null || space2 === null) {
+        if (space1.value === null || space2.value === null) {
             const nullSpace = space1 === null ? space1Number : space2Number
             throw new NullSpaceError(nullSpace, `Cannot swap null battlefield space: ${nullSpace}`)
         }
