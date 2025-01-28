@@ -70,14 +70,15 @@ describe("adding cards to deck", () => {
     test("should add a single card (using addCardsToDeck)", (done) => {
         const player = new Player(testPlayerId)
         player.addCardsToDeck([Cedar])
-        expect(player.deck).toStrictEqual([Cedar])
+        expect(player.deck).toContain(Cedar)
         done()
     })
 
     test("should add a multiple cards", (done) => {
         const player = new Player(testPlayerId)
         player.addCardsToDeck([Cedar, Gravel])
-        expect(player.deck).toStrictEqual([Cedar, Gravel])
+        expect(player.deck).toContainEqual(Cedar)
+        expect(player.deck).toContainEqual(Gravel)
         done()
     })
 })

@@ -72,12 +72,12 @@ export class ConGame {
 
   incrementPlayersReady() {
     this.numPlayersReady++
-    return this.numPlayersReady
+    return this.numPlayersReady;
   }
 
   decrementPlayersReady() {
     this.numPlayersReady--
-    return this.numPlayersReady
+    return this.numPlayersReady;
   }
 
   startGame(playerId: Player["id"]) {
@@ -90,6 +90,9 @@ export class ConGame {
     // TODO: initlize game
     this.initPlayerDecks();
     this.initPlayerFields();
+    
+
+    this.setStarted(true)
   }
 
   initPlayerDecks() {
@@ -107,12 +110,12 @@ export class ConGame {
   chooseWarriors(playerId: Player["id"], choices: [ElementalWarriorCard, ElementalWarriorCard]) {
     const player = this.getPlayer(playerId)
     const decklist = player.getDecklist()!
+    const decklistWariors = decklist.warriors
     const [choice1, choice2] = choices
 
-    if (
-      choice1.element !== decklist.sage.element ||
-      choice2.element !== decklist.sage.element
-    ) throw new ValidationError("Invalid warriors passed for chosen deck", "INVALID_INPUT")
+    // If chosen cards are not of the correct deck
+    if (!decklistWariors.includes(choice1) || !decklistWariors.includes(choice2)) 
+      throw new ValidationError("Invalid warrior(s) passed for chosen deck", "INVALID_INPUT")
     
     player.team!.initWarriors(choices)
 
