@@ -5,11 +5,11 @@ import { gameStateManager } from "./services/GameStateManager";
 import { Player } from "./models";
 import { CustomError } from "./services/CustomError/BaseError";
 
+// TODO: Rewrite all tests to use mock classes
+
 let clientSocket: Socket;
 const testGameId = "test-game";
 const numPlayers = 2;
-
-// TODO: replace all uses of other classes with mock implementations
 
 beforeAll((done) => {
   // Start the server (ensure it’s tied to your real server.ts code)
@@ -23,8 +23,8 @@ beforeAll((done) => {
 });
 
 afterAll(() => {
-  // server.close(); // Close the server
-  // clientSocket.close(); // Close the client socket
+  server.close(); 
+  clientSocket.close(); 
 });
 
 afterEach(() => {

@@ -15,7 +15,7 @@ describe("GameStateManager", () => {
   });
 
   describe("getInstance", () => {
-    it("returns the same instance for multiple calls", () => {
+    test("returns the same instance for multiple calls", () => {
       const instance1 = gameStateManager;
       const instance2 = gameStateManager;
       expect(instance1).toBe(instance2);
@@ -23,34 +23,34 @@ describe("GameStateManager", () => {
   });
 
   describe("addGame", () => {
-    it("adds a new game to the current games", () => {
+    test("adds a new game to the current games", () => {
       gameStateManager.addGame(mockGame);
 
       const retrievedGame = gameStateManager.getGame("game-1" as gameId);
       expect(retrievedGame).toBe(mockGame);
     });
 
-    it("returns the added game after adding it", () => {
+    test("returns the added game after adding test", () => {
       const addedGame = gameStateManager.addGame(mockGame);
       expect(addedGame).toBe(mockGame);
     });
   });
 
   describe("getGame", () => {
-    it("retrieves an existing game by its ID", () => {
+    test("retrieves an existing game by its ID", () => {
       gameStateManager.addGame(mockGame);
       const retrievedGame = gameStateManager.getGame("game-1" as gameId);
       expect(retrievedGame).toBe(mockGame);
     });
 
-    it("returns undefined for a non-existent game ID", () => {
+    test("returns undefined for a non-existent game ID", () => {
       const retrievedGame = gameStateManager.getGame("non-existent-game" as gameId);
       expect(retrievedGame).toBeUndefined();
     });
   });
 
   describe("deleteGame", () => {
-    it("removes an existing game by its ID", () => {
+    test("removes an existing game by its ID", () => {
       gameStateManager.addGame(mockGame);
       gameStateManager.deleteGame("game-1" as gameId);
 
@@ -58,13 +58,13 @@ describe("GameStateManager", () => {
       expect(retrievedGame).toBeUndefined();
     });
 
-    it("does not throw an error when deleting a non-existent game", () => {
+    test("does not throw an error when deleting a non-existent game", () => {
       expect(() => gameStateManager.deleteGame("non-existent-game" as gameId)).not.toThrow();
     });
   });
 
   describe("resetGameStateManager", () => {
-    it("resets the current games to an empty object", () => {
+    test("resets the current games to an empty object", () => {
       gameStateManager.addGame(mockGame);
       gameStateManager.resetGameStateManager();
 
