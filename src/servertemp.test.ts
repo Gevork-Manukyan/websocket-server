@@ -1,0 +1,81 @@
+import Client, { Socket } from "socket.io-client";
+import { server } from "./server";
+import { PORT } from "./utils/config";
+import { gameStateManager } from "./services/GameStateManager";
+import { ConGame, Player } from "./models";
+import { CustomError } from "./services/CustomError/BaseError";
+
+
+let clientSocket: Socket;
+const testGameId = "test-game";
+const numPlayers = 2;
+
+beforeAll((done) => {
+  // Start the server (ensure it’s tied to your real server.ts code)
+  server.listen(PORT, () => {
+    // Connect the client to the same server
+    clientSocket = Client(`http://localhost:${PORT}/gameplay`, {
+      transports: ["websocket"],
+    }); // Connect to the "/gameplay" namespace
+    clientSocket.on("connect", done); // Wait until the connection is established
+  });
+});
+
+afterAll(() => {
+  server.close(); 
+  clientSocket.close(); 
+});
+
+afterEach(() => {
+  gameStateManager.resetGameStateManager();
+  clientSocket.removeAllListeners();
+});
+
+describe("Server.ts", () => {
+    test("should establish a socket connection", () => {
+        expect(clientSocket.connected).toBe(true);
+    });
+
+    describe("join-game event", () => {
+
+        test("should create a new game", (done) => {
+            const mockGame = new ConGame(testGameId, numPlayers);
+            gameStateManager.getGame = jest.fn().mockReturnValue(undefined);
+            gameStateManager.addGame = jest.fn().mockReturnValue(mockGame);
+            mockGame.addPlayer = jest.fn()
+      
+            clientSocket.emit("join-game", testGameId, numPlayers)
+
+            clientSocket.once("join-game--success", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(gameStateManager.addGame).toHaveBeenCalledWith(expect.any(ConGame))
+                expect(mockGame.addPlayer).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                      id: expect.any(String),
+                      isGameHost: true, 
+                    })
+                );               
+                done();
+            });
+        })
+
+        test("should join an existing game", (done) => {
+            const mockGame = new ConGame(testGameId, numPlayers);
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame);
+            mockGame.addPlayer = jest.fn()
+            
+            clientSocket.emit("join-game", testGameId, numPlayers)
+
+            clientSocket.once("join-game--success", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.addPlayer).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                      id: expect.any(String),
+                      isGameHost: false, 
+                    })
+                );               
+                done();
+            });
+        })
+    })
+})
