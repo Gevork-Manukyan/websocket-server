@@ -7,6 +7,7 @@ import { CustomError } from "./services/CustomError/BaseError";
 
 
 let clientSocket: Socket;
+let mockGame: ConGame;
 const testGameId = "test-game";
 const numPlayers = 2;
 
@@ -26,6 +27,10 @@ afterAll(() => {
   clientSocket.close(); 
 });
 
+beforeEach(() => {
+    mockGame = new ConGame(testGameId, numPlayers)
+})
+
 afterEach(() => {
   gameStateManager.resetGameStateManager();
   clientSocket.removeAllListeners();
@@ -39,7 +44,6 @@ describe("Server.ts", () => {
     describe("join-game event", () => {
 
         test("should create a new game", (done) => {
-            const mockGame = new ConGame(testGameId, numPlayers);
             gameStateManager.getGame = jest.fn().mockReturnValue(undefined);
             gameStateManager.addGame = jest.fn().mockReturnValue(mockGame);
             mockGame.addPlayer = jest.fn()
@@ -60,7 +64,6 @@ describe("Server.ts", () => {
         })
 
         test("should join an existing game", (done) => {
-            const mockGame = new ConGame(testGameId, numPlayers);
             gameStateManager.getGame = jest.fn().mockReturnValue(mockGame);
             mockGame.addPlayer = jest.fn()
             
@@ -78,4 +81,21 @@ describe("Server.ts", () => {
             });
         })
     })
+
+    describe("select-sage event", () => {
+        test("should set the sage that is passed", (done) => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+            mockGame.setPlayerSage = jest.fn()
+
+            clientSocket.emit("select-sage", testGameId, "Cedar")
+            
+            clientSocket.once("select-sage--success", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.setPlayerSage).toHaveBeenCalledWith(expect.any(String), "Cedar")
+                done()
+            })
+        })
+    })
+
+    
 })
