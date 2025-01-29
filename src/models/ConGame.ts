@@ -1,7 +1,7 @@
 // Command of Nature (C.O.N)
 
 import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
-import { HostOnlyActionError, PlayersNotReadyError, SageUnavailableError } from "../services/CustomError/GameError";
+import { PlayersNotReadyError, SageUnavailableError } from "../services/CustomError/GameError";
 import { Sage, ElementalCard, gameId, ItemCard, ElementalWarriorCard } from "../types";
 import { Player } from "./Player";
 import { Team } from "./Team";
@@ -81,9 +81,6 @@ export class ConGame {
   }
 
   startGame(playerId: Player["id"]) {
-    // Only host can start game
-    if (!this.getPlayer(playerId).isGameHost) throw new HostOnlyActionError(`start the game`);
-
     // All players must be ready
     if (this.numPlayersReady !== this.numPlayersTotal) throw new PlayersNotReadyError(this.numPlayersReady, this.numPlayersTotal)
 

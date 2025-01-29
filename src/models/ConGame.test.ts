@@ -144,14 +144,6 @@ describe("ConGame", () => {
         expect(game.initPlayerFields).toHaveBeenCalled();
       });
   
-      test("throws HostOnlyActionError if a non-host player tries to start", () => {
-        const player = new Player("player-1");
-        player.isGameHost = false;
-        game.addPlayer(player);
-  
-        expect(() => game.startGame("player-1")).toThrow(HostOnlyActionError);
-      });
-  
       test("throws PlayersNotReadyError if not all players are ready", () => {
         const hostPlayer = new Player("player-1");
         hostPlayer.isGameHost = true;

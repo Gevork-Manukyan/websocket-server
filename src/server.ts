@@ -1,7 +1,7 @@
 import express from "express"; 
 import http from "http"; 
 import { Server } from "socket.io";
-import { ElementalWarriorCard } from "./types";
+import { ElementalWarriorCard, gameId } from "./types";
 import { ConGame } from "./models/ConGame";
 import { Player } from "./models/Player";
 import { Sage } from "./types";
@@ -10,6 +10,7 @@ import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
 import { handleSocketError } from "./utils/utilities";
+import { HostOnlyActionError } from "./services/CustomError/GameError";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -36,6 +37,22 @@ gameNamespace.on("connection", (socket) => {
   ) {
     return handleSocketError(socket, eventName, fn);
   }
+
+  // Host only actions middleware
+  socket.use(([event, gameId, ...args], next) => {
+    const hostOnlyEvents = ["clear-teams", "start-game"];
+
+    if (hostOnlyEvents.includes(event)) {
+      const game = gameStateManager.getGame(gameId as gameId)
+      const player = game?.getPlayer(socket.id);
+
+      if (!player || !player.isGameHost) {
+        return next(new HostOnlyActionError(`perform this action`));
+      }
+    }
+
+    next()
+  })
 
   socket.on(
     "join-game",
@@ -90,13 +107,16 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on("clear-teams", socketCallback("clear-teams", async (gameId: ConGame["id"]) => {
     // TODO: remove all players from all teams. Only the host can do this
+
   }))
 
   socket.on(
     "start-game",
     socketCallback("start-game", async (gameId: ConGame["id"]) => {
       const game = gameStateManager.getGame(gameId);
-      game.startGame(socket.id);
+      const playerId = socket.id;
+      
+      game.startGame(playerId);
       gameEventEmitter.emitPickWarriors(game.players);
 
       // TODO: coin flip for who is first. Players decide play order if 4 players
