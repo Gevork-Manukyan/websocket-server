@@ -4,7 +4,7 @@ import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
 import { ConGame, Player } from "./models";
 import { CustomError } from "./services/CustomError/BaseError";
-import { ClearTeamsData, JoinGameData, JoinTeamData, SelectSageData, ToggleReadyStatusData } from "./types/server-types";
+import { ClearTeamsData, JoinGameData, JoinTeamData, LeaveGameData, SelectSageData, ToggleReadyStatusData } from "./types/server-types";
 
 
 let clientSocket: Socket;
@@ -183,6 +183,33 @@ describe("Server.ts", () => {
                 expect(mockGame.getPlayer).toHaveBeenCalledWith(expect.any(String))
                 expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
                 expect(mockGame.clearTeams).toHaveBeenCalled()
+                done()
+            })
+        })
+    })
+
+    describe("start-game", () => {
+        // TODO: implement
+    })
+
+    describe("chose-warriors", () => {
+        // TODO: implement
+    })
+
+    describe("finished-setup", () => {
+        // TODO: implement
+    })
+
+    describe("leave-game", () => {
+        test("should make player leave the current game", (done) => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+            mockGame.removePlayer = jest.fn()
+
+            clientSocket.emit("leave-game", { gameId: testGameId } as LeaveGameData)
+
+            clientSocket.once("leave-game--success", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.removePlayer).toHaveBeenCalledWith(expect.any(String))
                 done()
             })
         })

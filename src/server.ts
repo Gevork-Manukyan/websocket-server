@@ -142,10 +142,9 @@ gameNamespace.on("connection", (socket) => {
   }));
 
   socket.on("leave-game", socketCallback("leave-game", async ({ gameId }: LeaveGameData) => {
-    const currPlayerId = socket.id;
-    gameStateManager.getGame(gameId).removePlayer(currPlayerId);
-
-    socket.leave(gameId);
+    gameStateManager.getGame(gameId).removePlayer(socket.id);
+    socket.leave(gameId)
+    socket.emit("leave-game--success")
   }));
 
   /**
