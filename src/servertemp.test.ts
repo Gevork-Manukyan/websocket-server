@@ -4,12 +4,15 @@ import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
 import { ConGame, Player } from "./models";
 import { CustomError } from "./services/CustomError/BaseError";
+import { JoinGameData, JoinTeamData, SelectSageData, ToggleReadyStatusData } from "./types/server-types";
 
 
 let clientSocket: Socket;
 let mockGame: ConGame;
+let mockPlayer: Player;
 const testGameId = "test-game";
 const numPlayers = 2;
+const testPlayerId = "test-player"
 
 beforeAll((done) => {
   // Start the server (ensure it’s tied to your real server.ts code)
@@ -29,6 +32,7 @@ afterAll(() => {
 
 beforeEach(() => {
     mockGame = new ConGame(testGameId, numPlayers)
+    mockPlayer = new Player(testPlayerId)
 })
 
 afterEach(() => {
@@ -48,7 +52,7 @@ describe("Server.ts", () => {
             gameStateManager.addGame = jest.fn().mockReturnValue(mockGame);
             mockGame.addPlayer = jest.fn()
       
-            clientSocket.emit("join-game", { gameId: testGameId, numPlayers })
+            clientSocket.emit("join-game", { gameId: testGameId, numPlayers } as JoinGameData)
 
             clientSocket.once("join-game--success", () => {
                 expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
@@ -82,7 +86,7 @@ describe("Server.ts", () => {
         })
 
         test("should throw an error if one of the parameters are missing", (done) => {
-            clientSocket.emit("join-game", {gameId: testGameId})
+            clientSocket.emit("join-game", {gameId: testGameId} as JoinGameData)
 
             clientSocket.once("join-game--error", () => {
                 done()
@@ -103,7 +107,7 @@ describe("Server.ts", () => {
             gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
             mockGame.setPlayerSage = jest.fn()
 
-            clientSocket.emit("select-sage", {gameId: testGameId, sage: "Cedar"})
+            clientSocket.emit("select-sage", {gameId: testGameId, sage: "Cedar"} as SelectSageData)
             
             clientSocket.once("select-sage--success", () => {
                 expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
@@ -114,9 +118,40 @@ describe("Server.ts", () => {
     })
 
     describe("toggle-ready-status", () => {
-        test("should toggle the player status to ready", (done) => {
+        beforeEach(() => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+            mockGame.getPlayer = jest.fn().mockReturnValue(mockPlayer)
+            mockPlayer.toggleReady = jest.fn()
+        })
 
-            clientSocket.emit("toggle-ready-status", )
+        test("should toggle the player status to ready", (done) => {
+            mockPlayer.isReady = true
+            mockGame.incrementPlayersReady = jest.fn()
+
+            clientSocket.emit("toggle-ready-status", { gameId: testGameId } as ToggleReadyStatusData)
+
+            clientSocket.once("ready-status--ready", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.getPlayer).toHaveBeenCalledWith(expect.any(String))
+                expect(mockPlayer.toggleReady).toHaveBeenCalled()
+                expect(mockGame.incrementPlayersReady).toHaveBeenCalled()
+                done()
+            })
+        })
+
+        test("should toggle the player status to not ready", (done) => {
+            mockPlayer.isReady = false
+            mockGame.decrementPlayersReady = jest.fn()
+
+            clientSocket.emit("toggle-ready-status", { gameId: testGameId } as ToggleReadyStatusData)
+
+            clientSocket.once("ready-status--not-ready", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.getPlayer).toHaveBeenCalledWith(expect.any(String))
+                expect(mockPlayer.toggleReady).toHaveBeenCalled()
+                expect(mockGame.decrementPlayersReady).toHaveBeenCalled()
+                done()
+            })
         })
     })
 })
