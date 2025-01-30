@@ -4,12 +4,15 @@ import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
 import { ConGame, Player } from "./models";
 import { CustomError } from "./services/CustomError/BaseError";
+import { ClearTeamsData, JoinGameData, JoinTeamData, LeaveGameData, SelectSageData, ToggleReadyStatusData } from "./types/server-types";
 
-// TODO: Rewrite all tests to use mock classes
 
 let clientSocket: Socket;
+let mockGame: ConGame;
+let mockPlayer: Player;
 const testGameId = "test-game";
 const numPlayers = 2;
+const testPlayerId = "test-player"
 
 beforeAll((done) => {
   // Start the server (ensure it’s tied to your real server.ts code)
@@ -27,210 +30,188 @@ afterAll(() => {
   clientSocket.close(); 
 });
 
+beforeEach(() => {
+    mockGame = new ConGame(testGameId, numPlayers)
+    mockPlayer = new Player(testPlayerId)
+})
+
 afterEach(() => {
   gameStateManager.resetGameStateManager();
   clientSocket.removeAllListeners();
 });
 
 describe("Server.ts", () => {
-
-  test("should establish a socket connection", () => {
-    expect(clientSocket.connected).toBe(true);
-  });
-
-  describe("join-game event", () => {
-    test("should handle a 'join-game' event for 2 players", (done) => {
-      clientSocket.emit("join-game", testGameId, numPlayers);
-
-      clientSocket.once("connect", () => {
-        console.log("Client connected");
-      });
-
-      clientSocket.once("join-game--success", () => {
-        console.log("The game was joined successfully!");
-        done();
-      });
+    test("should establish a socket connection", () => {
+        expect(clientSocket.connected).toBe(true);
     });
 
-    test("should handle a 'join-game' event for 4 players", (done) => {
-      const numPlayers = 4;
+    describe("join-game event", () => {
 
-      clientSocket.emit("join-game", testGameId, numPlayers);
-
-      clientSocket.once("connect", () => {
-        console.log("Client connected");
-      });
-
-      clientSocket.once("join-game--success", () => {
-        console.log("The game was joined successfully!");
-        done();
-      });
-    });
-  });
-
-  describe("select-sage event", () => {
-    beforeEach(() => {
-      clientSocket.emit("join-game", testGameId, numPlayers);
-    })
-
-    test("should select sage", (done) => {
-      clientSocket.once("join-game--success", () => {
-        clientSocket.emit("select-sage", testGameId, "Cedar")
-        clientSocket.once("select-sage--success", () => {
-          expect(gameStateManager.getGame(testGameId).players[0].sage).toBe("Cedar")
-          done();
-        })
-      })
-    });
-
-    test("should Error if selected sage is already picked", (done) => {
-      clientSocket.once("join-game--success", () => {
-        const player2 = new Player("player2")
-        const game = gameStateManager.getGame(testGameId)
-        game.addPlayer(player2)
-        game.setPlayerSage(player2.id, "Cedar")
-      })
-
-
-      clientSocket.once("join-game--success", () => {
-        clientSocket.emit("select-sage", testGameId, "Cedar")
-        clientSocket.once("select-sage--error", (error: CustomError) => {
-          console.log(error.message)
-          done();
-        })
-      })
-    });
-  });
-
-  describe("toggle-ready-status event", () => {
-    beforeEach(() => {
-      clientSocket.emit("join-game", testGameId, numPlayers);
-      clientSocket.on("join-game--success", () => {
-        clientSocket.emit("select-sage", testGameId, "Cedar");
-      });
-    });
-
-    test("should make player ready if they are not ready", (done) => {
-        clientSocket.once("select-sage--success", () => {
-          
-        clientSocket.emit("toggle-ready-status", testGameId);
-
-        clientSocket.once("ready-status--ready", () => {
-          console.log("Player is now ready!");
-          done();
-        });
-      });
-    });
-
-    test("should make player not ready if they are ready", (done) => {
-      clientSocket.once("select-sage--success", () => {
-        clientSocket.emit("toggle-ready-status", testGameId);
-
-        clientSocket.once("ready-status--ready", () => {
-          console.log("Player is now ready!");
-
-          clientSocket.emit("toggle-ready-status", testGameId);
-
-          clientSocket.once("ready-status--not-ready", () => {
-            console.log("Player is now not ready!");
-            done();
-          });
-        });
-      });
-    });
-  });
-
-  describe("join-team event", () => {
-      beforeEach(() => {
-          clientSocket.emit("join-game", testGameId, numPlayers);
-          clientSocket.on("join-game--success", () => {
-            clientSocket.emit("select-sage", testGameId, "Cedar");
-            clientSocket.once("select-sage--success", () => {
-                  clientSocket.emit("toggle-ready-status", testGameId);                    
-            })
-          });
-      });
-
-      test("should make player join team 1", (done) => {
-          const expectedTeamNumber = 1;
-          clientSocket.once("ready-status--ready", () => {
-              clientSocket.emit("join-team", testGameId, expectedTeamNumber)
-              clientSocket.once("join-team--success", () => {
-                  expect(gameStateManager.getGame(testGameId).players[0].team?.getTeamNumber()).toBe(expectedTeamNumber)
-                  console.log("Player joined team 1");
-                  done();
-              })
-          });
-      })
-
-      test("should make player join team 2", (done) => {
-          const expectedTeamNumber = 2;
-          clientSocket.once("ready-status--ready", () => {
-              clientSocket.emit("join-team", testGameId, expectedTeamNumber)
-              clientSocket.once("join-team--success", () => {
-                  expect(gameStateManager.getGame(testGameId).players[0].team?.getTeamNumber()).toBe(expectedTeamNumber)
-                  console.log("Player joined team 2");
-                  done();
-              })
-          });
-      })
-
-      test("should throw error if joining a full team", (done) => {
-          const expectedTeamNumber = 1;
-          const addPlayer2 = () => {
-              const player2 = new Player("player2")
-              const game = gameStateManager.getGame(testGameId)
-              game.addPlayer(player2)
-              game.joinTeam(player2.id, expectedTeamNumber)
-          }
-
-          clientSocket.once("ready-status--ready", () => {
-              addPlayer2()
-              clientSocket.emit("join-team", testGameId, expectedTeamNumber)
-              clientSocket.once("join-team--error", () => {
-                  done();
-              })        
-          });
-      })
-
-      test("should make player switch from team 1 to team 2", (done) => {
-          const expectedTeamNumberFirst = 1;
-          const expectedTeamNumberSecond = 2;
-          clientSocket.once("ready-status--ready", () => {
-              clientSocket.emit("join-team", testGameId, expectedTeamNumberFirst)
-              clientSocket.once("join-team--success", () => {
-                  expect(gameStateManager.getGame(testGameId).players[0].team?.getTeamNumber()).toBe(expectedTeamNumberFirst)
-                  
-                  clientSocket.emit("join-team", testGameId, expectedTeamNumberSecond)
-                  clientSocket.once("join-team--success", () => {
-                      expect(gameStateManager.getGame(testGameId).players[0].team?.getTeamNumber()).toBe(expectedTeamNumberSecond)
-                      done()
-                  })
-              })
-          });
-      })
-  })
-
-  describe("clear-teams event", () => {
-    let game: ConGame
-
-    beforeEach(() => {
-      game = new ConGame(testGameId, 2)
-      gameStateManager.addGame(game)
-    });
-
-    test("should throw an error if non-host clears teams", () => {
-      const hostPlayerId = "hostPlayer"
-      game.addPlayer(new Player(hostPlayerId, true))
-      game.joinTeam(hostPlayerId, 1)
+        test("should create a new game", (done) => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(undefined);
+            gameStateManager.addGame = jest.fn().mockReturnValue(mockGame);
+            mockGame.addPlayer = jest.fn()
       
-      clientSocket.emit("join-game", testGameId, numPlayers);
-      clientSocket.on("join-game--success", () => {
-        clientSocket.emit("clear-teams")
-        clientSocket.on("clear-teams--error", (done) => {
-          done()
+            clientSocket.emit("join-game", { gameId: testGameId, numPlayers } as JoinGameData)
+
+            clientSocket.once("join-game--success", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(gameStateManager.addGame).toHaveBeenCalledWith(expect.any(ConGame))
+                expect(mockGame.addPlayer).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                      id: expect.any(String),
+                      isGameHost: true, 
+                    })
+                );               
+                done();
+            });
         })
-      });
+
+        test("should join an existing game", (done) => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame);
+            mockGame.addPlayer = jest.fn()
+            
+            clientSocket.emit("join-game", { gameId: testGameId, numPlayers })
+
+            clientSocket.once("join-game--success", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.addPlayer).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                      id: expect.any(String),
+                      isGameHost: false, 
+                    })
+                );               
+                done();
+            });
+        })
+
+        test("should throw an error if one of the parameters are missing", (done) => {
+            clientSocket.emit("join-game", {gameId: testGameId} as JoinGameData)
+
+            clientSocket.once("join-game--error", () => {
+                done()
+            })
+        })
+
+        test("should throw an error if both of the parameters are missing", (done) => {
+            clientSocket.emit("join-game")
+
+            clientSocket.once("join-game--error", () => {
+                done()
+            })
+        })
     })
-  })
+
+    describe("select-sage event", () => {
+        test("should set the sage that is passed", (done) => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+            mockGame.setPlayerSage = jest.fn()
+
+            clientSocket.emit("select-sage", {gameId: testGameId, sage: "Cedar"} as SelectSageData)
+            
+            clientSocket.once("select-sage--success", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.setPlayerSage).toHaveBeenCalledWith(expect.any(String), "Cedar")
+                done()
+            })
+        })
+    })
+
+    describe("toggle-ready-status", () => {
+        beforeEach(() => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+            mockGame.getPlayer = jest.fn().mockReturnValue(mockPlayer)
+            mockPlayer.toggleReady = jest.fn()
+        })
+
+        test("should toggle the player status to ready", (done) => {
+            mockPlayer.isReady = true
+            mockGame.incrementPlayersReady = jest.fn()
+
+            clientSocket.emit("toggle-ready-status", { gameId: testGameId } as ToggleReadyStatusData)
+
+            clientSocket.once("ready-status--ready", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.getPlayer).toHaveBeenCalledWith(expect.any(String))
+                expect(mockPlayer.toggleReady).toHaveBeenCalled()
+                expect(mockGame.incrementPlayersReady).toHaveBeenCalled()
+                done()
+            })
+        })
+
+        test("should toggle the player status to not ready", (done) => {
+            mockPlayer.isReady = false
+            mockGame.decrementPlayersReady = jest.fn()
+
+            clientSocket.emit("toggle-ready-status", { gameId: testGameId } as ToggleReadyStatusData)
+
+            clientSocket.once("ready-status--not-ready", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.getPlayer).toHaveBeenCalledWith(expect.any(String))
+                expect(mockPlayer.toggleReady).toHaveBeenCalled()
+                expect(mockGame.decrementPlayersReady).toHaveBeenCalled()
+                done()
+            })
+        })
+    })
+
+    describe("join-team event", () => {
+        test("should successfully join a team", (done) => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+            mockGame.joinTeam = jest.fn()
+
+            clientSocket.emit("join-team", { gameId: testGameId, team: 1 } as JoinTeamData)
+
+            clientSocket.once("join-team--success", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.joinTeam).toHaveBeenCalledWith(expect.any(String), 1)
+                done()
+            })
+        })
+    })
+
+    describe("clear-teams event", () => {
+        test("should clear all teams of players", (done) => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+            mockGame.getPlayer = jest.fn().mockReturnValue(new Player(testPlayerId, true))
+            mockGame.clearTeams = jest.fn()
+
+            clientSocket.emit("clear-teams", { gameId: testGameId } as ClearTeamsData)
+
+            clientSocket.once("clear-teams--success", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.getPlayer).toHaveBeenCalledWith(expect.any(String))
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.clearTeams).toHaveBeenCalled()
+                done()
+            })
+        })
+    })
+
+    describe("start-game", () => {
+        // TODO: implement
+    })
+
+    describe("chose-warriors", () => {
+        // TODO: implement
+    })
+
+    describe("finished-setup", () => {
+        // TODO: implement
+    })
+
+    describe("leave-game", () => {
+        test("should make player leave the current game", (done) => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+            mockGame.removePlayer = jest.fn()
+
+            clientSocket.emit("leave-game", { gameId: testGameId } as LeaveGameData)
+
+            clientSocket.once("leave-game--success", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.removePlayer).toHaveBeenCalledWith(expect.any(String))
+                done()
+            })
+        })
+    })
 })
