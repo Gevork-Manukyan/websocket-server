@@ -112,6 +112,10 @@ describe("ConGame", () => {
       });
     });
   
+    describe("clearTeams", () => {
+      // TODO: implement
+    })
+
     describe("incrementPlayersReady", () => {
       test("increments the number of players ready", () => {
         expect(game.incrementPlayersReady()).toBe(1);

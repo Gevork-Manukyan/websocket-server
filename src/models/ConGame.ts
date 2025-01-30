@@ -81,6 +81,10 @@ export class ConGame {
     return this.numPlayersReady;
   }
 
+  clearTeams() {
+    // TODO: remove all players from all teams and set player ready/finished set up to zero
+  }
+
   startGame(playerId: Player["id"]) {
     // All players must be ready
     if (this.numPlayersReady !== this.numPlayersTotal) throw new PlayersNotReadyError(this.numPlayersReady, this.numPlayersTotal)

@@ -4,7 +4,7 @@ import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
 import { ConGame, Player } from "./models";
 import { CustomError } from "./services/CustomError/BaseError";
-import { JoinGameData, JoinTeamData, SelectSageData, ToggleReadyStatusData } from "./types/server-types";
+import { ClearTeamsData, JoinGameData, JoinTeamData, SelectSageData, ToggleReadyStatusData } from "./types/server-types";
 
 
 let clientSocket: Socket;
@@ -165,6 +165,24 @@ describe("Server.ts", () => {
             clientSocket.once("join-team--success", () => {
                 expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
                 expect(mockGame.joinTeam).toHaveBeenCalledWith(expect.any(String), 1)
+                done()
+            })
+        })
+    })
+
+    describe("clear-teams event", () => {
+        test("should clear all teams of players", (done) => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+            mockGame.getPlayer = jest.fn().mockReturnValue(new Player(testPlayerId, true))
+            mockGame.clearTeams = jest.fn()
+
+            clientSocket.emit("clear-teams", { gameId: testGameId } as ClearTeamsData)
+
+            clientSocket.once("clear-teams--success", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.getPlayer).toHaveBeenCalledWith(expect.any(String))
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.clearTeams).toHaveBeenCalled()
                 done()
             })
         })

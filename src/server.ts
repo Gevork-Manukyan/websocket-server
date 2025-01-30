@@ -34,7 +34,7 @@ const gameNamespace = io.of("/gameplay");
 gameNamespace.on("connection", (socket) => {
 
   // Host only actions middleware
-  socket.use(([event, gameId, ...args], next) => {
+  socket.use(([event, gameId, ..._], next) => {
     const hostOnlyEvents = ["clear-teams", "start-game"];
 
     if (hostOnlyEvents.includes(event)) {
@@ -52,7 +52,8 @@ gameNamespace.on("connection", (socket) => {
   socket.on(
     "join-game",
     socketCallback("join-game", async ({ gameId, numPlayers }: JoinGameData) => {
-      console.log(gameId)
+      // TODO: should not take numPlayers. Instead if it's a new game it should emit 
+      // back to client and ask for how many players are playing
       let game = gameStateManager.getGame(gameId);
 
       // Create game if doesn't exist
@@ -102,8 +103,8 @@ gameNamespace.on("connection", (socket) => {
   );
 
   socket.on("clear-teams", socketCallback("clear-teams", async ({ gameId }: ClearTeamsData) => {
-    // TODO: remove all players from all teams. Only the host can do this
-
+    gameStateManager.getGame(gameId).clearTeams()
+    socket.emit("clear-teams--success")
   }))
 
   socket.on(
