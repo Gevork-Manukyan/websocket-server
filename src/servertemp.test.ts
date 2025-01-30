@@ -48,7 +48,7 @@ describe("Server.ts", () => {
             gameStateManager.addGame = jest.fn().mockReturnValue(mockGame);
             mockGame.addPlayer = jest.fn()
       
-            clientSocket.emit("join-game", testGameId, numPlayers)
+            clientSocket.emit("join-game", { gameId: testGameId, numPlayers })
 
             clientSocket.once("join-game--success", () => {
                 expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
@@ -67,7 +67,7 @@ describe("Server.ts", () => {
             gameStateManager.getGame = jest.fn().mockReturnValue(mockGame);
             mockGame.addPlayer = jest.fn()
             
-            clientSocket.emit("join-game", testGameId, numPlayers)
+            clientSocket.emit("join-game", { gameId: testGameId, numPlayers })
 
             clientSocket.once("join-game--success", () => {
                 expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
@@ -82,7 +82,7 @@ describe("Server.ts", () => {
         })
 
         test("should throw an error if one of the parameters are missing", (done) => {
-            clientSocket.emit("join-game", testGameId)
+            clientSocket.emit("join-game", {gameId: testGameId})
 
             clientSocket.once("join-game--error", () => {
                 done()
@@ -103,7 +103,7 @@ describe("Server.ts", () => {
             gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
             mockGame.setPlayerSage = jest.fn()
 
-            clientSocket.emit("select-sage", testGameId, "Cedar")
+            clientSocket.emit("select-sage", {gameId: testGameId, sage: "Cedar"})
             
             clientSocket.once("select-sage--success", () => {
                 expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)

@@ -3,20 +3,7 @@ import { Sage } from "../types";
 import { DropletDeck, LeafDeck, PebbleDeck, TwigDeck } from "./constants";
 import { CustomError, ValidationError } from "../services/CustomError/BaseError";
 import { InvalidSageError } from "../services/CustomError/GameError";
-import { EventSchemas } from "./zod-schemas";
 
-
-export function validateSocketEvent(eventName: string, data: any) {
-  const schema = EventSchemas[eventName];
-
-  if (!schema) return;
-
-  try {
-    schema.parse(data);
-  } catch (error) {
-    throw new ValidationError(`Invalid parameters for event '${eventName}'`, `${error}`);
-  }
-}
 
 export function getSageDecklist(sage: Sage | null) {
   if (!sage) throw new ValidationError(`No chosen sage`, "sage")

@@ -1,18 +1,17 @@
 import express from "express"; 
 import http from "http"; 
 import { Server } from "socket.io";
-import { ElementalWarriorCard, gameId } from "./types";
+import { gameId } from "./types";
 import { ConGame } from "./models/ConGame";
 import { Player } from "./models/Player";
-import { Sage } from "./types";
 import { GameEventEmitter } from "./services";
 import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
-import { handleSocketError, validateSocketEvent } from "./utils/utilities";
+import { handleSocketError } from "./utils/utilities";
 import { HostOnlyActionError } from "./services/CustomError/GameError";
 import { ValidationError } from "./services/CustomError/BaseError";
-import { ElementalWarriorStarterCard } from "./types/card-types";
+import { ChoseWarriorsData, ClearTeamsData, EventSchemas, FinishedSetupData, JoinGameData, JoinTeamData, LeaveGameData, SelectSageData, SocketEventMap, StartGameData, ToggleReadyStatusData } from "./types/server-types";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -52,7 +51,7 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(
     "join-game",
-    socketCallback("join-game", async (gameId, numPlayers) => {
+    socketCallback("join-game", async ({ gameId, numPlayers }: JoinGameData) => {
       console.log(gameId)
       let game = gameStateManager.getGame(gameId);
 
@@ -71,7 +70,7 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(
     "select-sage",
-    socketCallback("select-sage", async (gameId: ConGame["id"], sage: Sage) => {
+    socketCallback("select-sage", async ({ gameId, sage }: SelectSageData) => {
       gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage);
       socket.emit("select-sage--success");
     })
@@ -79,7 +78,7 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(
     "toggle-ready-status",
-    socketCallback("toggle-ready--status", async (gameId: ConGame["id"]) => {
+    socketCallback("toggle-ready-status", async ({ gameId }: ToggleReadyStatusData) => {
       const game = gameStateManager.getGame(gameId)
       const currPlayer = game.getPlayer(socket.id);
       currPlayer.toggleReady();
@@ -96,20 +95,20 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(
     "join-team",
-    socketCallback("join-team", async (gameId: ConGame["id"], team: 1 | 2) => {
+    socketCallback("join-team", async ({ gameId, team }: JoinTeamData) => {
       gameStateManager.getGame(gameId).joinTeam(socket.id, team);
       socket.emit("join-team--success")
     })
   );
 
-  socket.on("clear-teams", socketCallback("clear-teams", async (gameId: ConGame["id"]) => {
+  socket.on("clear-teams", socketCallback("clear-teams", async ({ gameId }: ClearTeamsData) => {
     // TODO: remove all players from all teams. Only the host can do this
 
   }))
 
   socket.on(
     "start-game",
-    socketCallback("start-game", async (gameId: ConGame["id"]) => {
+    socketCallback("start-game", async ({ gameId }: StartGameData) => {
       const game = gameStateManager.getGame(gameId);
       const playerId = socket.id;
       
@@ -124,7 +123,7 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(
     "chose-warriors",
-    socketCallback("chose-warriors", async (gameId: ConGame["id"], choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) => {
+    socketCallback("chose-warriors", async ({ gameId, choices }: ChoseWarriorsData) => {
         gameStateManager.getGame(gameId).chooseWarriors(socket.id, choices);
 
         // TODO: Emit to player to choose battlefield layout
@@ -132,7 +131,7 @@ gameNamespace.on("connection", (socket) => {
     )
   );
 
-  socket.on("finished-setup", socketCallback("finished-setup", async (gameId: ConGame["id"]) => {
+  socket.on("finished-setup", socketCallback("finished-setup", async ({ gameId }: FinishedSetupData) => {
     const game = gameStateManager.getGame(gameId);
     game.numPlayersFinishedSetup++;
 
@@ -141,31 +140,41 @@ gameNamespace.on("connection", (socket) => {
       return;
   }));
 
-  socket.on("leave-game", socketCallback("leave-game", async (gameId: ConGame["id"]) => {
+  socket.on("leave-game", socketCallback("leave-game", async ({ gameId }: LeaveGameData) => {
     const currPlayerId = socket.id;
     gameStateManager.getGame(gameId).removePlayer(currPlayerId);
 
     socket.leave(gameId);
   }));
 
-  function socketCallback(
-    eventName: string,
-    fn: (...args: any[]) => Promise<void>
+  /**
+   * Middleware that catches any error that may occur during the event, and checks arguments for correctness
+   * @param eventName 
+   * @param fn 
+   * @returns 
+   */
+  function socketCallback<T extends keyof SocketEventMap>(
+    eventName: T,
+    fn: (data: SocketEventMap[T]) => Promise<void>
   ) {
-    return async (...args: any[]) => {
+    return async (rawData: unknown) => {
       try {
-        // Validate parameters
-        validateSocketEvent(eventName, Object.fromEntries(["gameId", ...args.map((_, i) => `arg${i}`)].map((key, i) => [key, args[i]])));
+        const result = EventSchemas[eventName].safeParse(rawData);
   
-        // Proceed with event logic
-        await fn(...args);
+        if (!result.success) {
+          throw new ValidationError(`Invalid data for event: ${eventName}`, `${rawData}`);
+        }
+  
+        const data = result.data as SocketEventMap[T];
+
+        await fn(data);
       } catch (error) {
         handleSocketError(socket, eventName, async () => {
           throw error;
         })();
       }
     };
-  }
+  }  
 });
 
 // Start the server if not in test mode
