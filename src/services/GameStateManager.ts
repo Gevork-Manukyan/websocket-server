@@ -1,5 +1,6 @@
 import { ConGame } from "../models";
 import { CurrentGames, gameId } from "../types";
+import { ConflictError } from "./CustomError/BaseError";
 
 class GameStateManager {
     private static instance: GameStateManager;
@@ -19,6 +20,7 @@ class GameStateManager {
     }
 
     addGame(game: ConGame) {
+        if (this.currentGames[game.id]) throw new ConflictError(`There is already an existing game with the given ID`)
         this.currentGames[game.id] = game;
         return this.currentGames[game.id]
     }

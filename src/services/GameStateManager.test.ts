@@ -1,5 +1,6 @@
 import { ConGame } from "../models";
 import { gameId } from "../types";
+import { ConflictError } from "./CustomError/BaseError";
 import { gameStateManager } from "./GameStateManager";
 
 
@@ -34,6 +35,11 @@ describe("GameStateManager", () => {
       const addedGame = gameStateManager.addGame(mockGame);
       expect(addedGame).toBe(mockGame);
     });
+
+    test("throws an error if a game with the ID already exists", () => {
+      gameStateManager.addGame(mockGame)
+      expect(() => gameStateManager.addGame(mockGame)).toThrow(ConflictError)
+    })
   });
 
   describe("getGame", () => {

@@ -2,15 +2,18 @@ import { z } from "zod";
 import { SageSchema } from "./types";
 import { ElementalWarriorStarterCardSchema } from "./card-types";
 
-// Define each event schema separately
-const joinGameSchema = z.object({
+const createGameSchema = z.object({
   gameId: z.string(),
   numPlayers: z.union([z.literal(2), z.literal(4)]),
+})
+
+const joinGameSchema = z.object({
+  gameId: z.string(),
 });
 
 const selectSageSchema = z.object({
   gameId: z.string(),
-  sage: SageSchema, // Ensuring SageSchema is correctly defined
+  sage: SageSchema,
 });
 
 const toggleReadyStatusSchema = z.object({
@@ -45,6 +48,7 @@ const leaveGameSchema = z.object({
 
 // Define EventSchemas record
 export const EventSchemas = {
+  "create-game": createGameSchema,
   "join-game": joinGameSchema,
   "select-sage": selectSageSchema,
   "toggle-ready-status": toggleReadyStatusSchema,
@@ -57,6 +61,7 @@ export const EventSchemas = {
 } as const;
 
 // Infer the types from the schemas directly
+export type CreateGameData = z.infer<typeof createGameSchema>;
 export type JoinGameData = z.infer<typeof joinGameSchema>;
 export type SelectSageData = z.infer<typeof selectSageSchema>;
 export type ToggleReadyStatusData = z.infer<typeof toggleReadyStatusSchema>;
@@ -69,6 +74,7 @@ export type LeaveGameData = z.infer<typeof leaveGameSchema>;
 
 // Create a mapped type for socket events
 export type SocketEventMap = {
+  "create-game": CreateGameData;
   "join-game": JoinGameData;
   "select-sage": SelectSageData;
   "toggle-ready-status": ToggleReadyStatusData;

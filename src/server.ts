@@ -11,7 +11,7 @@ import { PORT } from "./utils/config";
 import { handleSocketError } from "./utils/utilities";
 import { HostOnlyActionError } from "./services/CustomError/GameError";
 import { ValidationError } from "./services/CustomError/BaseError";
-import { ChoseWarriorsData, ClearTeamsData, EventSchemas, FinishedSetupData, JoinGameData, JoinTeamData, LeaveGameData, SelectSageData, SocketEventMap, StartGameData, ToggleReadyStatusData } from "./types/server-types";
+import { ChoseWarriorsData, ClearTeamsData, CreateGameData, EventSchemas, FinishedSetupData, JoinGameData, JoinTeamData, LeaveGameData, SelectSageData, SocketEventMap, StartGameData, ToggleReadyStatusData } from "./types/server-types";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -50,24 +50,24 @@ gameNamespace.on("connection", (socket) => {
   })
 
   socket.on(
+    "create-game", 
+    socketCallback("create-game", async({ gameId, numPlayers }: CreateGameData) => {
+      const newGame = gameStateManager.addGame(new ConGame(gameId, numPlayers))
+      newGame.addPlayer(new Player(socket.id, true)) // First player to join is the host
+      socket.join(gameId)
+      socket.emit("create-game--success")
+    })
+  )
+
+  socket.on(
     "join-game",
-    socketCallback("join-game", async ({ gameId, numPlayers }: JoinGameData) => {
-      // TODO: should not take numPlayers. Instead if it's a new game it should emit 
-      // back to client and ask for how many players are playing
-      let game = gameStateManager.getGame(gameId);
-
-      // Create game if doesn't exist
-      if (!game) {
-        game = gameStateManager.addGame(new ConGame(gameId, numPlayers));
-        game.addPlayer(new Player(socket.id, true)); // First player to join is the host
-      } else {
-        game.addPlayer(new Player(socket.id));
-      }
-
+    socketCallback("join-game", async ({ gameId }: JoinGameData) => {
+      gameStateManager.getGame(gameId).addPlayer(new Player(socket.id));
       socket.join(gameId);
       socket.emit("join-game--success");
     })
   );
+  
 
   socket.on(
     "select-sage",

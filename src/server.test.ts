@@ -4,7 +4,7 @@ import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
 import { ConGame, Player } from "./models";
 import { CustomError } from "./services/CustomError/BaseError";
-import { ClearTeamsData, JoinGameData, JoinTeamData, LeaveGameData, SelectSageData, ToggleReadyStatusData } from "./types/server-types";
+import { ClearTeamsData, CreateGameData, JoinGameData, JoinTeamData, LeaveGameData, SelectSageData, ToggleReadyStatusData } from "./types/server-types";
 
 
 let clientSocket: Socket;
@@ -45,27 +45,25 @@ describe("Server.ts", () => {
         expect(clientSocket.connected).toBe(true);
     });
 
-    describe("join-game event", () => {
-
-        test("should create a new game", (done) => {
-            gameStateManager.getGame = jest.fn().mockReturnValue(undefined);
-            gameStateManager.addGame = jest.fn().mockReturnValue(mockGame);
+    describe("create-game event", () => {
+        test("should create a new game with given game ID and add the player", (done) => {
+            gameStateManager.addGame = jest.fn().mockReturnValue(mockGame)
             mockGame.addPlayer = jest.fn()
-      
-            clientSocket.emit("join-game", { gameId: testGameId, numPlayers } as JoinGameData)
+            
+            clientSocket.emit("create-game", { gameId: testGameId, numPlayers } as CreateGameData)
 
-            clientSocket.once("join-game--success", () => {
-                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+            clientSocket.once("create-game--success", () => {
                 expect(gameStateManager.addGame).toHaveBeenCalledWith(expect.any(ConGame))
-                expect(mockGame.addPlayer).toHaveBeenCalledWith(
-                    expect.objectContaining({
-                      id: expect.any(String),
-                      isGameHost: true, 
-                    })
-                );               
-                done();
-            });
+                expect(mockGame.addPlayer).toHaveBeenCalledWith(expect.objectContaining({
+                    id: expect.any(String),
+                    isGameHost: true,
+                }))
+                done()
+            })
         })
+    })
+
+    describe("join-game event", () => {
 
         test("should join an existing game", (done) => {
             gameStateManager.getGame = jest.fn().mockReturnValue(mockGame);
@@ -85,15 +83,8 @@ describe("Server.ts", () => {
             });
         })
 
-        test("should throw an error if one of the parameters are missing", (done) => {
-            clientSocket.emit("join-game", {gameId: testGameId} as JoinGameData)
-
-            clientSocket.once("join-game--error", () => {
-                done()
-            })
-        })
-
-        test("should throw an error if both of the parameters are missing", (done) => {
+        // TODO: add similar tests to all event tests
+        test("should throw an error if gameId is missing", (done) => {
             clientSocket.emit("join-game")
 
             clientSocket.once("join-game--error", () => {
