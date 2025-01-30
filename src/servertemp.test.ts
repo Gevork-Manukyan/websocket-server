@@ -154,4 +154,19 @@ describe("Server.ts", () => {
             })
         })
     })
+
+    describe("join-team event", () => {
+        test("should successfully join a team", (done) => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+            mockGame.joinTeam = jest.fn()
+
+            clientSocket.emit("join-team", { gameId: testGameId, team: 1 } as JoinTeamData)
+
+            clientSocket.once("join-team--success", () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.joinTeam).toHaveBeenCalledWith(expect.any(String), 1)
+                done()
+            })
+        })
+    })
 })
