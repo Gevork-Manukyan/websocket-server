@@ -42,8 +42,15 @@ gameNamespace.on("connection", (socket) => {
       const player = game?.getPlayer(socket.id);
 
       if (!player || !player.isGameHost) {
-        // TODO: does not cause an error emit
-        return next(new HostOnlyActionError());
+        const error = new HostOnlyActionError();
+      
+        // Emit error to the client
+        socket.emit(`${event}--error`, {
+          code: error.code,
+          message: error.message,
+        });
+  
+        return; 
       }
     }
 
