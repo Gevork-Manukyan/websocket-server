@@ -1,9 +1,13 @@
+import { z } from "zod";
 import { ConGame } from "../models/ConGame";
 import { ElementalChampion, ElementalSage, ElementalStarterCard, ElementalWarriorCard, ItemCard } from "./card-types";
 
 export type gameId = string;
-export type Element = "twig" | "pebble" | "leaf" | "droplet";
-export type Sage = "Cedar" | "Gravel" | "Porella" | "Torrent";
+
+export const ElementSchema = z.enum(["twig", "pebble", "leaf", "droplet"]);
+export const SageSchema = z.enum(["Cedar", "Gravel", "Porella", "Torrent"]);
+export type Element = z.infer<typeof ElementSchema>;
+export type Sage = z.infer<typeof SageSchema>;
 
 export type CurrentGames = {
   [key: gameId]: ConGame;

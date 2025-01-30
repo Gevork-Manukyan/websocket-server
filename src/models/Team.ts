@@ -1,5 +1,6 @@
 import { ConflictError, NotFoundError } from "../services/CustomError/BaseError";
 import { ElementalWarriorCard } from "../types";
+import { ElementalWarriorStarterCard } from "../types/card-types";
 import { Decklist } from "../types/types";
 import { Battlefield } from "./Battlefield";
 import { Player } from "./Player";
@@ -71,7 +72,7 @@ export class Team {
         }
     }
 
-    initWarriors(choices: [ElementalWarriorCard, ElementalWarriorCard]) {
+    initWarriors(choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
         const [choice1, choice2] = choices;
 
         if (this.teamSize === 1) {
@@ -82,7 +83,7 @@ export class Team {
         }
     }
 
-    private initWarriors2Decks(choices: [ElementalWarriorCard, ElementalWarriorCard]) {
+    private initWarriors2Decks(choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
         const [choice1, choice2] = choices;
         
         // If cards given are same class as left sage then place on left side

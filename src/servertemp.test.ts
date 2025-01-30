@@ -80,6 +80,22 @@ describe("Server.ts", () => {
                 done();
             });
         })
+
+        test("should throw an error if one of the parameters are missing", (done) => {
+            clientSocket.emit("join-game", testGameId)
+
+            clientSocket.once("join-game--error", () => {
+                done()
+            })
+        })
+
+        test("should throw an error if both of the parameters are missing", (done) => {
+            clientSocket.emit("join-game")
+
+            clientSocket.once("join-game--error", () => {
+                done()
+            })
+        })
     })
 
     describe("select-sage event", () => {
@@ -97,5 +113,10 @@ describe("Server.ts", () => {
         })
     })
 
-    
+    describe("toggle-ready-status", () => {
+        test("should toggle the player status to ready", (done) => {
+
+            clientSocket.emit("toggle-ready-status", )
+        })
+    })
 })

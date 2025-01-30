@@ -9,8 +9,10 @@ import { GameEventEmitter } from "./services";
 import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
-import { handleSocketError } from "./utils/utilities";
+import { handleSocketError, validateSocketEvent } from "./utils/utilities";
 import { HostOnlyActionError } from "./services/CustomError/GameError";
+import { ValidationError } from "./services/CustomError/BaseError";
+import { ElementalWarriorStarterCard } from "./types/card-types";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -31,12 +33,6 @@ const gameEventEmitter = new GameEventEmitter(io);
 // Creates the gameplay namespace that will handle all gameplay connections
 const gameNamespace = io.of("/gameplay");
 gameNamespace.on("connection", (socket) => {
-  function socketCallback(
-    eventName: string,
-    fn: (...args: any[]) => Promise<void>
-  ) {
-    return handleSocketError(socket, eventName, fn);
-  }
 
   // Host only actions middleware
   socket.use(([event, gameId, ...args], next) => {
@@ -57,6 +53,7 @@ gameNamespace.on("connection", (socket) => {
   socket.on(
     "join-game",
     socketCallback("join-game", async (gameId, numPlayers) => {
+      console.log(gameId)
       let game = gameStateManager.getGame(gameId);
 
       // Create game if doesn't exist
@@ -127,7 +124,7 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(
     "chose-warriors",
-    socketCallback("chose-warriors", async (gameId: ConGame["id"], choices: [ElementalWarriorCard, ElementalWarriorCard]) => {
+    socketCallback("chose-warriors", async (gameId: ConGame["id"], choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) => {
         gameStateManager.getGame(gameId).chooseWarriors(socket.id, choices);
 
         // TODO: Emit to player to choose battlefield layout
@@ -150,6 +147,25 @@ gameNamespace.on("connection", (socket) => {
 
     socket.leave(gameId);
   }));
+
+  function socketCallback(
+    eventName: string,
+    fn: (...args: any[]) => Promise<void>
+  ) {
+    return async (...args: any[]) => {
+      try {
+        // Validate parameters
+        validateSocketEvent(eventName, Object.fromEntries(["gameId", ...args.map((_, i) => `arg${i}`)].map((key, i) => [key, args[i]])));
+  
+        // Proceed with event logic
+        await fn(...args);
+      } catch (error) {
+        handleSocketError(socket, eventName, async () => {
+          throw error;
+        })();
+      }
+    };
+  }
 });
 
 // Start the server if not in test mode

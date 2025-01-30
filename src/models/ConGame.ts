@@ -3,6 +3,7 @@
 import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { PlayersNotReadyError, SageUnavailableError } from "../services/CustomError/GameError";
 import { Sage, ElementalCard, gameId, ItemCard, ElementalWarriorCard } from "../types";
+import { ElementalWarriorStarterCard } from "../types/card-types";
 import { Player } from "./Player";
 import { Team } from "./Team";
 
@@ -104,7 +105,7 @@ export class ConGame {
     this.team2.initBattlefield(team2Decklists)
   }
 
-  chooseWarriors(playerId: Player["id"], choices: [ElementalWarriorCard, ElementalWarriorCard]) {
+  chooseWarriors(playerId: Player["id"], choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
     const player = this.getPlayer(playerId)
     const decklist = player.getDecklist()!
     const decklistWariors = decklist.warriors
