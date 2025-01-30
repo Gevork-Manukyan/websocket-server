@@ -42,7 +42,8 @@ gameNamespace.on("connection", (socket) => {
       const player = game?.getPlayer(socket.id);
 
       if (!player || !player.isGameHost) {
-        return next(new HostOnlyActionError(`perform this action`));
+        // TODO: does not cause an error emit
+        return next(new HostOnlyActionError());
       }
     }
 
@@ -102,9 +103,11 @@ gameNamespace.on("connection", (socket) => {
     })
   );
 
-  socket.on("clear-teams", socketCallback("clear-teams", async ({ gameId }: ClearTeamsData) => {
-    gameStateManager.getGame(gameId).clearTeams()
-    socket.emit("clear-teams--success")
+  socket.on(
+    "clear-teams", 
+    socketCallback("clear-teams", async ({ gameId }: ClearTeamsData) => {
+      gameStateManager.getGame(gameId).clearTeams()
+      socket.emit("clear-teams--success")
   }))
 
   socket.on(

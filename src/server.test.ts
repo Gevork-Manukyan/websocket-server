@@ -61,6 +61,30 @@ describe("Server.ts", () => {
                 done()
             })
         })
+
+        test("should throw an error if number of players is missing", (done) => {
+            clientSocket.emit("create-game", { gameId: testGameId })
+
+            clientSocket.once("create-game--error", () => {
+                done()
+            })
+        })
+
+        test("should throw an error if game ID is missing", (done) => {
+            clientSocket.emit("create-game", { numPlayers })
+
+            clientSocket.once("create-game--error", () => {
+                done()
+            })
+        })
+
+        test("should throw an error if both of the parameters are missing", (done) => {
+            clientSocket.emit("create-game")
+
+            clientSocket.once("create-game--error", () => {
+                done()
+            })
+        })
     })
 
     describe("join-game event", () => {
@@ -83,7 +107,6 @@ describe("Server.ts", () => {
             });
         })
 
-        // TODO: add similar tests to all event tests
         test("should throw an error if gameId is missing", (done) => {
             clientSocket.emit("join-game")
 
@@ -103,6 +126,27 @@ describe("Server.ts", () => {
             clientSocket.once("select-sage--success", () => {
                 expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
                 expect(mockGame.setPlayerSage).toHaveBeenCalledWith(expect.any(String), "Cedar")
+                done()
+            })
+        })
+
+        test("should throw an error if game ID is missing", (done) => {
+            clientSocket.emit("select-sage", { sage: "Cedar" })
+            clientSocket.once("select-sage--error", () => {
+                done()
+            })
+        })
+
+        test("should throw an error if sage is missing", (done) => {
+            clientSocket.emit("select-sage", { gameId: testGameId })
+            clientSocket.once("select-sage--error", () => {
+                done()
+            })
+        })
+
+        test("should throw an error if both parameters are missing", (done) => {
+            clientSocket.emit("select-sage")
+            clientSocket.once("select-sage--error", () => {
                 done()
             })
         })
@@ -144,6 +188,13 @@ describe("Server.ts", () => {
                 done()
             })
         })
+
+        test("should throw an error if game ID is missing", (done) => {
+            clientSocket.emit("toggle-ready-status")
+            clientSocket.once("toggle-ready-status--error", () => {
+                done()
+            })
+        })
     })
 
     describe("join-team event", () => {
@@ -159,12 +210,37 @@ describe("Server.ts", () => {
                 done()
             })
         })
+
+        test("should throw an error if game ID is missing", (done) => {
+            clientSocket.emit("join-team", { team: 1 })
+            clientSocket.once("join-team--error", () => {
+                done()
+            })
+        })
+
+        test("should throw an error if team number is missing", (done) => {
+            clientSocket.emit("join-team", { gameId: testGameId })
+            clientSocket.once("join-team--error", () => {
+                done()
+            })
+        })
+
+        test("should throw an error if both parameters are missing", (done) => {
+            clientSocket.emit("join-team")
+            clientSocket.once("join-team--error", () => {
+                done()
+            })
+        })
     })
 
     describe("clear-teams event", () => {
+        beforeEach(() => {
+            gameStateManager.getGame = jest.fn().mockReturnValueOnce(mockGame)
+            mockGame.getPlayer = jest.fn().mockReturnValueOnce(new Player(testPlayerId, true))
+        })
+
         test("should clear all teams of players", (done) => {
             gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
-            mockGame.getPlayer = jest.fn().mockReturnValue(new Player(testPlayerId, true))
             mockGame.clearTeams = jest.fn()
 
             clientSocket.emit("clear-teams", { gameId: testGameId } as ClearTeamsData)
@@ -177,10 +253,31 @@ describe("Server.ts", () => {
                 done()
             })
         })
+
+        test("should throw an error if a non-host tries to clear teams", (done) => {
+            mockGame.getPlayer = jest.fn().mockReturnValueOnce(new Player(testPlayerId, false))
+            
+            clientSocket.emit("clear-teams", { gameId: testGameId } as ClearTeamsData)
+
+            clientSocket.once("clear-teams--error", () => {
+                done()
+            })
+        })
+
+        test("should throw an error if game ID is missing", (done) => {
+            clientSocket.emit("clear-teams")
+            clientSocket.once("clear-teams--error", () => {
+                done()
+            })
+        })
     })
 
     describe("start-game", () => {
         // TODO: implement
+
+        test("should throw an error if a non-host tries to start game", () => {
+
+        })
     })
 
     describe("chose-warriors", () => {
@@ -201,6 +298,13 @@ describe("Server.ts", () => {
             clientSocket.once("leave-game--success", () => {
                 expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
                 expect(mockGame.removePlayer).toHaveBeenCalledWith(expect.any(String))
+                done()
+            })
+        })
+
+        test("should throw an error if game ID is missing", (done) => {
+            clientSocket.emit("leave-game")
+            clientSocket.once("leave-game--error", () => {
                 done()
             })
         })
