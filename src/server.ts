@@ -8,7 +8,7 @@ import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
 import { ChoseWarriorsData, ClearTeamsData, CreateGameData, FinishedSetupData, JoinGameData, JoinTeamData, LeaveGameData, SelectSageData, SocketEventMap, StartGameData, ToggleReadyStatusData } from "./types/server-types";
-import { handleSocketError, processEvent, socketCallback } from "./utils/utilities";
+import { handleSocketError, processEvent, socketErrorHandler } from "./utils/utilities";
 import { CustomError } from "./services/CustomError/BaseError";
 
 const app = express();
@@ -39,25 +39,25 @@ gameNamespace.on("connection", (socket) => {
     console.error("Socket error:", error);
   });
 
-  socket.on("create-game", socketCallback(socket, "create-game", async ({ gameId, numPlayers }: CreateGameData) => {
+  socket.on("create-game", socketErrorHandler(socket, "create-game", async ({ gameId, numPlayers }: CreateGameData) => {
     const newGame = gameStateManager.addGame(new ConGame(gameId, numPlayers));
     newGame.addPlayer(new Player(socket.id, true)); // First player to join is the host
     socket.join(gameId);
     socket.emit("create-game--success");
   }));
 
-  socket.on("join-game", socketCallback(socket, "join-game", async ({ gameId }: JoinGameData) => {
+  socket.on("join-game", socketErrorHandler(socket, "join-game", async ({ gameId }: JoinGameData) => {
     gameStateManager.getGame(gameId).addPlayer(new Player(socket.id));
     socket.join(gameId);
     socket.emit("join-game--success");
   }));
 
-  socket.on("select-sage", socketCallback(socket, "select-sage", async ({ gameId, sage }: SelectSageData) => {
+  socket.on("select-sage", socketErrorHandler(socket, "select-sage", async ({ gameId, sage }: SelectSageData) => {
     gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage);
     socket.emit("select-sage--success");
   }));
 
-  socket.on("toggle-ready-status", socketCallback(socket, "toggle-ready-status", async ({ gameId }: ToggleReadyStatusData) => {
+  socket.on("toggle-ready-status", socketErrorHandler(socket, "toggle-ready-status", async ({ gameId }: ToggleReadyStatusData) => {
     const game = gameStateManager.getGame(gameId);
     const currPlayer = game.getPlayer(socket.id);
     currPlayer.toggleReady();
@@ -71,17 +71,17 @@ gameNamespace.on("connection", (socket) => {
     }
   }));
 
-  socket.on("join-team", socketCallback(socket, "join-team", async ({ gameId, team }: JoinTeamData) => {
+  socket.on("join-team", socketErrorHandler(socket, "join-team", async ({ gameId, team }: JoinTeamData) => {
     gameStateManager.getGame(gameId).joinTeam(socket.id, team);
     socket.emit("join-team--success");
   }));
 
-  socket.on("clear-teams", socketCallback(socket, "clear-teams", async ({ gameId }: ClearTeamsData) => {
+  socket.on("clear-teams", socketErrorHandler(socket, "clear-teams", async ({ gameId }: ClearTeamsData) => {
     gameStateManager.getGame(gameId).clearTeams();
     socket.emit("clear-teams--success");
   }));
 
-  socket.on("start-game", socketCallback(socket, "start-game", async ({ gameId }: StartGameData) => {
+  socket.on("start-game", socketErrorHandler(socket, "start-game", async ({ gameId }: StartGameData) => {
     const game = gameStateManager.getGame(gameId);
     const playerId = socket.id;
 
@@ -91,12 +91,12 @@ gameNamespace.on("connection", (socket) => {
     game.setStarted(true);
   }));
 
-  socket.on("chose-warriors", socketCallback(socket, "chose-warriors", async ({ gameId, choices }: ChoseWarriorsData) => {
+  socket.on("chose-warriors", socketErrorHandler(socket, "chose-warriors", async ({ gameId, choices }: ChoseWarriorsData) => {
     gameStateManager.getGame(gameId).chooseWarriors(socket.id, choices);
     // TODO: Emit to player to choose battlefield layout
   }));
 
-  socket.on("finished-setup", socketCallback(socket, "finished-setup", async ({ gameId }: FinishedSetupData) => {
+  socket.on("finished-setup", socketErrorHandler(socket, "finished-setup", async ({ gameId }: FinishedSetupData) => {
     const game = gameStateManager.getGame(gameId);
     game.numPlayersFinishedSetup++;
 
@@ -105,7 +105,7 @@ gameNamespace.on("connection", (socket) => {
       return;
   }));
 
-  socket.on("leave-game", socketCallback(socket, "leave-game", async ({ gameId }: LeaveGameData) => {
+  socket.on("leave-game", socketErrorHandler(socket, "leave-game", async ({ gameId }: LeaveGameData) => {
     gameStateManager.getGame(gameId).removePlayer(socket.id);
     socket.leave(gameId);
     socket.emit("leave-game--success");

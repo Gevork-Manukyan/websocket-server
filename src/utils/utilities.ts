@@ -23,7 +23,7 @@ export function getSageDecklist(sage: Sage | null) {
       }
 }
 
-export function socketCallback<T extends keyof SocketEventMap>(
+export function socketErrorHandler<T extends keyof SocketEventMap>(
   socket: Socket,
   eventName: T,
   fn: (data: SocketEventMap[T]) => Promise<void>
