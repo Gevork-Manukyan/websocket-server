@@ -23,6 +23,20 @@ export function getSageDecklist(sage: Sage | null) {
       }
 }
 
+export function socketCallback<T extends keyof SocketEventMap>(
+  socket: Socket,
+  eventName: T,
+  fn: (data: SocketEventMap[T]) => Promise<void>
+) {
+  return async (rawData: unknown) => {
+    try {
+      await fn(rawData as SocketEventMap[T])
+    } catch (error) {
+      handleSocketError(socket, eventName, error as CustomError)
+    }
+  }
+}
+
 export function handleSocketError(
   socket: Socket,
   eventName: string,
