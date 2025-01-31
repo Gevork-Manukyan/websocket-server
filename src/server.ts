@@ -8,7 +8,8 @@ import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
 import { ChoseWarriorsData, ClearTeamsData, CreateGameData, FinishedSetupData, JoinGameData, JoinTeamData, LeaveGameData, SelectSageData, SocketEventMap, StartGameData, ToggleReadyStatusData } from "./types/server-types";
-import { processEvent } from "./utils/utilities";
+import { handleSocketError, processEvent } from "./utils/utilities";
+import { CustomError } from "./services/CustomError/BaseError";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -40,103 +41,141 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(
     "create-game", 
-    async({ gameId, numPlayers }: CreateGameData) => {
-      const newGame = gameStateManager.addGame(new ConGame(gameId, numPlayers))
-      newGame.addPlayer(new Player(socket.id, true)) // First player to join is the host
-      socket.join(gameId)
-      socket.emit("create-game--success")
+    ({ gameId, numPlayers }: CreateGameData) => {
+      try {
+        const newGame = gameStateManager.addGame(new ConGame(gameId, numPlayers))
+        newGame.addPlayer(new Player(socket.id, true)) // First player to join is the host
+        socket.join(gameId)
+        socket.emit("create-game--success")
+      } catch (error) {
+        handleSocketError(socket, "create-game", error as CustomError)
+      }
     }
   )
 
   socket.on(
     "join-game",
-    async ({ gameId }: JoinGameData) => {
-      gameStateManager.getGame(gameId).addPlayer(new Player(socket.id));
-      socket.join(gameId);
-      socket.emit("join-game--success");
+    ({ gameId }: JoinGameData) => {
+      try {
+        gameStateManager.getGame(gameId).addPlayer(new Player(socket.id));
+        socket.join(gameId);
+        socket.emit("join-game--success");
+      } catch (error) {
+        handleSocketError(socket, "join-game", error as CustomError)
+      }
     }
   );
   
 
   socket.on(
     "select-sage",
-    async ({ gameId, sage }: SelectSageData) => {
-      gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage);
-      socket.emit("select-sage--success");
+    ({ gameId, sage }: SelectSageData) => {
+      try {
+        gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage);
+        socket.emit("select-sage--success");
+      } catch (error) {
+        handleSocketError(socket, "select-sage", error as CustomError)
+      }
     }
   );
 
   socket.on(
     "toggle-ready-status",
-    async ({ gameId }: ToggleReadyStatusData) => {
-      const game = gameStateManager.getGame(gameId)
-      const currPlayer = game.getPlayer(socket.id);
-      currPlayer.toggleReady();
-
-      if (currPlayer.isReady) {
-        game.incrementPlayersReady()
-        socket.emit("ready-status--ready");
-      } else {
-        game.decrementPlayersReady()
-        socket.emit("ready-status--not-ready");
+    ({ gameId }: ToggleReadyStatusData) => {
+      try {
+        const game = gameStateManager.getGame(gameId)
+        const currPlayer = game.getPlayer(socket.id);
+        currPlayer.toggleReady();
+        
+        if (currPlayer.isReady) {
+          game.incrementPlayersReady()
+          socket.emit("ready-status--ready");
+        } else {
+          game.decrementPlayersReady()
+          socket.emit("ready-status--not-ready");
+        }
+      } catch (error) {
+        handleSocketError(socket, "toggle-ready-status", error as CustomError)
       }
     }
   );
 
   socket.on(
     "join-team",
-    async ({ gameId, team }: JoinTeamData) => {
-      gameStateManager.getGame(gameId).joinTeam(socket.id, team);
-      socket.emit("join-team--success")
+    ({ gameId, team }: JoinTeamData) => {
+      try {
+        gameStateManager.getGame(gameId).joinTeam(socket.id, team);
+        socket.emit("join-team--success")
+      } catch (error) {
+        handleSocketError(socket, "join-team", error as CustomError)
+      }
     }
   );
 
   socket.on(
     "clear-teams", 
-    async ({ gameId }: ClearTeamsData) => {
-      gameStateManager.getGame(gameId).clearTeams()
-      socket.emit("clear-teams--success")
+    ({ gameId }: ClearTeamsData) => {
+      try {
+        gameStateManager.getGame(gameId).clearTeams()
+        socket.emit("clear-teams--success")
+      } catch (error) {
+        handleSocketError(socket, "clear-teams", error as CustomError)
+      }
     }
   );
 
   socket.on(
     "start-game",
-    async ({ gameId }: StartGameData) => {
-      const game = gameStateManager.getGame(gameId);
-      const playerId = socket.id;
-      
-      game.startGame(playerId);
-      gameEventEmitter.emitPickWarriors(game.players);
-
-      // TODO: coin flip for who is first. Players decide play order if 4 players
-
-      game.setStarted(true);
+    ({ gameId }: StartGameData) => {
+      try {
+        const game = gameStateManager.getGame(gameId);
+        const playerId = socket.id;
+        
+        game.startGame(playerId);
+        gameEventEmitter.emitPickWarriors(game.players);
+  
+        // TODO: coin flip for who is first. Players decide play order if 4 players
+  
+        game.setStarted(true);
+      } catch (error) {
+        handleSocketError(socket, "start-game", error as CustomError)
+      }
     }
   );
 
   socket.on(
     "chose-warriors",
-    async ({ gameId, choices }: ChoseWarriorsData) => {
+    ({ gameId, choices }: ChoseWarriorsData) => {
+      try {
         gameStateManager.getGame(gameId).chooseWarriors(socket.id, choices);
-
         // TODO: Emit to player to choose battlefield layout
+      } catch (error) {
+        handleSocketError(socket, "chose-warriors", error as CustomError)
+      }
     }
   );
 
-  socket.on("finished-setup", async ({ gameId }: FinishedSetupData) => {
-    const game = gameStateManager.getGame(gameId);
-    game.numPlayersFinishedSetup++;
-
-    if (game.numPlayersFinishedSetup === game.players.length)
-      // TODO: Go to choosing who is first and emit to players who is first
-      return;
+  socket.on("finished-setup", ({ gameId }: FinishedSetupData) => {
+    try {
+      const game = gameStateManager.getGame(gameId);
+      game.numPlayersFinishedSetup++;
+  
+      if (game.numPlayersFinishedSetup === game.players.length)
+        // TODO: Go to choosing who is first and emit to players who is first
+        return;
+    } catch (error) {
+      handleSocketError(socket, "finished-setup", error as CustomError)
     }
-  );
+  });
 
-  socket.on("leave-game", async ({ gameId }: LeaveGameData) => {
-    gameStateManager.getGame(gameId).removePlayer(socket.id);
-    socket.leave(gameId)
-    socket.emit("leave-game--success")
+  socket.on("leave-game", ({ gameId }: LeaveGameData) => {
+    try {
+      gameStateManager.getGame(gameId).removePlayer(socket.id);
+      socket.leave(gameId)
+      socket.emit("leave-game--success")
+    } catch (error) {
+      handleSocketError(socket, "leave-game", error as CustomError)
+    }
   });
 });
 

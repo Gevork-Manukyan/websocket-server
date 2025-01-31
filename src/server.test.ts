@@ -44,6 +44,7 @@ describe("Server.ts", () => {
         expect(clientSocket.connected).toBe(true);
     });
 
+    // Write generic tests for all events that tests if [event]--error is called if error is thrown
     test("should emit an error if a function in an event throws an error", (done) => {
         gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
         const newPlayer = new Player("player-2")

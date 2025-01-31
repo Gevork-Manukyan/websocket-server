@@ -23,25 +23,39 @@ export function getSageDecklist(sage: Sage | null) {
       }
 }
 
-export function processEvent<T extends keyof SocketEventMap>(socket: Socket, event: T, rawData: any, next: (err?: Error) => void) {
-  // TODO: doesn't catch errors in indivual events. bring back socketCallback? 
+export function handleSocketError(
+  socket: Socket,
+  eventName: string,
+  error: CustomError,
+) {
+  const { message, code, ...rest } = error;
+
+  socket.emit(`${eventName}--error`, {
+    code: code || "INTERNAL_ERROR",
+    message: message || "An unexpected error occurred.",
+    ...rest
+  });
+}
+
+
+export function processEvent<T extends keyof SocketEventMap>(socket: Socket, eventName: T, rawData: any, next: (err?: Error) => void) {
   try {
     // Ensure the event is recognized
-    if (!(event in EventSchemas)) {
-      throw new ValidationError(`Unrecognized event: ${event}`, rawData);
+    if (!(eventName in EventSchemas)) {
+      throw new ValidationError(`Unrecognized event: ${eventName}`, rawData);
     }
 
     // Validate data schema
-    const result = EventSchemas[event].safeParse(rawData);
+    const result = EventSchemas[eventName].safeParse(rawData);
     if (!result.success) {
-      throw new ValidationError(`Invalid data for event: ${event}`, rawData);
+      throw new ValidationError(`Invalid data for event: ${eventName}`, rawData);
     }
 
     const data = result.data;
 
     // Check for host-only actions
     const hostOnlyEvents = ["clear-teams", "start-game"];
-    if (hostOnlyEvents.includes(event)) {
+    if (hostOnlyEvents.includes(eventName)) {
       const game = gameStateManager.getGame(data.gameId as gameId);
       const player = game?.getPlayer(socket.id);
 
@@ -57,13 +71,7 @@ export function processEvent<T extends keyof SocketEventMap>(socket: Socket, eve
     next(); // Continue if everything is fine
   } catch (error) {
     const customError = error as CustomError;
-
-    // Emit error event to the client
-    socket.emit(`${event}--error`, {
-      code: customError.code || "VALIDATION_ERROR",
-      message: customError.message || "An unexpected error occurred.",
-    });
-
+    handleSocketError(socket, eventName, customError)
     next(customError)
   }
 }
