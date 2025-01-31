@@ -46,18 +46,29 @@ const leaveGameSchema = z.object({
   gameId: z.string(),
 });
 
+export const CreateGameEvent = "create-game" as const;
+export const JoinGameEvent = "join-game" as const;
+export const SelectSageEvent = "select-sage" as const;
+export const ToggleReadyStatusEvent = "toggle-ready-status" as const;
+export const JoinTeamEvent = "join-team" as const;
+export const ClearTeamsEvent = "clear-teams" as const;
+export const StartGameEvent = "start-game" as const;
+export const ChoseWarriorsEvent = "chose-warriors" as const;
+export const FinishedSetupEvent = "finished-setup" as const;
+export const LeaveGameEvent = "leave-game" as const;
+
 // Define EventSchemas record
 export const EventSchemas = {
-  "create-game": createGameSchema,
-  "join-game": joinGameSchema,
-  "select-sage": selectSageSchema,
-  "toggle-ready-status": toggleReadyStatusSchema,
-  "join-team": joinTeamSchema,
-  "clear-teams": clearTeamsSchema,
-  "start-game": startGameSchema,
-  "chose-warriors": choseWarriorsSchema,
-  "finished-setup": finishedSetupSchema,
-  "leave-game": leaveGameSchema,
+  [CreateGameEvent]: createGameSchema,
+  [JoinGameEvent]: joinGameSchema,
+  [SelectSageEvent]: selectSageSchema,
+  [ToggleReadyStatusEvent]: toggleReadyStatusSchema,
+  [JoinTeamEvent]: joinTeamSchema,
+  [ClearTeamsEvent]: clearTeamsSchema,
+  [StartGameEvent]: startGameSchema,
+  [ChoseWarriorsEvent]: choseWarriorsSchema,
+  [FinishedSetupEvent]: finishedSetupSchema,
+  [LeaveGameEvent]: leaveGameSchema,
 } as const;
 
 // Infer the types from the schemas directly
@@ -74,14 +85,14 @@ export type LeaveGameData = z.infer<typeof leaveGameSchema>;
 
 // Create a mapped type for socket events
 export type SocketEventMap = {
-  "create-game": CreateGameData;
-  "join-game": JoinGameData;
-  "select-sage": SelectSageData;
-  "toggle-ready-status": ToggleReadyStatusData;
-  "join-team": JoinTeamData;
-  "clear-teams": ClearTeamsData;
-  "start-game": StartGameData;
-  "chose-warriors": ChoseWarriorsData;
-  "finished-setup": FinishedSetupData;
-  "leave-game": LeaveGameData;
+  [CreateGameEvent]: CreateGameData;
+  [JoinGameEvent]: JoinGameData;
+  [SelectSageEvent]: SelectSageData;
+  [ToggleReadyStatusEvent]: ToggleReadyStatusData;
+  [JoinTeamEvent]: JoinTeamData;
+  [ClearTeamsEvent]: ClearTeamsData;
+  [StartGameEvent]: StartGameData;
+  [ChoseWarriorsEvent]: ChoseWarriorsData;
+  [FinishedSetupEvent]: FinishedSetupData;
+  [LeaveGameEvent]: LeaveGameData;
 }

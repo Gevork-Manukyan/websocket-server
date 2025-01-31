@@ -3,8 +3,10 @@ import { AcornSquire, CalamityLeopard, Cedar, HornedHollow, QuillThornback, Slum
 import { AgileAssailant, BobBlight, BotanicFangs, BoulderhideBrute, CloseStrike, CoastalCoyote, Cobble, Dribble, DropletCharm, FarStrike, FrostfallEmperor, GeoWeasel, GraniteRampart, Gravel, JadeTitan, KingCrustacean, KomodoKin, LeafCharm, NaturalRestoration, OnyxBearer, OxenAvenger, PebbleCharm, PetalMage, Porella, RiptideTiger, RiverRogue, Sprout, ThornFencer, TideTurner, Torrent, TwigCharm } from "./cards";
 import { NODE_ENV } from './config';
 
+/* ------- ENV ------- */
 export const IS_PRODUCTION = NODE_ENV === "production"
 
+/* ------- DECKLISTS ------- */
 export const TwigDeck: Decklist = {
     sage: Cedar,
     champions: {
@@ -52,3 +54,4 @@ export const DropletDeck: Decklist = {
     basic: Dribble,
     items: [CloseStrike, CloseStrike, FarStrike, NaturalRestoration, DropletCharm]
 }
+
