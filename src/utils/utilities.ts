@@ -24,6 +24,7 @@ export function getSageDecklist(sage: Sage | null) {
 }
 
 export function processEvent<T extends keyof SocketEventMap>(socket: Socket, event: T, rawData: any, next: (err?: Error) => void) {
+  // TODO: doesn't catch errors in indivual events. bring back socketCallback? 
   try {
     // Ensure the event is recognized
     if (!(event in EventSchemas)) {

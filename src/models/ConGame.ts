@@ -54,7 +54,9 @@ export class ConGame {
 
   setPlayerSage(playerId: Player["id"], sage: Sage) {
     const isSageAvailable = this.players.every(player => player.sage !== sage)
+    console.log("before error")
     if (!isSageAvailable) throw new SageUnavailableError(sage);
+    console.log("after error")
 
     this.getPlayer(playerId).setSage(sage)
   }

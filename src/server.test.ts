@@ -3,8 +3,7 @@ import { server } from "./server";
 import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
 import { ConGame, Player } from "./models";
-import { CustomError } from "./services/CustomError/BaseError";
-import { ClearTeamsData, CreateGameData, JoinGameData, JoinTeamData, LeaveGameData, SelectSageData, ToggleReadyStatusData } from "./types/server-types";
+import { ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, SelectSageData, ToggleReadyStatusData } from "./types/server-types";
 
 
 let clientSocket: Socket;
@@ -44,6 +43,19 @@ describe("Server.ts", () => {
     test("should establish a socket connection", () => {
         expect(clientSocket.connected).toBe(true);
     });
+
+    test("should emit an error if a function in an event throws an error", (done) => {
+        gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+        const newPlayer = new Player("player-2")
+        newPlayer.setSage("Cedar")
+        mockGame.addPlayer(newPlayer)
+
+        clientSocket.emit("select-sage", {gameId: testGameId, sage: "Cedar"} as SelectSageData)
+        
+        clientSocket.once("select-sage--error", () => {
+            done()
+        })
+    })
 
     describe("create-game event", () => {
         test("should create a new game with given game ID and add the player", (done) => {
