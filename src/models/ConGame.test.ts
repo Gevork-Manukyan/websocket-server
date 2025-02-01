@@ -123,6 +123,7 @@ describe("ConGame", () => {
         expect(mockGame.team2.resetTeam).toHaveBeenCalled()
         expect(mockGame.numPlayersReady).toBe(0)
         expect(mockGame.numPlayersFinishedSetup).toBe(0)
+        // TODO: expect all players' isReady to be false
       })
     })
 

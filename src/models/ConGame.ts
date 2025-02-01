@@ -45,7 +45,6 @@ export class ConGame {
     if (!player)
       throw new NotFoundError(
         "Player",
-        playerId,
         `Player with socket ID ${playerId} not found in game ${this.id}`
       );
       
@@ -96,6 +95,7 @@ export class ConGame {
     this.team2.resetTeam()
     this.numPlayersReady = 0;
     this.numPlayersFinishedSetup = 0
+    this.players.forEach(player => player.isReady = false)
   }
 
   startGame(playerId: Player["id"]) {

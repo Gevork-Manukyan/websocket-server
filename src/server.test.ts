@@ -3,7 +3,7 @@ import { server } from "./server";
 import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
 import { ConGame, Player } from "./models";
-import { ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, SelectSageData, ToggleReadyStatusData } from "./types/server-types";
+import { ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, SelectSageData, SwapWarriorsEvent, ToggleReadyStatusData } from "./types/server-types";
 
 
 let clientSocket: Socket;
@@ -294,6 +294,10 @@ describe("Server.ts", () => {
     })
 
     describe("chose-warriors", () => {
+        // TODO: implement
+    })
+
+    describe(SwapWarriorsEvent, () => {
         // TODO: implement
     })
 
