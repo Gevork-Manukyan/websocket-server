@@ -163,4 +163,8 @@ describe("Team", () => {
             expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(QuillThornback, 12)
         })
     })
+
+    describe("swapWarriors method", () => {
+        // TODO: Implement
+    })
 })

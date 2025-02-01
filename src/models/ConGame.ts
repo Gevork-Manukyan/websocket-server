@@ -125,15 +125,6 @@ export class ConGame {
     this.team2.initBattlefield(team2Decklists)
   }
 
-  swapWarriors(playerId: Player["id"]) {
-    const player = this.getPlayer(playerId)
-    const team = player.team
-
-    if (!team) throw new NotFoundError("Team", "Player requires a team before swapping warriors")
-    
-    team.swapWarriors(player.getElement())
-  }
-
   finishPlayerSetup(playerId: Player["id"]) {
     const player = this.getPlayer(playerId);
     if (!player.isReady) throw new NotFoundError("Player", "Player is not ready");

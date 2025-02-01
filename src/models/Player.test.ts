@@ -139,4 +139,24 @@ describe("chooseWarriors", () => {
               ])
           ).toThrow(ValidationError);
     });
-  });
+
+    describe("swapWarriors", () => {
+        test("swaps the player's warriors", () => {
+            const player = new Player("player-1");
+            player.team = {
+                swapWarriors: jest.fn(),
+            } as Partial<Team> as Team;
+        
+            player.swapWarriors();
+        
+            expect(player.team.swapWarriors).toHaveBeenCalled();
+        });
+
+        test("throws NotFoundError if player does not have a team", () => {
+            const player = new Player("player-1");
+            player.team = null;
+        
+            expect(() => player.swapWarriors()).toThrow(Error);
+        });
+    })
+});

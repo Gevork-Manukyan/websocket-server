@@ -100,7 +100,7 @@ gameNamespace.on("connection", (socket) => {
   }));
 
   socket.on(SwapWarriorsEvent, socketErrorHandler(socket, SwapWarriorsEvent, async ({ gameId }: SwapWarriorsData) => {
-    gameStateManager.getGame(gameId).swapWarriors(socket.id)
+    gameStateManager.getGame(gameId).getPlayer(socket.id).swapWarriors()
     socket.emit(`${SwapWarriorsEvent}--success`)
   }));
 
