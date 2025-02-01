@@ -123,7 +123,9 @@ describe("ConGame", () => {
         expect(mockGame.team2.resetTeam).toHaveBeenCalled()
         expect(mockGame.numPlayersReady).toBe(0)
         expect(mockGame.numPlayersFinishedSetup).toBe(0)
-        // TODO: expect all players' isReady to be false
+        mockGame.players.forEach(player => {
+          expect(player.isReady).toBe(false)
+        })
       })
     })
 
@@ -132,6 +134,12 @@ describe("ConGame", () => {
         expect(mockGame.incrementPlayersReady()).toBe(1);
         expect(mockGame.numPlayersReady).toBe(1);
       });
+
+      test("incrementing past the total number of players does not change the count", () => {
+        mockGame.numPlayersReady = 4;
+        expect(mockGame.incrementPlayersReady()).toBe(4);
+        expect(mockGame.numPlayersReady).toBe(4);
+      })
     });
   
     describe("decrementPlayersReady", () => {
@@ -140,6 +148,37 @@ describe("ConGame", () => {
         expect(mockGame.decrementPlayersReady()).toBe(0);
         expect(mockGame.numPlayersReady).toBe(0);
       });
+
+      test("decrementing below zero does not change the count", () => {
+        expect(mockGame.decrementPlayersReady()).toBe(0);
+        expect(mockGame.numPlayersReady).toBe(0);
+      })
+    });
+
+    describe("incrementPlayersFinishedSetup", () => {
+      test("increments the number of players finished setup", () => {
+        expect(mockGame.incrementPlayersFinishedSetup()).toBe(1);
+        expect(mockGame.numPlayersFinishedSetup).toBe(1);
+      });
+
+      test("incrementing past the total number of players does not change the count", () => {
+        mockGame.numPlayersFinishedSetup = 4;
+        expect(mockGame.incrementPlayersFinishedSetup()).toBe(4);
+        expect(mockGame.numPlayersFinishedSetup).toBe(4);
+      })
+    });
+
+    describe("decrementPlayersFinishedSetup", () => {
+      test("decrements the number of players finished setup", () => {
+        mockGame.numPlayersFinishedSetup = 1;
+        expect(mockGame.decrementPlayersFinishedSetup()).toBe(0);
+        expect(mockGame.numPlayersFinishedSetup).toBe(0);
+      });
+
+      test("decrementing below zero does not change the count", () => {
+        expect(mockGame.decrementPlayersFinishedSetup()).toBe(0);
+        expect(mockGame.numPlayersFinishedSetup).toBe(0);
+      })
     });
   
     describe("startGame", () => {
@@ -168,60 +207,5 @@ describe("ConGame", () => {
         expect(() => mockGame.startGame("player-1")).toThrow(PlayersNotReadyError);
       });
     });
-  
-    describe("chooseWarriors", () => {
-      test("sets warriors for a player and adds non-chosen cards to their deck", () => {
-        const player = new Player("player-1");
-        player.getDecklist = jest.fn().mockReturnValue(TwigDeck);
-        mockGame.addPlayer(player);
-        
-        player.addCardToDeck = jest.fn()
-        player.team = {
-            initWarriors: jest.fn(),
-        } as Partial<Team> as Team;
-  
-        mockGame.chooseWarriors("player-1", [
-            AcornSquire,
-            QuillThornback,
-        ]);
-  
-        expect(player.team?.initWarriors).toHaveBeenCalledWith([
-            AcornSquire,
-            QuillThornback,
-        ]);
-  
-        expect(player.addCardToDeck).toHaveBeenCalledWith(SlumberJack);
-      });
-  
-      test("throws ValidationError if the chosen warriors do not match the player's sage element", () => {
-        const player = new Player("player-1");
-        player.getDecklist = jest.fn().mockReturnValue(TwigDeck);
-        mockGame.addPlayer(player);
-        player.team = {
-            initWarriors: jest.fn(),
-        } as Partial<Team> as Team;
-  
-        expect(() =>
-          mockGame.chooseWarriors("player-1", [
-            AcornSquire,
-            GeoWeasel,
-          ])
-        ).toThrow(ValidationError);
-
-        expect(() =>
-            mockGame.chooseWarriors("player-1", [
-                GeoWeasel,
-                AcornSquire,
-            ])
-        ).toThrow(ValidationError);
-
-        expect(() =>
-            mockGame.chooseWarriors("player-1", [
-                GeoWeasel,
-                GraniteRampart,
-            ])
-        ).toThrow(ValidationError);
-      });
-    });
-  });
+});
   

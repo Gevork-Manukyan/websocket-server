@@ -174,6 +174,7 @@ describe("Server.ts", () => {
 
         test("should toggle the player status to ready", (done) => {
             mockPlayer.isReady = true
+            mockPlayer.sage = "Cedar"
             mockGame.incrementPlayersReady = jest.fn()
 
             clientSocket.emit("toggle-ready-status", { gameId: testGameId } as ToggleReadyStatusData)
@@ -189,6 +190,7 @@ describe("Server.ts", () => {
 
         test("should toggle the player status to not ready", (done) => {
             mockPlayer.isReady = false
+            mockPlayer.sage = "Cedar"
             mockGame.decrementPlayersReady = jest.fn()
 
             clientSocket.emit("toggle-ready-status", { gameId: testGameId } as ToggleReadyStatusData)
@@ -198,6 +200,15 @@ describe("Server.ts", () => {
                 expect(mockGame.getPlayer).toHaveBeenCalledWith(expect.any(String))
                 expect(mockPlayer.toggleReady).toHaveBeenCalled()
                 expect(mockGame.decrementPlayersReady).toHaveBeenCalled()
+                done()
+            })
+        })
+
+        test("should throw error if sage is not set when trying to toggle ready", (done) => {
+            mockPlayer.sage = null
+
+            clientSocket.emit("toggle-ready-status", { gameId: testGameId } as ToggleReadyStatusData)
+            clientSocket.once("toggle-ready-status--error", () => {
                 done()
             })
         })

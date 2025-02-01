@@ -1,5 +1,6 @@
 import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { Card, Sage } from "../types";
+import { ElementalWarriorStarterCard } from "../types/card-types";
 import { Decklist } from "../types/types";
 import { getSageDecklist } from "../utils/utilities";
 import { Team } from "./Team";
@@ -7,6 +8,8 @@ import { Team } from "./Team";
 export class Player {
   id: string;
   isReady: boolean = false;
+  isSetup: boolean = false;
+  hasChosenWarriors: boolean = false;
   isGameHost: boolean;
   team: Team | null = null;
   sage: Sage | null = null;
@@ -46,7 +49,6 @@ export class Player {
   }
 
   toggleReady() {
-    if (!this.sage) throw new ValidationError("Cannot toggle ready. The sage has not been set.", "sage");
     this.isReady = !this.isReady;
   }
 
@@ -66,4 +68,25 @@ export class Player {
     const basicStarter = decklist.basic
     this.addCardsToDeck([basicStarter, ...decklist.items])
   }
+
+    chooseWarriors(choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
+      const decklist = this.getDecklist()!
+      const decklistWariors = decklist.warriors
+      const [choice1, choice2] = choices
+  
+      // If chosen cards are not of the correct deck
+      if (!decklistWariors.includes(choice1) || !decklistWariors.includes(choice2)) 
+        throw new ValidationError("Invalid warrior(s) passed for chosen deck", "INVALID_INPUT")
+      
+      if (!this.team) throw new NotFoundError("Team", "Player requires a team before choosing warriors")
+
+      this.team.initWarriors(choices)
+      this.hasChosenWarriors = true;
+  
+      // Add the non-chosen card to the player's deck
+      decklist.warriors.forEach(card => {
+        if ((card.name !== choice1.name) || (card.name !== choice2.name))
+          this.addCardToDeck(card);
+      })
+    }
 }

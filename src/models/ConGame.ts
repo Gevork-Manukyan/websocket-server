@@ -1,9 +1,8 @@
 // Command of Nature (C.O.N)
 
-import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
+import { NotFoundError } from "../services/CustomError/BaseError";
 import { PlayersNotReadyError, SageUnavailableError } from "../services/CustomError/GameError";
 import { Sage, ElementalCard, gameId, ItemCard, ElementalWarriorCard } from "../types";
-import { ElementalWarriorStarterCard } from "../types/card-types";
 import { Player } from "./Player";
 import { Team } from "./Team";
 
@@ -72,21 +71,25 @@ export class ConGame {
 
   incrementPlayersReady() {
     this.numPlayersReady++
+    if (this.numPlayersReady > this.numPlayersTotal) this.numPlayersReady = this.numPlayersTotal
     return this.numPlayersReady;
   }
 
   decrementPlayersReady() {
     this.numPlayersReady--
+    if (this.numPlayersReady < 0) this.numPlayersReady = 0
     return this.numPlayersReady;
   }
 
   incrementPlayersFinishedSetup() {
     this.numPlayersFinishedSetup++
+    if (this.numPlayersFinishedSetup > this.numPlayersTotal) this.numPlayersFinishedSetup = this.numPlayersTotal
     return this.numPlayersFinishedSetup;
   }
 
   decrementPlayersFinishedSetup() {
     this.numPlayersFinishedSetup--
+    if (this.numPlayersFinishedSetup < 0) this.numPlayersFinishedSetup = 0
     return this.numPlayersFinishedSetup;
   }
 
@@ -122,25 +125,6 @@ export class ConGame {
     this.team2.initBattlefield(team2Decklists)
   }
 
-  chooseWarriors(playerId: Player["id"], choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
-    const player = this.getPlayer(playerId)
-    const decklist = player.getDecklist()!
-    const decklistWariors = decklist.warriors
-    const [choice1, choice2] = choices
-
-    // If chosen cards are not of the correct deck
-    if (!decklistWariors.includes(choice1) || !decklistWariors.includes(choice2)) 
-      throw new ValidationError("Invalid warrior(s) passed for chosen deck", "INVALID_INPUT")
-    
-    player.team!.initWarriors(choices)
-
-    // Add the non-chosen card to the player's deck
-    decklist.warriors.forEach(card => {
-      if ((card.name !== choice1.name) || (card.name !== choice2.name))
-        player.addCardToDeck(card);
-    })
-  }
-
   swapWarriors(playerId: Player["id"]) {
     const player = this.getPlayer(playerId)
     const team = player.team
@@ -148,5 +132,19 @@ export class ConGame {
     if (!team) throw new NotFoundError("Team", "Player requires a team before swapping warriors")
     
     team.swapWarriors(player.getElement())
+  }
+
+  finishPlayerSetup(playerId: Player["id"]) {
+    const player = this.getPlayer(playerId);
+    if (!player.isReady) throw new NotFoundError("Player", "Player is not ready");
+    if (!player.hasChosenWarriors) throw new NotFoundError("Warriors", "Player has not chosen warriors");
+    player.isSetup = true;
+    this.incrementPlayersFinishedSetup();
+  }
+
+  cancelPlayerSetup(playerId: Player["id"]) {
+    const player = this.getPlayer(playerId);
+    player.isSetup = false;
+    this.decrementPlayersFinishedSetup();
   }
 }

@@ -7,8 +7,9 @@ import { GameEventEmitter } from "./services";
 import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
-import { ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, FinishedSetupData, FinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent } from "./types/server-types";
+import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, FinishedSetupData, FinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent } from "./types/server-types";
 import { processEvent, socketErrorHandler } from "./utils/utilities";
+import { ValidationError } from "./services/CustomError/BaseError";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -71,6 +72,7 @@ gameNamespace.on("connection", (socket) => {
   socket.on(ToggleReadyStatusEvent, socketErrorHandler(socket, ToggleReadyStatusEvent, async ({ gameId }: ToggleReadyStatusData) => {
     const game = gameStateManager.getGame(gameId);
     const currPlayer = game.getPlayer(socket.id);
+    if (!currPlayer.sage) throw new ValidationError("Cannot toggle ready. The sage has not been set.", "sage");
     currPlayer.toggleReady();
 
     if (currPlayer.isReady) {
@@ -93,7 +95,7 @@ gameNamespace.on("connection", (socket) => {
   }));
 
   socket.on(ChoseWarriorsEvent, socketErrorHandler(socket, ChoseWarriorsEvent, async ({ gameId, choices }: ChoseWarriorsData) => {
-    gameStateManager.getGame(gameId).chooseWarriors(socket.id, choices);
+    gameStateManager.getGame(gameId).getPlayer(socket.id).chooseWarriors(choices);
     socket.emit(`${ChoseWarriorsEvent}--success`)
   }));
 
@@ -104,12 +106,18 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(FinishedSetupEvent, socketErrorHandler(socket, FinishedSetupEvent, async ({ gameId }: FinishedSetupData) => {
     const game = gameStateManager.getGame(gameId);
-    game.incrementPlayersFinishedSetup();
+    game.finishPlayerSetup(socket.id);
 
-    if (game.numPlayersFinishedSetup === game.players.length)
+    if (game.numPlayersFinishedSetup === game.players.length) {
       // TODO: Go to choosing who is first and emit to players who is first
-      return;
+      
+    }
   }));
+
+  socket.on(CancelSetupEvent, socketErrorHandler(socket, CancelSetupEvent, async ({ gameId }: CancelSetupData) => {
+    gameStateManager.getGame(gameId).cancelPlayerSetup(socket.id)
+    socket.emit(`${CancelSetupEvent}--success`)
+  }))
 
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {
     gameStateManager.getGame(gameId).removePlayer(socket.id);

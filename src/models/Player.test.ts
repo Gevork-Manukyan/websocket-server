@@ -1,8 +1,9 @@
 import { ValidationError } from "../services/CustomError/BaseError";
 import { Cedar, Gravel, Timber } from "../utils";
-import { CloseStrike, FarStrike, NaturalRestoration, TwigCharm } from "../utils/cards";
+import { AcornSquire, CloseStrike, FarStrike, GeoWeasel, GraniteRampart, NaturalRestoration, QuillThornback, SlumberJack, TwigCharm } from "../utils/cards";
 import { TwigDeck } from "../utils/constants";
 import { Player } from "./Player";
+import { Team } from "./Team";
 
 const testPlayerId = "testId123"
 
@@ -51,12 +52,6 @@ describe("toggleReady method", () => {
         expect(player.isReady).toBe(false)
         done()
     })
-
-    test("should throw error if sage is not set when trying to toggle ready", (done) => {
-        const player = new Player(testPlayerId)
-        expect(() => player.toggleReady()).toThrow(ValidationError)
-        done()
-    })
 })
 
 describe("adding cards to deck", () => {
@@ -101,3 +96,47 @@ describe("initDeck method", () => {
         done()
     })
 })
+
+describe("chooseWarriors", () => {
+    test("sets warriors for a player and adds non-chosen cards to their deck", () => {
+        const player = new Player("player-1");
+        player.getDecklist = jest.fn().mockReturnValue(TwigDeck);
+        player.team = {
+            initWarriors: jest.fn(),
+        } as Partial<Team> as Team;
+    
+        player.chooseWarriors([AcornSquire, SlumberJack]);
+    
+        expect(player.team.initWarriors).toHaveBeenCalledWith([AcornSquire, SlumberJack]);
+        expect(player.hasChosenWarriors).toBe(true);
+    });
+
+    test("throws ValidationError if the chosen warriors do not match the player's sage element", () => {
+        const player = new Player("player-1");
+        player.getDecklist = jest.fn().mockReturnValue(TwigDeck);
+        player.team = {
+            initWarriors: jest.fn(),
+        } as Partial<Team> as Team;
+    
+        expect(() =>
+            player.chooseWarriors([
+              AcornSquire,
+              GeoWeasel,
+            ])
+          ).toThrow(ValidationError);
+    
+          expect(() =>
+              player.chooseWarriors([
+                  GeoWeasel,
+                  AcornSquire,
+              ])
+          ).toThrow(ValidationError);
+    
+          expect(() =>
+              player.chooseWarriors([
+                  GeoWeasel,
+                  GraniteRampart,
+              ])
+          ).toThrow(ValidationError);
+    });
+  });

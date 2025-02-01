@@ -21,5 +21,7 @@ export class GameEventEmitter {
         this.emitToPlayer(player.id, "pick-warriors", player.decklist);
       })
     }
+
+    
   }
   

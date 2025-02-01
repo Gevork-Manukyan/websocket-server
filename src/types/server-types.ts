@@ -46,6 +46,10 @@ const finishedSetupSchema = z.object({
   gameId: z.string(),
 });
 
+const cancelSetupSchema = z.object({
+  gameId: z.string(),
+})
+
 const leaveGameSchema = z.object({
   gameId: z.string(),
 });
@@ -60,6 +64,7 @@ export const StartGameEvent = "start-game" as const;
 export const ChoseWarriorsEvent = "chose-warriors" as const;
 export const SwapWarriorsEvent = "swap-warriors" as const;
 export const FinishedSetupEvent = "finished-setup" as const;
+export const CancelSetupEvent = "cancel-setup" as const;
 export const LeaveGameEvent = "leave-game" as const;
 
 // Define EventSchemas record
@@ -74,6 +79,7 @@ export const EventSchemas = {
   [ChoseWarriorsEvent]: choseWarriorsSchema,
   [SwapWarriorsEvent]: swapWarriorsSchema,
   [FinishedSetupEvent]: finishedSetupSchema,
+  [CancelSetupEvent]: cancelSetupSchema,
   [LeaveGameEvent]: leaveGameSchema,
 } as const;
 
@@ -88,6 +94,7 @@ export type StartGameData = z.infer<typeof startGameSchema>;
 export type ChoseWarriorsData = z.infer<typeof choseWarriorsSchema>;
 export type SwapWarriorsData = z.infer<typeof swapWarriorsSchema>;
 export type FinishedSetupData = z.infer<typeof finishedSetupSchema>;
+export type CancelSetupData = z.infer<typeof cancelSetupSchema>;
 export type LeaveGameData = z.infer<typeof leaveGameSchema>;
 
 // Create a mapped type for socket events
@@ -102,5 +109,6 @@ export type SocketEventMap = {
   [ChoseWarriorsEvent]: ChoseWarriorsData;
   [SwapWarriorsEvent]: SwapWarriorsData;
   [FinishedSetupEvent]: FinishedSetupData;
+  [CancelSetupEvent]: CancelSetupData;
   [LeaveGameEvent]: LeaveGameData;
 }
