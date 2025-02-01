@@ -1,5 +1,4 @@
 import { ConflictError, NotFoundError } from "../services/CustomError/BaseError";
-import { ElementalWarriorCard } from "../types";
 import { ElementalWarriorStarterCard } from "../types/card-types";
 import { Decklist } from "../types/types";
 import { Battlefield } from "./Battlefield";
@@ -16,6 +15,11 @@ export class Team {
         this.battlefield = new Battlefield(teamSize);
         this.teamNumber = teamNumber;
         this.teamSize = teamSize;
+    }
+
+    resetTeam() {
+        this.players = []
+        this.battlefield = new Battlefield(this.teamSize)
     }
 
     getTeamNumber() {

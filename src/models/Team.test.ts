@@ -1,6 +1,7 @@
 import { ConflictError, NotFoundError } from "../services/CustomError/BaseError"
 import { AcornSquire, Cedar, Porella, QuillThornback, Sprout, Timber } from "../utils"
 import { LeafDeck, TwigDeck } from "../utils/constants"
+import { Battlefield } from "./Battlefield"
 import { Player } from "./Player"
 import { Team } from "./Team"
 
@@ -15,143 +16,151 @@ jest.mock("./Battlefield", () => {
     }
 })
 
-test("should create a default Team object", (done) => {
-    const team = new Team(1, 1)
-    const { players, battlefield } = team
+describe("Team", () => {
+    let mockTeam: Team;
 
-    expect(players).toEqual([])
-    expect(battlefield).toBeDefined();
-    expect(team.getTeamNumber()).toBe(1)
-    expect(team.getTeamSize()).toBe(1)
-    done()
-})
-
-describe("addPlayerToTeam method", () => {
-    test("should add player to team", () => {
-        const team = new Team(1, 1)
-        team.addPlayerToTeam(new Player("testPlayerId_1"))
-        expect(team.players[0].id).toBe("testPlayerId_1")
+    beforeEach(() => {
+        mockTeam = new Team(1, 1)
     })
 
-    test("should throw error if team is full", () => {
-        const team = new Team(1, 1)
-        team.addPlayerToTeam(new Player("testPlayerId_1"))
-        expect(() => team.addPlayerToTeam(new Player("testPlayerId_2"))).toThrow(ConflictError)
-    })
-})
+    test("should create a default Team object", (done) => {
+        const { players, battlefield } = mockTeam
 
-describe("removePlayerFromTeam method", () => {
-    test("should remove player from the team", () => {
-        const team = new Team(1, 1)
-        const playerId = "testPlayerId_1"
-        const player = new Player(playerId)
-        team.addPlayerToTeam(player)
-        expect(team.players[0].id).toBe(playerId)
-        team.removePlayerFromTeam(player)
-        expect(team.players.length).toBe(0)
+        expect(players).toEqual([])
+        expect(battlefield).toBeDefined();
+        expect(mockTeam.getTeamNumber()).toBe(1)
+        expect(mockTeam.getTeamSize()).toBe(1)
+        done()
     })
 
-    test("should return unchanged team if player doesn't exist on team", () => {
-        const team = new Team(1, 1)
-        const player = new Player("testPlayerId_1")
-        team.addPlayerToTeam(player)
-        expect(team.players[0].id).toBe("testPlayerId_1")
-        team.removePlayerFromTeam(new Player("testPlayerId_2"))
-        expect(team.players.length).toBe(1)
-        expect(team.players[0].id).toBe("testPlayerId_1")
-    })
-})
-
-describe("getAllPlayerDecklists method", () => {
-    test("should return all player decklists", () => {
-        const team = new Team(1, 1);
-        const player = new Player("testPlayerId_1");
-        player.getDecklist = jest.fn().mockReturnValue({ id: "decklist_1" });
-        team.addPlayerToTeam(player);
-        const decklists = team.getAllPlayerDecklists();
-        expect(decklists).toEqual([{ id: "decklist_1" }]);
-      });
-  
-    test("should throw error if a player has no decklist", () => {
-        const team = new Team(1, 1);
-        const player = new Player("testPlayerId_1");
-        player.getDecklist = jest.fn().mockReturnValue(null);
-        team.addPlayerToTeam(player);
-        expect(() => team.getAllPlayerDecklists()).toThrow(NotFoundError);
-    });
-})
-
-describe("initBattlefield method", () => {
-    test("should initialize battlefield for a single-player team", () => {
-        const team = new Team(1, 1);
-        const decklist = TwigDeck;
-        const basicCard = Timber;
-        const sage = Cedar;
-        team.initBattlefield([decklist]);
-  
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(basicCard, 1);
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(basicCard, 2);
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(basicCard, 3);
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(sage, 5);
-      });
-
-    test("should initialize battlefield for a two-player team", () => {
-        const team = new Team(2, 1);
-
-        const decklist_1 = TwigDeck;
-        const basicCard_1 = Timber;
-        const sage_1 = Cedar;
-
-        const decklist_2 = LeafDeck;
-        const basicCard_2 = Sprout;
-        const sage_2 = Porella;
-
-        team.initBattlefield([decklist_1, decklist_2]);
-
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(basicCard_1, 1);
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(basicCard_2, 2);
-
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(basicCard_1, 3);
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(basicCard_1, 4);
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(basicCard_2, 5);
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(basicCard_2, 6);
-
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(sage_1, 8);
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(sage_2, 11);
+    describe("resetTeam method", () => {
+        test("should remove all players and create new battlefield", () => {
+            const initialBattlefield = mockTeam.battlefield;
+            mockTeam.resetTeam()
+            expect(mockTeam.players).toEqual([])
+            expect(mockTeam.battlefield).not.toBe(initialBattlefield); 
+            expect(Battlefield).toHaveBeenCalledWith(mockTeam.getTeamSize()); 
+        })
     })
 
-})
+    describe("addPlayerToTeam method", () => {
+        test("should add player to team", () => {
+            mockTeam.addPlayerToTeam(new Player("testPlayerId_1"))
+            expect(mockTeam.players[0].id).toBe("testPlayerId_1")
+        })
 
-describe("initWarriors method", () => {
-    test("should initialize warriors for one-player team", () => {
-        const team = new Team(1, 1);
-        team.initWarriors([AcornSquire, QuillThornback])
-
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(AcornSquire, 4)
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(QuillThornback, 6)
+        test("should throw error if team is full", () => {
+            mockTeam.addPlayerToTeam(new Player("testPlayerId_1"))
+            expect(() => mockTeam.addPlayerToTeam(new Player("testPlayerId_2"))).toThrow(ConflictError)
+        })
     })
 
-    test("should initialize warriors for two-player team (left side)", () => {
-        const team = new Team(2, 1);
+    describe("removePlayerFromTeam method", () => {
+        test("should remove player from the team", () => {
+            const playerId = "testPlayerId_1"
+            const player = new Player(playerId)
+            mockTeam.addPlayerToTeam(player)
+            expect(mockTeam.players[0].id).toBe(playerId)
+            mockTeam.removePlayerFromTeam(player)
+            expect(mockTeam.players.length).toBe(0)
+        })
 
-        team.battlefield.getCard = jest
-        .fn()
-        .mockImplementation((position) => (position === 8 ? Cedar : null));
-
-        team.initWarriors([AcornSquire, QuillThornback])
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(AcornSquire, 7)
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(QuillThornback, 9)
+        test("should return unchanged team if player doesn't exist on team", () => {
+            const player = new Player("testPlayerId_1")
+            mockTeam.addPlayerToTeam(player)
+            expect(mockTeam.players[0].id).toBe("testPlayerId_1")
+            mockTeam.removePlayerFromTeam(new Player("testPlayerId_2"))
+            expect(mockTeam.players.length).toBe(1)
+            expect(mockTeam.players[0].id).toBe("testPlayerId_1")
+        })
     })
 
-    test("should initialize warriors for two-player team (right side)", () => {
-        const team = new Team(2, 1);
+    describe("getAllPlayerDecklists method", () => {
+        test("should return all player decklists", () => {
+            const player = new Player("testPlayerId_1");
+            player.getDecklist = jest.fn().mockReturnValue({ id: "decklist_1" });
+            mockTeam.addPlayerToTeam(player);
+            const decklists = mockTeam.getAllPlayerDecklists();
+            expect(decklists).toEqual([{ id: "decklist_1" }]);
+        });
+    
+        test("should throw error if a player has no decklist", () => {
+            const player = new Player("testPlayerId_1");
+            player.getDecklist = jest.fn().mockReturnValue(null);
+            mockTeam.addPlayerToTeam(player);
+            expect(() => mockTeam.getAllPlayerDecklists()).toThrow(NotFoundError);
+        });
+    })
 
-        team.battlefield.getCard = jest
-        .fn()
-        .mockImplementation((position) => (position === 11 ? Cedar : null));
+    describe("initBattlefield method", () => {
+        test("should initialize battlefield for a single-player team", () => {
+            const decklist = TwigDeck;
+            const basicCard = Timber;
+            const sage = Cedar;
+            mockTeam.initBattlefield([decklist]);
+    
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard, 1);
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard, 2);
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard, 3);
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(sage, 5);
+        });
 
-        team.initWarriors([AcornSquire, QuillThornback])
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(AcornSquire, 10)
-        expect(team.battlefield.addCard).toHaveBeenCalledWith(QuillThornback, 12)
+        test("should initialize battlefield for a two-player team", () => {
+            mockTeam = new Team(2, 1);
+
+            const decklist_1 = TwigDeck;
+            const basicCard_1 = Timber;
+            const sage_1 = Cedar;
+
+            const decklist_2 = LeafDeck;
+            const basicCard_2 = Sprout;
+            const sage_2 = Porella;
+
+            mockTeam.initBattlefield([decklist_1, decklist_2]);
+
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard_1, 1);
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard_2, 2);
+
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard_1, 3);
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard_1, 4);
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard_2, 5);
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard_2, 6);
+
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(sage_1, 8);
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(sage_2, 11);
+        })
+    })
+
+    describe("initWarriors method", () => {
+        test("should initialize warriors for one-player team", () => {
+            mockTeam.initWarriors([AcornSquire, QuillThornback])
+
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(AcornSquire, 4)
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(QuillThornback, 6)
+        })
+
+        test("should initialize warriors for two-player team (left side)", () => {
+            mockTeam = new Team(2, 1);
+
+            mockTeam.battlefield.getCard = jest
+            .fn()
+            .mockImplementation((position) => (position === 8 ? Cedar : null));
+
+            mockTeam.initWarriors([AcornSquire, QuillThornback])
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(AcornSquire, 7)
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(QuillThornback, 9)
+        })
+
+        test("should initialize warriors for two-player team (right side)", () => {
+            mockTeam = new Team(2, 1);
+
+            mockTeam.battlefield.getCard = jest
+            .fn()
+            .mockImplementation((position) => (position === 11 ? Cedar : null));
+
+            mockTeam.initWarriors([AcornSquire, QuillThornback])
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(AcornSquire, 10)
+            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(QuillThornback, 12)
+        })
     })
 })

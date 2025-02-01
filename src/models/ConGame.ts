@@ -82,7 +82,10 @@ export class ConGame {
   }
 
   clearTeams() {
-    // TODO: remove all players from all teams and set player ready/finished set up to zero
+    this.team1.resetTeam()
+    this.team2.resetTeam()
+    this.numPlayersReady = 0;
+    this.numPlayersFinishedSetup = 0
   }
 
   startGame(playerId: Player["id"]) {
