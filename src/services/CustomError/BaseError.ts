@@ -46,12 +46,10 @@ export class AuthorizationError extends CustomError {
  */
 export class NotFoundError extends CustomError {
     resource;
-    identifier;
 
-    constructor(resource: string, identifier: string, message?: string) {
+    constructor(resource: string, message?: string) {
       super(message ? message : `${resource} not found`, "NOT_FOUND", 404);
       this.resource = resource; // Name of the resource (e.g., "Game")
-      this.identifier = identifier; // Identifier for debugging (e.g., game ID)
     }
 }
 

@@ -7,7 +7,7 @@ import { GameEventEmitter } from "./services";
 import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
-import { ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, FinishedSetupData, FinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, ToggleReadyStatusData, ToggleReadyStatusEvent } from "./types/server-types";
+import { ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, FinishedSetupData, FinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent } from "./types/server-types";
 import { processEvent, socketErrorHandler } from "./utils/utilities";
 
 const app = express();
@@ -38,6 +38,8 @@ gameNamespace.on("connection", (socket) => {
     console.error("Socket error:", error);
   });
 
+  // TODO: create a system to enforce an order of calling events. Shouldn't be able to call events out of order
+
   socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ gameId, numPlayers }: CreateGameData) => {
     const newGame = gameStateManager.addGame(new ConGame(gameId, numPlayers));
     newGame.addPlayer(new Player(socket.id, true)); // First player to join is the host
@@ -56,6 +58,16 @@ gameNamespace.on("connection", (socket) => {
     socket.emit(`${SelectSageEvent}--success`);
   }));
 
+  socket.on(JoinTeamEvent, socketErrorHandler(socket, JoinTeamEvent, async ({ gameId, team }: JoinTeamData) => {
+    gameStateManager.getGame(gameId).joinTeam(socket.id, team);
+    socket.emit(`${JoinTeamEvent}--success`);
+  }));
+
+  socket.on(ClearTeamsEvent, socketErrorHandler(socket, ClearTeamsEvent, async ({ gameId }: ClearTeamsData) => {
+    gameStateManager.getGame(gameId).clearTeams();
+    socket.emit(`${ClearTeamsEvent}--success`);
+  }));
+
   socket.on(ToggleReadyStatusEvent, socketErrorHandler(socket, ToggleReadyStatusEvent, async ({ gameId }: ToggleReadyStatusData) => {
     const game = gameStateManager.getGame(gameId);
     const currPlayer = game.getPlayer(socket.id);
@@ -70,16 +82,6 @@ gameNamespace.on("connection", (socket) => {
     }
   }));
 
-  socket.on(JoinTeamEvent, socketErrorHandler(socket, JoinTeamEvent, async ({ gameId, team }: JoinTeamData) => {
-    gameStateManager.getGame(gameId).joinTeam(socket.id, team);
-    socket.emit(`${JoinTeamEvent}--success`);
-  }));
-
-  socket.on(ClearTeamsEvent, socketErrorHandler(socket, ClearTeamsEvent, async ({ gameId }: ClearTeamsData) => {
-    gameStateManager.getGame(gameId).clearTeams();
-    socket.emit(`${ClearTeamsEvent}--success`);
-  }));
-
   socket.on(StartGameEvent, socketErrorHandler(socket, StartGameEvent, async ({ gameId }: StartGameData) => {
     const game = gameStateManager.getGame(gameId);
     const playerId = socket.id;
@@ -92,12 +94,17 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(ChoseWarriorsEvent, socketErrorHandler(socket, ChoseWarriorsEvent, async ({ gameId, choices }: ChoseWarriorsData) => {
     gameStateManager.getGame(gameId).chooseWarriors(socket.id, choices);
-    // TODO: Emit to player to choose battlefield layout
+    socket.emit(`${ChoseWarriorsEvent}--success`)
+  }));
+
+  socket.on(SwapWarriorsEvent, socketErrorHandler(socket, SwapWarriorsEvent, async ({ gameId }: SwapWarriorsData) => {
+    gameStateManager.getGame(gameId).swapWarriors(socket.id)
+    socket.emit(`${SwapWarriorsEvent}--success`)
   }));
 
   socket.on(FinishedSetupEvent, socketErrorHandler(socket, FinishedSetupEvent, async ({ gameId }: FinishedSetupData) => {
     const game = gameStateManager.getGame(gameId);
-    game.numPlayersFinishedSetup++;
+    game.incrementPlayersFinishedSetup();
 
     if (game.numPlayersFinishedSetup === game.players.length)
       // TODO: Go to choosing who is first and emit to players who is first

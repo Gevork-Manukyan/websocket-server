@@ -81,6 +81,16 @@ export class ConGame {
     return this.numPlayersReady;
   }
 
+  incrementPlayersFinishedSetup() {
+    this.numPlayersFinishedSetup++
+    return this.numPlayersFinishedSetup;
+  }
+
+  decrementPlayersFinishedSetup() {
+    this.numPlayersFinishedSetup--
+    return this.numPlayersFinishedSetup;
+  }
+
   clearTeams() {
     this.team1.resetTeam()
     this.team2.resetTeam()
@@ -129,5 +139,14 @@ export class ConGame {
       if ((card.name !== choice1.name) || (card.name !== choice2.name))
         player.addCardToDeck(card);
     })
+  }
+
+  swapWarriors(playerId: Player["id"]) {
+    const player = this.getPlayer(playerId)
+    const team = player.team
+
+    if (!team) throw new NotFoundError("Team", "Player requires a team before swapping warriors")
+    
+    team.swapWarriors(player.getElement())
   }
 }

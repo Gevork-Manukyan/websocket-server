@@ -1,5 +1,5 @@
-import { ValidationError } from "../services/CustomError/BaseError";
-import { Card, ElementalWarriorCard, Sage } from "../types";
+import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
+import { Card, Sage } from "../types";
 import { Decklist } from "../types/types";
 import { getSageDecklist } from "../utils/utilities";
 import { Team } from "./Team";
@@ -36,6 +36,13 @@ export class Player {
 
   getDecklist() {
     return this.decklist
+  }
+
+  getElement() {
+    if (!this.sage) throw new NotFoundError("Sage", "Player does not have an element")
+    if (!this.decklist) throw new NotFoundError("Decklist", "Player does not have an element")
+    
+    return this.decklist.sage.element;
   }
 
   toggleReady() {

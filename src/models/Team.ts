@@ -1,6 +1,6 @@
-import { ConflictError, NotFoundError } from "../services/CustomError/BaseError";
+import { ConflictError, NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { ElementalWarriorStarterCard } from "../types/card-types";
-import { Decklist } from "../types/types";
+import { Decklist, Element } from "../types/types";
 import { Battlefield } from "./Battlefield";
 import { Player } from "./Player";
 
@@ -42,7 +42,7 @@ export class Team {
     getAllPlayerDecklists() {
         return this.players.map(player => {
             const decklist = player.getDecklist();
-            if (decklist === null) throw new NotFoundError("Decklist", player.id, `Player ${player.id}'s decklist is not set`);
+            if (decklist === null) throw new NotFoundError("Decklist", `Player ${player.id}'s decklist is not set`);
             return decklist;    
         });
     }
@@ -98,6 +98,25 @@ export class Team {
         else if (choice1.element === this.battlefield.getCard(11)?.element) {
             this.battlefield.addCard(choice1, 10)
             this.battlefield.addCard(choice2, 12)
+        }
+    }
+
+    swapWarriors(element: Element) {
+        // One player on Team
+        if (this.getTeamSize() === 1) {
+            this.battlefield.swapCards(4, 6)
+            return;
+        }
+
+        // Two players on Team
+        if (element === this.battlefield.getCard(8)?.element) {
+            this.battlefield.swapCards(7, 9)
+        }
+        else if (element === this.battlefield.getCard(11)?.element) {
+            this.battlefield.swapCards(10, 12)
+        } 
+        else {
+            throw new ValidationError("Player can only swap their own warriors", "element")
         }
     }
   }
