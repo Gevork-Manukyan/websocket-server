@@ -146,6 +146,8 @@ describe("chooseWarriors", () => {
             player.team = {
                 swapWarriors: jest.fn(),
             } as Partial<Team> as Team;
+            player.sage = "Cedar"
+            player.decklist = TwigDeck;
         
             player.swapWarriors();
         
