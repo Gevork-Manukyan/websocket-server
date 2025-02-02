@@ -2,7 +2,7 @@ import { NotFoundError, ValidationError } from "../services/CustomError/BaseErro
 import { PlayersNotReadyError, SageUnavailableError } from "../services/CustomError/GameError";
 import { AcornSquire, QuillThornback, SlumberJack } from "../utils";
 import { GeoWeasel, GraniteRampart } from "../utils/cards";
-import { TwigDeck } from "../utils/constants";
+import { LeafDeck, TwigDeck } from "../utils/constants";
 import { ConGame } from "./ConGame";
 import { Player } from "./Player";
 import { Team } from "./Team";
@@ -111,23 +111,6 @@ describe("ConGame", () => {
         expect(player.setTeam).toHaveBeenCalledWith(mockGame.team2)
       });
     });
-  
-    describe("clearTeams", () => {
-      test("should reset all teams and set ready/set up players to zero", () => {
-        mockGame.team1.resetTeam = jest.fn()
-        mockGame.team2.resetTeam = jest.fn()
-
-        mockGame.clearTeams()
-        
-        expect(mockGame.team1.resetTeam).toHaveBeenCalled()
-        expect(mockGame.team2.resetTeam).toHaveBeenCalled()
-        expect(mockGame.numPlayersReady).toBe(0)
-        expect(mockGame.numPlayersFinishedSetup).toBe(0)
-        mockGame.players.forEach(player => {
-          expect(player.isReady).toBe(false)
-        })
-      })
-    })
 
     describe("incrementPlayersReady", () => {
       test("increments the number of players ready", () => {
@@ -180,6 +163,23 @@ describe("ConGame", () => {
         expect(mockGame.numPlayersFinishedSetup).toBe(0);
       })
     });
+
+    describe("clearTeams", () => {
+      test("should reset all teams and set ready/set up players to zero", () => {
+        mockGame.team1.resetTeam = jest.fn()
+        mockGame.team2.resetTeam = jest.fn()
+
+        mockGame.clearTeams()
+        
+        expect(mockGame.team1.resetTeam).toHaveBeenCalled()
+        expect(mockGame.team2.resetTeam).toHaveBeenCalled()
+        expect(mockGame.numPlayersReady).toBe(0)
+        expect(mockGame.numPlayersFinishedSetup).toBe(0)
+        mockGame.players.forEach(player => {
+          expect(player.isReady).toBe(false)
+        })
+      })
+    })
   
     describe("startGame", () => {
       test("starts the game if all players are ready and host initiates", () => {
@@ -207,5 +207,47 @@ describe("ConGame", () => {
         expect(() => mockGame.startGame()).toThrow(PlayersNotReadyError);
       });
     });
+
+    describe("initPlayerDecks", () => {
+      test("should initialize the deck for each player", () => {
+        const player1 = new Player("player-1");
+        const player2 = new Player("player-2");
+        mockGame.addPlayer(player1);
+        mockGame.addPlayer(player2);
+  
+        player1.initDeck = jest.fn()
+        player2.initDeck = jest.fn()
+  
+        mockGame.initPlayerDecks();
+  
+        expect(player1.initDeck).toHaveBeenCalled();
+        expect(player2.initDeck).toHaveBeenCalled();
+      });
+    })
+
+    describe("initPlayerFields", () => {
+      test("should initialize the player field for each player", () => {
+        const player1 = new Player("player-1");
+        const player2 = new Player("player-2");
+        mockGame.addPlayer(player1);
+        mockGame.addPlayer(player2);
+        mockGame.team1.addPlayerToTeam(player1);
+        mockGame.team2.addPlayerToTeam(player2);
+
+        const decklist1 = [TwigDeck]
+        const decklist2 = [LeafDeck]
+        mockGame.team1.getAllPlayerDecklists = jest.fn().mockReturnValue(decklist1)
+        mockGame.team2.getAllPlayerDecklists = jest.fn().mockReturnValue(decklist2)
+        mockGame.team1.initBattlefield = jest.fn()
+        mockGame.team2.initBattlefield = jest.fn()
+
+        mockGame.initPlayerFields();
+
+        expect(mockGame.team1.getAllPlayerDecklists).toHaveBeenCalled()
+        expect(mockGame.team2.getAllPlayerDecklists).toHaveBeenCalled()
+        expect(mockGame.team1.initBattlefield).toHaveBeenCalledWith(decklist1)
+        expect(mockGame.team2.initBattlefield).toHaveBeenCalledWith(decklist2)
+      })
+    })
 });
   
