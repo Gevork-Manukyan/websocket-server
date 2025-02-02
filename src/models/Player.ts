@@ -94,4 +94,14 @@ export class Player {
     if (!this.team) throw new NotFoundError("Team", "Player requires a team before swapping warriors")
     this.team.swapWarriors(this.getElement())
   }
+
+  finishPlayerSetup() {
+    if (!this.isReady) throw new NotFoundError("Player", "Player is not ready");
+    if (!this.hasChosenWarriors) throw new NotFoundError("Warriors", "Player has not chosen warriors");
+    this.isSetup = true;
+  }
+
+  cancelPlayerSetup() {
+    this.isSetup = false;
+  }
 }

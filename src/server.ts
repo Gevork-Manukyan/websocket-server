@@ -56,6 +56,7 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(SelectSageEvent, socketErrorHandler(socket, SelectSageEvent, async ({ gameId, sage }: SelectSageData) => {
     gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage);
+    socket.to(gameId).emit("sage-selected", sage);
     socket.emit(`${SelectSageEvent}--success`);
   }));
 
@@ -86,11 +87,9 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(StartGameEvent, socketErrorHandler(socket, StartGameEvent, async ({ gameId }: StartGameData) => {
     const game = gameStateManager.getGame(gameId);
-    const playerId = socket.id;
 
-    game.startGame(playerId);
+    game.startGame();
     gameEventEmitter.emitPickWarriors(game.players);
-    // TODO: coin flip for who is first. Players decide play order if 4 players
     game.setStarted(true);
   }));
 
@@ -106,7 +105,9 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(FinishedSetupEvent, socketErrorHandler(socket, FinishedSetupEvent, async ({ gameId }: FinishedSetupData) => {
     const game = gameStateManager.getGame(gameId);
-    game.finishPlayerSetup(socket.id);
+    const player = game.getPlayer(socket.id);
+    player.finishPlayerSetup();
+    game.incrementPlayersFinishedSetup();
 
     if (game.numPlayersFinishedSetup === game.players.length) {
       // TODO: Go to choosing who is first and emit to players who is first
@@ -115,7 +116,9 @@ gameNamespace.on("connection", (socket) => {
   }));
 
   socket.on(CancelSetupEvent, socketErrorHandler(socket, CancelSetupEvent, async ({ gameId }: CancelSetupData) => {
-    gameStateManager.getGame(gameId).cancelPlayerSetup(socket.id)
+    const game = gameStateManager.getGame(gameId)
+    game.getPlayer(socket.id).cancelPlayerSetup();
+    game.decrementPlayersFinishedSetup();
     socket.emit(`${CancelSetupEvent}--success`)
   }))
 
@@ -125,6 +128,8 @@ gameNamespace.on("connection", (socket) => {
     socket.emit(`${LeaveGameEvent}--success`);
   }));
 });
+
+// TODO: coin flip for who is first. Players decide play order if 4 players
 
 // Start the server if not in test mode
 if (IS_PRODUCTION) {

@@ -101,15 +101,13 @@ export class ConGame {
     this.players.forEach(player => player.isReady = false)
   }
 
-  startGame(playerId: Player["id"]) {
+  startGame() {
     // All players must be ready
     if (this.numPlayersReady !== this.numPlayersTotal) throw new PlayersNotReadyError(this.numPlayersReady, this.numPlayersTotal)
 
-    // TODO: initlize game
     this.initPlayerDecks();
     this.initPlayerFields();
     
-
     this.setStarted(true)
   }
 
@@ -123,19 +121,5 @@ export class ConGame {
 
     this.team1.initBattlefield(team1Decklists)
     this.team2.initBattlefield(team2Decklists)
-  }
-
-  finishPlayerSetup(playerId: Player["id"]) {
-    const player = this.getPlayer(playerId);
-    if (!player.isReady) throw new NotFoundError("Player", "Player is not ready");
-    if (!player.hasChosenWarriors) throw new NotFoundError("Warriors", "Player has not chosen warriors");
-    player.isSetup = true;
-    this.incrementPlayersFinishedSetup();
-  }
-
-  cancelPlayerSetup(playerId: Player["id"]) {
-    const player = this.getPlayer(playerId);
-    player.isSetup = false;
-    this.decrementPlayersFinishedSetup();
   }
 }

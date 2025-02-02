@@ -1,4 +1,4 @@
-import { ValidationError } from "../services/CustomError/BaseError";
+import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { Cedar, Gravel, Timber } from "../utils";
 import { AcornSquire, CloseStrike, FarStrike, GeoWeasel, GraniteRampart, NaturalRestoration, QuillThornback, SlumberJack, TwigCharm } from "../utils/cards";
 import { TwigDeck } from "../utils/constants";
@@ -160,5 +160,36 @@ describe("chooseWarriors", () => {
         
             expect(() => player.swapWarriors()).toThrow(Error);
         });
+    })
+
+    describe("finishedPlayerSetup", () => {
+        test("should set the player as finished setup", () => {
+            const player = new Player("player-1");
+            player.isReady = true;
+            player.hasChosenWarriors = true;
+            player.finishPlayerSetup();
+            expect(player.isSetup).toBe(true);
+        })
+
+        test("should throw error if player is not ready", () => {
+            const player = new Player("player-1");
+            player.hasChosenWarriors = true;
+            expect(() => player.finishPlayerSetup()).toThrow(NotFoundError);
+        })
+
+        test("should throw error if player has not chosen warriors", () => {
+            const player = new Player("player-1");
+            player.isReady = true;
+            expect(() => player.finishPlayerSetup()).toThrow(NotFoundError);
+        })
+    })
+
+    describe("cancelPlayerSetup", () => {
+        test("should set the player as not setup", () => {
+            const player = new Player("player-1");
+            player.isSetup = true;
+            player.cancelPlayerSetup();
+            expect(player.isSetup).toBe(false);
+        })
     })
 });
