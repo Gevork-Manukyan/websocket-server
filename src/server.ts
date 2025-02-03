@@ -7,9 +7,10 @@ import { GameEventEmitter } from "./services";
 import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
-import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent } from "./types/server-types";
+import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, PlayerOrderChosen, AllPlayersSetupData, PlayerOrderChosenData, TeamOrderChosen, TeamOrderChosenData } from "./types/server-types";
 import { processEvent, socketErrorHandler } from "./utils/utilities";
 import { ValidationError } from "./services/CustomError/BaseError";
+import { Team } from "./models/Team";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -73,7 +74,7 @@ gameNamespace.on("connection", (socket) => {
   socket.on(ToggleReadyStatusEvent, socketErrorHandler(socket, ToggleReadyStatusEvent, async ({ gameId }: ToggleReadyStatusData) => {
     const game = gameStateManager.getGame(gameId);
     const currPlayer = game.getPlayer(socket.id);
-    if (!currPlayer.sage) throw new ValidationError("Cannot toggle ready. The sage has not been set.", "sage");
+    if (!currPlayer.getSage()) throw new ValidationError("Cannot toggle ready. The sage has not been set.", "sage");
     currPlayer.toggleReady();
 
     if (currPlayer.isReady) {
@@ -117,14 +118,25 @@ gameNamespace.on("connection", (socket) => {
     socket.emit(`${CancelSetupEvent}--success`)
   }))
 
-  socket.on(AllPlayersSetupEvent, socketErrorHandler(socket, AllPlayersSetupEvent, async ({ gameId }: { gameId: string }) => {
+  socket.on(AllPlayersSetupEvent, socketErrorHandler(socket, AllPlayersSetupEvent, async ({ gameId }: AllPlayersSetupData) => {
     const game = gameStateManager.getGame(gameId);
     if (game.numPlayersFinishedSetup !== game.players.length) throw new ValidationError("All players have not finished setup", "players");
 
     game.hasFinishedSetup = true;
-    gameEventEmitter.emitTeamOrder(gameId);
+    const firstTeam = Math.random() > 0.5 ? 1 : 2;
+
+    
+
+    gameEventEmitter.emitTeamOrder(gameId, firstTeam);
     if (game.numPlayersTotal === 4) gameEventEmitter.emitChoosePlayerOrder(gameId);
   }));
+
+  socket.on(PlayerOrderChosen, socketErrorHandler(socket, PlayerOrderChosen, async ({ gameId, playerOrder }: PlayerOrderChosenData) => {
+    const game = gameStateManager.getGame(gameId);
+    if (game.numPlayersTotal === 2) throw new ValidationError("Cannot choose player order for a 2 player game", "players");
+
+    game.setPlayerOrder(socket.id, playerOrder);
+  }))
 
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {
     gameStateManager.getGame(gameId).removePlayer(socket.id);
