@@ -1,5 +1,7 @@
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { Player } from "../models";
+import { Team } from "../models/Team";
+import { gameId, Sage } from "../types";
 
 export class GameEventEmitter {
   private io: Server;
@@ -12,7 +14,7 @@ export class GameEventEmitter {
     this.io.to(playerId).emit(eventName, data);
   }
 
-  emitToRoom(roomId: string, eventName: string, data: any) {
+  emitToRoom(roomId: gameId, eventName: string, data: any) {
     this.io.to(roomId).emit(eventName, data);
   }
 
@@ -20,6 +22,19 @@ export class GameEventEmitter {
     players.forEach(player => {
       this.emitToPlayer(player.id, "pick-warriors", player.decklist);
     })
+  }
+
+  emitSageSelected(socket: Socket, roomId: gameId, sage: Sage) {
+    socket.to(roomId).emit("sage-selected", sage);
+  }
+
+  emitTeamOrder(roomId: gameId) {
+    const firstTeam: Team['teamNumber'] = Math.random() > 0.5 ? 1 : 2;
+    this.emitToRoom(roomId, "team-order", firstTeam);
+  }
+
+  emitChoosePlayerOrder(roomId: gameId) {
+    this.emitToRoom(roomId, "choose-player-order", null);
   }
 }
   

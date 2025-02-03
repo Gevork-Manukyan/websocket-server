@@ -56,7 +56,7 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(SelectSageEvent, socketErrorHandler(socket, SelectSageEvent, async ({ gameId, sage }: SelectSageData) => {
     gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage);
-    socket.to(gameId).emit("sage-selected", sage);
+    gameEventEmitter.emitSageSelected(socket, gameId, sage);
     socket.emit(`${SelectSageEvent}--success`);
   }));
 
@@ -110,8 +110,8 @@ gameNamespace.on("connection", (socket) => {
     game.incrementPlayersFinishedSetup();
 
     if (game.numPlayersFinishedSetup === game.players.length) {
-      // TODO: Go to choosing who is first and emit to players who is first
-      
+      gameEventEmitter.emitTeamOrder(gameId);
+      if (game.numPlayersTotal === 4) gameEventEmitter.emitChoosePlayerOrder(gameId);
     }
   }));
 
@@ -128,8 +128,6 @@ gameNamespace.on("connection", (socket) => {
     socket.emit(`${LeaveGameEvent}--success`);
   }));
 });
-
-// TODO: coin flip for who is first. Players decide play order if 4 players
 
 // Start the server if not in test mode
 if (IS_PRODUCTION) {
