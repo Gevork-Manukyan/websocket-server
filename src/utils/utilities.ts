@@ -2,7 +2,7 @@ import { gameId, Sage } from "../types";
 import { DropletDeck, LeafDeck, PebbleDeck, TwigDeck } from "./constants";
 import { CustomError, ValidationError } from "../services/CustomError/BaseError";
 import { HostOnlyActionError, InvalidSageError } from "../services/CustomError/GameError";
-import { EventSchemas, SocketEventMap } from "../types/server-types";
+import { AllPlayersSetupEvent, ClearTeamsEvent, EventSchemas, SocketEventMap, StartGameEvent } from "../types/server-types";
 import { Socket } from "socket.io";
 import { gameStateManager } from "../services/GameStateManager";
 
@@ -68,13 +68,15 @@ export function processEvent<T extends keyof SocketEventMap>(socket: Socket, eve
     const data = result.data;
 
     // Check for host-only actions
-    const hostOnlyEvents = ["clear-teams", "start-game"];
-    if (hostOnlyEvents.includes(eventName)) {
-      const game = gameStateManager.getGame(data.gameId as gameId);
-      const player = game?.getPlayer(socket.id);
+    const hostOnlyEvents = [StartGameEvent, ClearTeamsEvent, AllPlayersSetupEvent];
+    for (const event of hostOnlyEvents) {
+      if (eventName === event) {
+        const player = gameStateManager.getGame(data.gameId as gameId).getPlayer(socket.id);
 
-      if (!player || !player.isGameHost) {
-        throw new HostOnlyActionError();
+        if (!player || !player.isGameHost) {
+          throw new HostOnlyActionError();
+        }
+        break;
       }
     }
 
@@ -82,7 +84,7 @@ export function processEvent<T extends keyof SocketEventMap>(socket: Socket, eve
     // socket.data = socket.data || {};
     // socket.data[event] = data;
 
-    next(); // Continue if everything is fine
+    next();
   } catch (error) {
     const customError = error as CustomError;
     handleSocketError(socket, eventName, customError)

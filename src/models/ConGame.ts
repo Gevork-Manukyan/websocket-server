@@ -9,9 +9,10 @@ import { Team } from "./Team";
 export class ConGame {
   id: gameId;
   isStarted: Boolean = false;
+  hasFinishedSetup: Boolean = false;
   numPlayersTotal: 2 | 4;
   numPlayersReady: number = 0;
-  numPlayersFinishedSetup: number = 0; // TODO: never incremended/decremented
+  numPlayersFinishedSetup: number = 0;
   players: Player[] = [];
   team1: Team;
   team2: Team;

@@ -7,7 +7,7 @@ import { GameEventEmitter } from "./services";
 import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
-import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, FinishedSetupData, FinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent } from "./types/server-types";
+import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent } from "./types/server-types";
 import { processEvent, socketErrorHandler } from "./utils/utilities";
 import { ValidationError } from "./services/CustomError/BaseError";
 
@@ -103,16 +103,11 @@ gameNamespace.on("connection", (socket) => {
     socket.emit(`${SwapWarriorsEvent}--success`)
   }));
 
-  socket.on(FinishedSetupEvent, socketErrorHandler(socket, FinishedSetupEvent, async ({ gameId }: FinishedSetupData) => {
+  socket.on(PlayerFinishedSetupEvent, socketErrorHandler(socket, PlayerFinishedSetupEvent, async ({ gameId }: PlayerFinishedSetupData) => {
     const game = gameStateManager.getGame(gameId);
     const player = game.getPlayer(socket.id);
     player.finishPlayerSetup();
     game.incrementPlayersFinishedSetup();
-
-    if (game.numPlayersFinishedSetup === game.players.length) {
-      gameEventEmitter.emitTeamOrder(gameId);
-      if (game.numPlayersTotal === 4) gameEventEmitter.emitChoosePlayerOrder(gameId);
-    }
   }));
 
   socket.on(CancelSetupEvent, socketErrorHandler(socket, CancelSetupEvent, async ({ gameId }: CancelSetupData) => {
@@ -121,6 +116,15 @@ gameNamespace.on("connection", (socket) => {
     game.decrementPlayersFinishedSetup();
     socket.emit(`${CancelSetupEvent}--success`)
   }))
+
+  socket.on(AllPlayersSetupEvent, socketErrorHandler(socket, AllPlayersSetupEvent, async ({ gameId }: { gameId: string }) => {
+    const game = gameStateManager.getGame(gameId);
+    if (game.numPlayersFinishedSetup !== game.players.length) throw new ValidationError("All players have not finished setup", "players");
+
+    game.hasFinishedSetup = true;
+    gameEventEmitter.emitTeamOrder(gameId);
+    if (game.numPlayersTotal === 4) gameEventEmitter.emitChoosePlayerOrder(gameId);
+  }));
 
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {
     gameStateManager.getGame(gameId).removePlayer(socket.id);

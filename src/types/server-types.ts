@@ -42,11 +42,15 @@ const swapWarriorsSchema = z.object({
   gameId: z.string(),
 })
 
-const finishedSetupSchema = z.object({
+const playerFinishedSetupSchema = z.object({
   gameId: z.string(),
 });
 
 const cancelSetupSchema = z.object({
+  gameId: z.string(),
+})
+
+const allPlayersSetupSchema = z.object({
   gameId: z.string(),
 })
 
@@ -63,8 +67,9 @@ export const ClearTeamsEvent = "clear-teams" as const;
 export const StartGameEvent = "start-game" as const;
 export const ChoseWarriorsEvent = "chose-warriors" as const;
 export const SwapWarriorsEvent = "swap-warriors" as const;
-export const FinishedSetupEvent = "finished-setup" as const;
+export const PlayerFinishedSetupEvent = "player-finished-setup" as const;
 export const CancelSetupEvent = "cancel-setup" as const;
+export const AllPlayersSetupEvent = "all-players-setup" as const;
 export const LeaveGameEvent = "leave-game" as const;
 
 // Define EventSchemas record
@@ -78,8 +83,9 @@ export const EventSchemas = {
   [StartGameEvent]: startGameSchema,
   [ChoseWarriorsEvent]: choseWarriorsSchema,
   [SwapWarriorsEvent]: swapWarriorsSchema,
-  [FinishedSetupEvent]: finishedSetupSchema,
+  [PlayerFinishedSetupEvent]: playerFinishedSetupSchema,
   [CancelSetupEvent]: cancelSetupSchema,
+  [AllPlayersSetupEvent]: allPlayersSetupSchema,
   [LeaveGameEvent]: leaveGameSchema,
 } as const;
 
@@ -93,8 +99,9 @@ export type ClearTeamsData = z.infer<typeof clearTeamsSchema>;
 export type StartGameData = z.infer<typeof startGameSchema>;
 export type ChoseWarriorsData = z.infer<typeof choseWarriorsSchema>;
 export type SwapWarriorsData = z.infer<typeof swapWarriorsSchema>;
-export type FinishedSetupData = z.infer<typeof finishedSetupSchema>;
+export type PlayerFinishedSetupData = z.infer<typeof playerFinishedSetupSchema>;
 export type CancelSetupData = z.infer<typeof cancelSetupSchema>;
+export type AllPlayersSetupData = z.infer<typeof allPlayersSetupSchema>;
 export type LeaveGameData = z.infer<typeof leaveGameSchema>;
 
 // Create a mapped type for socket events
@@ -108,7 +115,8 @@ export type SocketEventMap = {
   [StartGameEvent]: StartGameData;
   [ChoseWarriorsEvent]: ChoseWarriorsData;
   [SwapWarriorsEvent]: SwapWarriorsData;
-  [FinishedSetupEvent]: FinishedSetupData;
+  [PlayerFinishedSetupEvent]: PlayerFinishedSetupData;
   [CancelSetupEvent]: CancelSetupData;
+  [AllPlayersSetupEvent]: AllPlayersSetupData;
   [LeaveGameEvent]: LeaveGameData;
 }
