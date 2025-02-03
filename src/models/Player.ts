@@ -11,34 +11,74 @@ export class Player {
   isSetup: boolean = false;
   hasChosenWarriors: boolean = false;
   isGameHost: boolean;
-  team: Team | null = null;
-  sage: Sage | null = null;
-  decklist: Decklist | null = null;
-  gold: number = 0;
-  level: number = 1;
-  hand: Card[] = [];
-  deck: Card[] = [];
-  discardPile: Card[] = [];
+  private team: Team | null = null;
+  private sage: Sage | null = null;
+  private decklist: Decklist | null = null;
+  private gold: number = 0;
+  private level: number = 1;
+  private hand: Card[] = [];
+  private deck: Card[] = [];
+  private discardPile: Card[] = [];
 
   constructor(socketId: string, isGameHost = false) {
     this.id = socketId;
     this.isGameHost = isGameHost;
   }
 
+  getTeam() {
+    return this.team;
+  }
+
   setTeam(team: Team) {
     this.team = team;
   }
 
+  getSage() {
+    return this.sage;
+  }
+
   setSage(sage: Sage) {
     this.sage = sage;
+  }
+  
+  getDecklist() {
+    return this.decklist
   }
 
   setDecklist(decklist: Decklist) {
     this.decklist = decklist;
   }
 
-  getDecklist() {
-    return this.decklist
+  getGold() {
+    return this.gold;
+  }
+
+  setGold(amount: number) {
+    this.gold = amount;
+  }
+
+  getLevel() {
+    return this.level;
+  }
+
+  setLevel(level: number) {
+    this.level = level;
+  }
+
+  getHand() {
+    return this.hand;
+  }
+
+  setHand(hand: Card[]) {
+    this.hand = hand;
+  }
+
+  getDiscardPile() {
+    return this.discardPile;
+  }
+
+  setDiscardPile(discardPile: Card[]) {
+    this.discardPile = discardPile;
   }
 
   getElement() {
