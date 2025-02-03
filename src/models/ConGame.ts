@@ -16,6 +16,7 @@ export class ConGame {
   players: Player[] = [];
   team1: Team;
   team2: Team;
+  private teamOrder: [Team, Team];
   creatureShop: ElementalCard[] = [];
   itemShop: ItemCard[] = [];
 
@@ -26,6 +27,7 @@ export class ConGame {
     const teamSize = numPlayers / 2;
     this.team1 = new Team(teamSize as Team['teamSize'], 1)
     this.team2 = new Team(teamSize as Team['teamSize'], 2)
+    this.teamOrder = [this.team1, this.team2];
   }
 
   setStarted(value: Boolean) {
@@ -52,10 +54,24 @@ export class ConGame {
   }
 
   setPlayerSage(playerId: Player["id"], sage: Sage) {
-    const isSageAvailable = this.players.every(player => player.sage !== sage)
+    const isSageAvailable = this.players.every(player => player.getSage() !== sage)
     if (!isSageAvailable) throw new SageUnavailableError(sage);
 
     this.getPlayer(playerId).setSage(sage)
+  }
+
+  getTeamOrder() {
+    return this.teamOrder;
+  }
+
+  setTeamOrder(teamOrder: [Team, Team]) {
+    // make sure that the teams that are passed are the same instances that are in the game
+    if (
+      (teamOrder[0] !== this.team1 && teamOrder[0] !== this.team2) ||
+      (teamOrder[0] !== this.team2 && teamOrder[0] !== this.team1)
+    ) throw new NotFoundError("Team", "Team(s) not found in game")
+
+    this.teamOrder = teamOrder;
   }
 
   joinTeam(playerId: Player['id'], teamNumber: Team['teamNumber']) {
@@ -63,7 +79,7 @@ export class ConGame {
     const player = this.getPlayer(playerId);
 
     // Check if already on team
-    const currTeam = player.team;
+    const currTeam = player.getTeam();
     if (currTeam !== null) currTeam.removePlayerFromTeam(player)
 
     teamSelected.addPlayerToTeam(player);
@@ -122,5 +138,10 @@ export class ConGame {
 
     this.team1.initBattlefield(team1Decklists)
     this.team2.initBattlefield(team2Decklists)
+  }
+
+  setPlayerOrder(playerId: Player['id'], order: 1 | 2) {
+    const player = this.getPlayer(playerId)
+    
   }
 }

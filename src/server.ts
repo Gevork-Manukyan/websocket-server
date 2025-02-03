@@ -7,7 +7,7 @@ import { GameEventEmitter } from "./services";
 import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
-import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, PlayerOrderChosen, AllPlayersSetupData, PlayerOrderChosenData, TeamOrderChosen, TeamOrderChosenData } from "./types/server-types";
+import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, PlayerOrderChosen, AllPlayersSetupData, PlayerOrderChosenData } from "./types/server-types";
 import { processEvent, socketErrorHandler } from "./utils/utilities";
 import { ValidationError } from "./services/CustomError/BaseError";
 import { Team } from "./models/Team";
@@ -123,9 +123,10 @@ gameNamespace.on("connection", (socket) => {
     if (game.numPlayersFinishedSetup !== game.players.length) throw new ValidationError("All players have not finished setup", "players");
 
     game.hasFinishedSetup = true;
-    const firstTeam = Math.random() > 0.5 ? 1 : 2;
-
     
+    const firstTeam = Math.random() > 0.5 ? 1 : 2;
+    let teamOrder: [Team, Team] = firstTeam === 1 ? [game.team1, game.team2] : [game.team2, game.team1];
+    game.setTeamOrder(teamOrder);
 
     gameEventEmitter.emitTeamOrder(gameId, firstTeam);
     if (game.numPlayersTotal === 4) gameEventEmitter.emitChoosePlayerOrder(gameId);
