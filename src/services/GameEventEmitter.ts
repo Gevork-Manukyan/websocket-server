@@ -20,7 +20,7 @@ export class GameEventEmitter {
 
   emitPickWarriors(players: Player[]) {
     players.forEach(player => {
-      this.emitToPlayer(player.id, "pick-warriors", player.decklist);
+      this.emitToPlayer(player.id, "pick-warriors", player.getDecklist());
     })
   }
 
@@ -28,8 +28,7 @@ export class GameEventEmitter {
     socket.to(roomId).emit("sage-selected", sage);
   }
 
-  emitTeamOrder(roomId: gameId) {
-    const firstTeam: Team['teamNumber'] = Math.random() > 0.5 ? 1 : 2;
+  emitTeamOrder(roomId: gameId, firstTeam: Team['teamNumber']) {
     this.emitToRoom(roomId, "team-order", firstTeam);
   }
 
