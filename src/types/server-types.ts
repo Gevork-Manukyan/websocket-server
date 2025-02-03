@@ -75,7 +75,7 @@ export const SwapWarriorsEvent = "swap-warriors" as const;
 export const PlayerFinishedSetupEvent = "player-finished-setup" as const;
 export const CancelSetupEvent = "cancel-setup" as const;
 export const AllPlayersSetupEvent = "all-players-setup" as const;
-export const PlayerOrderChosen = "player-order-chosen" as const;
+export const PlayerOrderChosenEvent = "player-order-chosen" as const;
 export const LeaveGameEvent = "leave-game" as const;
 
 // Define EventSchemas record
@@ -92,7 +92,7 @@ export const EventSchemas = {
   [PlayerFinishedSetupEvent]: playerFinishedSetupSchema,
   [CancelSetupEvent]: cancelSetupSchema,
   [AllPlayersSetupEvent]: allPlayersSetupSchema,
-  [PlayerOrderChosen]: playerOrderChosenSchema,
+  [PlayerOrderChosenEvent]: playerOrderChosenSchema,
   [LeaveGameEvent]: leaveGameSchema,
 } as const;
 
@@ -126,6 +126,6 @@ export type SocketEventMap = {
   [PlayerFinishedSetupEvent]: PlayerFinishedSetupData;
   [CancelSetupEvent]: CancelSetupData;
   [AllPlayersSetupEvent]: AllPlayersSetupData;
-  [PlayerOrderChosen]: PlayerOrderChosenData;
+  [PlayerOrderChosenEvent]: PlayerOrderChosenData;
   [LeaveGameEvent]: LeaveGameData;
 }

@@ -7,10 +7,11 @@ import { GameEventEmitter } from "./services";
 import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
-import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, PlayerOrderChosen, AllPlayersSetupData, PlayerOrderChosenData } from "./types/server-types";
+import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, PlayerOrderChosenEvent, AllPlayersSetupData, PlayerOrderChosenData } from "./types/server-types";
 import { processEvent, socketErrorHandler } from "./utils/utilities";
 import { ValidationError } from "./services/CustomError/BaseError";
 import { Team } from "./models/Team";
+import { PlayerOrderOptions } from "./types/types";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -125,18 +126,28 @@ gameNamespace.on("connection", (socket) => {
     game.hasFinishedSetup = true;
     
     const firstTeam = Math.random() > 0.5 ? 1 : 2;
-    let teamOrder: [Team, Team] = firstTeam === 1 ? [game.team1, game.team2] : [game.team2, game.team1];
+    const teamOrder: [Team, Team] = firstTeam === 1 ? [game.team1, game.team2] : [game.team2, game.team1];
     game.setTeamOrder(teamOrder);
-
+    
     gameEventEmitter.emitTeamOrder(gameId, firstTeam);
-    if (game.numPlayersTotal === 4) gameEventEmitter.emitChoosePlayerOrder(gameId);
+    if (game.numPlayersTotal === 2) {
+      game.setPlayerOrder(teamOrder[0].players[0], 1);
+      game.setPlayerOrder(teamOrder[0].players[0], 2);
+    }
+    else gameEventEmitter.emitChoosePlayerOrder(gameId);
   }));
 
-  socket.on(PlayerOrderChosen, socketErrorHandler(socket, PlayerOrderChosen, async ({ gameId, playerOrder }: PlayerOrderChosenData) => {
+  socket.on(PlayerOrderChosenEvent, socketErrorHandler(socket, PlayerOrderChosenEvent, async ({ gameId, playerOrder }: PlayerOrderChosenData) => {
     const game = gameStateManager.getGame(gameId);
     if (game.numPlayersTotal === 2) throw new ValidationError("Cannot choose player order for a 2 player game", "players");
 
-    game.setPlayerOrder(socket.id, playerOrder);
+    const player1 = game.getPlayer(socket.id);
+    const player2 = player1.getTeam()?.players.find(player => player.id !== player1.id)!;
+    const teamNumber = game.getTeamOrder().findIndex(team => team.getTeamNumber() === player1.getTeam()?.getTeamNumber()) + 1;
+
+    game.setPlayerOrder(player1, (playerOrder * teamNumber) as PlayerOrderOptions);
+    game.setPlayerOrder(player2, ((playerOrder === 1 ? 2 : 1) * teamNumber) as PlayerOrderOptions);
+    // TODO: Rethink storing teams and players and their order
   }))
 
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {

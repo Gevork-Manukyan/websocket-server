@@ -24,3 +24,5 @@ export type Decklist = {
   basic: ElementalStarterCard;
   items: ItemCard[];
 }
+
+export type PlayerOrderOptions = 1 | 2 | 3 | 4;

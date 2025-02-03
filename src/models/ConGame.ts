@@ -1,8 +1,9 @@
 // Command of Nature (C.O.N)
 
-import { NotFoundError } from "../services/CustomError/BaseError";
+import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { PlayersNotReadyError, SageUnavailableError } from "../services/CustomError/GameError";
 import { Sage, ElementalCard, gameId, ItemCard, ElementalWarriorCard } from "../types";
+import { PlayerOrderOptions } from "../types/types";
 import { Player } from "./Player";
 import { Team } from "./Team";
 
@@ -17,6 +18,7 @@ export class ConGame {
   team1: Team;
   team2: Team;
   private teamOrder: [Team, Team];
+  private playerOrder: [Player, Player] | [Player, Player, Player, Player] | null = null;
   creatureShop: ElementalCard[] = [];
   itemShop: ItemCard[] = [];
 
@@ -72,6 +74,21 @@ export class ConGame {
     ) throw new NotFoundError("Team", "Team(s) not found in game")
 
     this.teamOrder = teamOrder;
+  }
+
+  getPlayerOrder() {
+    return this.playerOrder;
+  }
+
+  setPlayerOrder(player: Player, playerOrder: PlayerOrderOptions) {
+    if (this.playerOrder === null) throw new NotFoundError("Player Order", "Player order not set")
+    if (playerOrder < 1 || playerOrder > this.numPlayersTotal) throw new NotFoundError("Player Order", "Invalid player order")
+    if (this.numPlayersTotal === 4 && playerOrder > 2) throw new NotFoundError("Player Order", "Invalid player order for 4 player game")
+
+    const playerOrderIndex = playerOrder - 1;
+
+    if (this.playerOrder[playerOrderIndex] === player) throw new ValidationError("Player Order", "Player is already in that position")
+    this.playerOrder[playerOrderIndex] = player;
   }
 
   joinTeam(playerId: Player['id'], teamNumber: Team['teamNumber']) {
@@ -138,10 +155,5 @@ export class ConGame {
 
     this.team1.initBattlefield(team1Decklists)
     this.team2.initBattlefield(team2Decklists)
-  }
-
-  setPlayerOrder(playerId: Player['id'], order: 1 | 2) {
-    const player = this.getPlayer(playerId)
-    
   }
 }
