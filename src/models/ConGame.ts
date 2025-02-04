@@ -7,6 +7,13 @@ import { PlayerOrderOptions } from "../types/types";
 import { Player } from "./Player";
 import { Team } from "./Team";
 
+type TeamOrder = {
+  first: Team;
+  second: Team;
+}
+
+type PlayerOrder = [Player, Player] | [Player, Player, Player, Player];
+
 export class ConGame {
   id: gameId;
   isStarted: Boolean = false;
@@ -17,8 +24,8 @@ export class ConGame {
   players: Player[] = [];
   team1: Team;
   team2: Team;
-  private teamOrder: [Team, Team];
-  private playerOrder: [Player, Player] | [Player, Player, Player, Player] | null = null;
+  private teamOrder: TeamOrder;
+  private playerOrder!: PlayerOrder;
   creatureShop: ElementalCard[] = [];
   itemShop: ItemCard[] = [];
 
