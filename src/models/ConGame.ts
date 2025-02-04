@@ -7,6 +7,11 @@ import { PlayerOrderOptions } from "../types/types";
 import { Player } from "./Player";
 import { Team } from "./Team";
 
+type TeamOrder = {
+  first: Team;
+  second: Team;
+}
+
 export class ConGame {
   id: gameId;
   isStarted: Boolean = false;
@@ -17,8 +22,8 @@ export class ConGame {
   players: Player[] = [];
   team1: Team;
   team2: Team;
-  private teamOrder: [Team, Team];
-  private playerOrder: [Player, Player] | [Player, Player, Player, Player] | null = null;
+  private teamOrder: TeamOrder;
+  private playerOrder!: [Player, Player] | [Player, Player, Player, Player];
   creatureShop: ElementalCard[] = [];
   itemShop: ItemCard[] = [];
 
@@ -30,7 +35,11 @@ export class ConGame {
     this.team1 = new Team(teamSize, 1)
     this.team2 = new Team(teamSize, 2)
 
-    this.teamOrder = Math.random() > 0.5 ? [this.team1, this.team2] : [this.team2, this.team1];
+    const teamOrder = Math.random() > 0.5 ? [this.team1, this.team2] : [this.team2, this.team1];
+    this.teamOrder = {
+      first: teamOrder[0],
+      second: teamOrder[1]
+    }
   }
 
   setStarted(value: Boolean) {
@@ -68,11 +77,11 @@ export class ConGame {
   }
 
   getTeamGoingFirst() {
-    return this.teamOrder[0];
+    return this.teamOrder.first;
   }
 
   getTeamGoingSecond() {
-    return this.teamOrder[1];
+    return this.teamOrder.second;
   }
 
   getPlayerOrder() {
@@ -88,6 +97,19 @@ export class ConGame {
 
     if (this.playerOrder[playerOrderIndex] === player) throw new ValidationError("Player Order", "Player is already in that position")
     this.playerOrder[playerOrderIndex] = player;
+  }
+
+  setPlayerOrderForTeam(playerOrder: [Player, Player]) {
+    if (this.numPlayersTotal === 2) throw new ValidationError("Player Order", "Cannot set player order for a 2 player game")
+    const teamNumber = playerOrder[0].getTeam().getTeamNumber();
+
+    if (teamNumber === this.getTeamGoingFirst().getTeamNumber()) {
+      this.setPlayerOrder(playerOrder[0], 1)
+      this.setPlayerOrder(playerOrder[1], 3)
+    } else {
+      this.setPlayerOrder(playerOrder[0], 2)
+      this.setPlayerOrder(playerOrder[1], 4)
+    }
   }
 
   joinTeam(playerId: Player['id'], teamNumber: Team['teamNumber']) {

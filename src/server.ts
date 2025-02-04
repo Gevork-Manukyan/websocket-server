@@ -139,12 +139,9 @@ gameNamespace.on("connection", (socket) => {
     if (game.numPlayersTotal === 2) throw new ValidationError("Cannot choose player order for a 2 player game", "players");
 
     const player1 = game.getPlayer(socket.id);
-    const player2 = player1.getTeam()?.players.find(player => player.id !== player1.id)!;
-    const teamNumber = game.getTeamOrder().findIndex(team => team.getTeamNumber() === player1.getTeam()?.getTeamNumber()) + 1;
-
-    game.setPlayerOrder(player1, (playerOrder * teamNumber) as PlayerOrderOptions);
-    game.setPlayerOrder(player2, ((playerOrder === 1 ? 2 : 1) * teamNumber) as PlayerOrderOptions);
-    // TODO: Rethink storing teams and players and their order
+    const player2 = player1.getTeam().players.find(player => player.id !== player1.id)!;
+    const order: [Player, Player] = playerOrder === 1 ? [player1, player2] : [player2, player1];
+    game.setPlayerOrderForTeam(order);    
   }))
 
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {

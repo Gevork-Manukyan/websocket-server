@@ -26,6 +26,7 @@ export class Player {
   }
 
   getTeam() {
+    if (!this.team) throw new NotFoundError("Team", "Player does not have a team")
     return this.team;
   }
 
