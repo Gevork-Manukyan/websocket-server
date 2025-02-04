@@ -10,11 +10,11 @@ export class GameEventEmitter {
     this.io = io;
   }
 
-  emitToPlayer(playerId: string, eventName: string, data: any) {
+  emitToPlayer(playerId: string, eventName: string, data: any = null) {
     this.io.to(playerId).emit(eventName, data);
   }
 
-  emitToRoom(roomId: gameId, eventName: string, data: any) {
+  emitToRoom(roomId: gameId, eventName: string, data: any = null) {
     this.io.to(roomId).emit(eventName, data);
   }
 
@@ -33,7 +33,11 @@ export class GameEventEmitter {
   }
 
   emitChoosePlayerOrder(roomId: gameId) {
-    this.emitToRoom(roomId, "choose-player-order", null);
+    this.emitToRoom(roomId, "choose-player-order");
+  }
+
+  emitBeginBattle(roomId: gameId) {
+    this.emitToRoom(roomId, "begin-battle");
   }
 }
   
