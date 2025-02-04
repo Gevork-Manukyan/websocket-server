@@ -26,10 +26,11 @@ export class ConGame {
     this.id = gameId;
     this.numPlayersTotal = numPlayers;
     
-    const teamSize = numPlayers / 2;
-    this.team1 = new Team(teamSize as Team['teamSize'], 1)
-    this.team2 = new Team(teamSize as Team['teamSize'], 2)
-    this.teamOrder = [this.team1, this.team2];
+    const teamSize = (numPlayers / 2) as Team['teamSize'];
+    this.team1 = new Team(teamSize, 1)
+    this.team2 = new Team(teamSize, 2)
+
+    this.teamOrder = Math.random() > 0.5 ? [this.team1, this.team2] : [this.team2, this.team1];
   }
 
   setStarted(value: Boolean) {
@@ -66,14 +67,12 @@ export class ConGame {
     return this.teamOrder;
   }
 
-  setTeamOrder(teamOrder: [Team, Team]) {
-    // make sure that the teams that are passed are the same instances that are in the game
-    if (
-      (teamOrder[0] !== this.team1 && teamOrder[0] !== this.team2) ||
-      (teamOrder[0] !== this.team2 && teamOrder[0] !== this.team1)
-    ) throw new NotFoundError("Team", "Team(s) not found in game")
+  getTeamGoingFirst() {
+    return this.teamOrder[0];
+  }
 
-    this.teamOrder = teamOrder;
+  getTeamGoingSecond() {
+    return this.teamOrder[1];
   }
 
   getPlayerOrder() {

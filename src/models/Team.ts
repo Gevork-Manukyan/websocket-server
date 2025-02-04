@@ -9,7 +9,6 @@ export class Team {
     battlefield: Battlefield;
     private teamNumber: 1 | 2;
     private teamSize: 1 | 2;
-    private teamOrder: 1 | 2 = 1;
   
     constructor(teamSize: Team['teamSize'], teamNumber: Team['teamNumber']) {
         this.players = [];
@@ -29,14 +28,6 @@ export class Team {
 
     getTeamSize() {
         return this.teamSize;
-    }
-
-    setTeamOrder(order: Team['teamOrder']) {
-        this.teamOrder = order;
-    }
-
-    getTeamOrder() {
-        return this.teamOrder;
     }
 
     addPlayerToTeam(player: Player) {

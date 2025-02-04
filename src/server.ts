@@ -125,14 +125,11 @@ gameNamespace.on("connection", (socket) => {
 
     game.hasFinishedSetup = true;
     
-    const firstTeam = Math.random() > 0.5 ? 1 : 2;
-    const teamOrder: [Team, Team] = firstTeam === 1 ? [game.team1, game.team2] : [game.team2, game.team1];
-    game.setTeamOrder(teamOrder);
-    
-    gameEventEmitter.emitTeamOrder(gameId, firstTeam);
+    gameEventEmitter.emitTeamOrder(gameId, game.getTeamGoingFirst().getTeamNumber());
+
     if (game.numPlayersTotal === 2) {
-      game.setPlayerOrder(teamOrder[0].players[0], 1);
-      game.setPlayerOrder(teamOrder[0].players[0], 2);
+      game.setPlayerOrder(game.getTeamGoingFirst().players[0], 1);
+      game.setPlayerOrder(game.getTeamGoingSecond().players[0], 2);
     }
     else gameEventEmitter.emitChoosePlayerOrder(gameId);
   }));
