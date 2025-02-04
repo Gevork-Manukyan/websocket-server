@@ -73,7 +73,7 @@ describe("ConGame", () => {
       test("throws SageUnavailableError if the sage is already chosen", () => {
         const player1 = new Player("player-1");
         const player2 = new Player("player-2");
-        player1.sage = "Cedar";
+        player1.setSage("Cedar");
   
         mockGame.addPlayer(player1);
         mockGame.addPlayer(player2);

@@ -10,8 +10,6 @@ import { PORT } from "./utils/config";
 import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, PlayerOrderChosenEvent, AllPlayersSetupData, PlayerOrderChosenData } from "./types/server-types";
 import { processEvent, socketErrorHandler } from "./utils/utilities";
 import { ValidationError } from "./services/CustomError/BaseError";
-import { Team } from "./models/Team";
-import { PlayerOrderOptions } from "./types/types";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -140,7 +138,7 @@ gameNamespace.on("connection", (socket) => {
     if (game.numPlayersTotal === 2) throw new ValidationError("Cannot choose player order for a 2 player game", "players");
 
     const player1 = game.getPlayer(socket.id);
-    const player2 = player1.getTeam().players.find(player => player.id !== player1.id)!;
+    const player2 = player1.getTeam()?.players.find(player => player.id !== player1.id)!;
     const order: [Player, Player] = playerOrder === 1 ? [player1, player2] : [player2, player1];
     game.setPlayerOrderForTeam(order);    
     gameEventEmitter.emitBeginBattle(gameId);

@@ -10,19 +10,19 @@ const testPlayerId = "testId123"
 describe("constructor", () => {
     test("should call constructor and create default player", (done) => {
         const player = new Player(testPlayerId)
-        const { id, isReady, isGameHost, team, sage, decklist, gold, level, hand, deck, discardPile } = player
+        const { id, isReady, isGameHost } = player
     
         expect(id).toBe(testPlayerId)
         expect(isReady).toBe(false)
         expect(isGameHost).toBe(false)
-        expect(team).toBe(null)
-        expect(sage).toBe(null)
-        expect(decklist).toBe(null)
-        expect(gold).toBe(0)
-        expect(level).toBe(1)
-        expect(hand).toEqual([])
-        expect(deck).toEqual([])
-        expect(discardPile).toEqual([])
+        expect(player.getTeam()).toBe(null)
+        expect(player.getSage()).toBe(null)
+        expect(player.getDecklist()).toBe(null)
+        expect(player.getGold()).toBe(0)
+        expect(player.getLevel()).toBe(1)
+        expect(player.getHand()).toEqual([])
+        expect(player.getDeck()).toEqual([])
+        expect(player.getDiscardPile()).toEqual([])
         done()
     })
     
@@ -58,22 +58,22 @@ describe("adding cards to deck", () => {
     test("should add a single card (using addCardToDeck)", (done) => {
         const player = new Player(testPlayerId)
         player.addCardToDeck(Cedar)
-        expect(player.deck).toStrictEqual([Cedar])
+        expect(player.getDeck()).toStrictEqual([Cedar])
         done()
     })
 
     test("should add a single card (using addCardsToDeck)", (done) => {
         const player = new Player(testPlayerId)
         player.addCardsToDeck([Cedar])
-        expect(player.deck).toContain(Cedar)
+        expect(player.getDeck()).toContain(Cedar)
         done()
     })
 
     test("should add a multiple cards", (done) => {
         const player = new Player(testPlayerId)
         player.addCardsToDeck([Cedar, Gravel])
-        expect(player.deck).toContainEqual(Cedar)
-        expect(player.deck).toContainEqual(Gravel)
+        expect(player.getDeck()).toContainEqual(Cedar)
+        expect(player.getDeck()).toContainEqual(Gravel)
         done()
     })
 })
@@ -91,8 +91,8 @@ describe("initDeck method", () => {
         player.toggleReady()
         player.initDeck()
 
-        expect(player.decklist).toStrictEqual(TwigDeck)
-        expect(player.deck).toStrictEqual([Timber, CloseStrike, CloseStrike, FarStrike, NaturalRestoration, TwigCharm])
+        expect(player.getDecklist()).toStrictEqual(TwigDeck)
+        expect(player.getDeck()).toStrictEqual([Timber, CloseStrike, CloseStrike, FarStrike, NaturalRestoration, TwigCharm])
         done()
     })
 })
@@ -101,22 +101,22 @@ describe("chooseWarriors", () => {
     test("sets warriors for a player and adds non-chosen cards to their deck", () => {
         const player = new Player("player-1");
         player.getDecklist = jest.fn().mockReturnValue(TwigDeck);
-        player.team = {
+        player.setTeam({
             initWarriors: jest.fn(),
-        } as Partial<Team> as Team;
+        } as Partial<Team> as Team);
     
         player.chooseWarriors([AcornSquire, SlumberJack]);
     
-        expect(player.team.initWarriors).toHaveBeenCalledWith([AcornSquire, SlumberJack]);
+        expect(player.getTeam()?.initWarriors).toHaveBeenCalledWith([AcornSquire, SlumberJack]);
         expect(player.hasChosenWarriors).toBe(true);
     });
 
     test("throws ValidationError if the chosen warriors do not match the player's sage element", () => {
         const player = new Player("player-1");
         player.getDecklist = jest.fn().mockReturnValue(TwigDeck);
-        player.team = {
+        player.setTeam({
             initWarriors: jest.fn(),
-        } as Partial<Team> as Team;
+        } as Partial<Team> as Team);
     
         expect(() =>
             player.chooseWarriors([
@@ -143,20 +143,20 @@ describe("chooseWarriors", () => {
     describe("swapWarriors", () => {
         test("swaps the player's warriors", () => {
             const player = new Player("player-1");
-            player.team = {
+            player.setTeam({
                 swapWarriors: jest.fn(),
-            } as Partial<Team> as Team;
-            player.sage = "Cedar"
-            player.decklist = TwigDeck;
+            } as Partial<Team> as Team);
+            player.setSage("Cedar")
+            player.setDecklist(TwigDeck);
         
             player.swapWarriors();
         
-            expect(player.team.swapWarriors).toHaveBeenCalled();
+            expect(player.getTeam()?.swapWarriors).toHaveBeenCalled();
         });
 
         test("throws NotFoundError if player does not have a team", () => {
             const player = new Player("player-1");
-            player.team = null;
+            player.setTeam(null);
         
             expect(() => player.swapWarriors()).toThrow(Error);
         });

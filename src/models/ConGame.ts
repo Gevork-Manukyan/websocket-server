@@ -103,7 +103,7 @@ export class ConGame {
 
   setPlayerOrderForTeam(playerOrder: [Player, Player]) {
     if (this.numPlayersTotal === 2) throw new ValidationError("Player Order", "Cannot set player order for a 2 player game")
-    const teamNumber = playerOrder[0].getTeam().getTeamNumber();
+    const teamNumber = playerOrder[0].getTeam()?.getTeamNumber();
 
     if (teamNumber === this.getTeamGoingFirst().getTeamNumber()) {
       this.setPlayerOrder(playerOrder[0], 1)

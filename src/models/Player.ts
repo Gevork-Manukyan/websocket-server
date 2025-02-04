@@ -26,11 +26,10 @@ export class Player {
   }
 
   getTeam() {
-    if (!this.team) throw new NotFoundError("Team", "Player does not have a team")
     return this.team;
   }
 
-  setTeam(team: Team) {
+  setTeam(team: Player['team']) {
     this.team = team;
   }
 
@@ -38,7 +37,7 @@ export class Player {
     return this.sage;
   }
 
-  setSage(sage: Sage) {
+  setSage(sage: Player['sage']) {
     this.sage = sage;
   }
   
@@ -72,6 +71,14 @@ export class Player {
 
   setHand(hand: Card[]) {
     this.hand = hand;
+  }
+
+  getDeck() {
+    return this.deck;
+  }
+
+  setDeck(deck: Card[]) {
+    this.deck = deck;
   }
 
   getDiscardPile() {
