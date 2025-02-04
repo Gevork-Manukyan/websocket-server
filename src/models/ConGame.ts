@@ -33,10 +33,15 @@ export class ConGame {
     this.id = gameId;
     this.numPlayersTotal = numPlayers;
     
-    const teamSize = numPlayers / 2;
-    this.team1 = new Team(teamSize as Team['teamSize'], 1)
-    this.team2 = new Team(teamSize as Team['teamSize'], 2)
-    this.teamOrder = [this.team1, this.team2];
+    const teamSize = (numPlayers / 2) as Team['teamSize'];
+    this.team1 = new Team(teamSize, 1)
+    this.team2 = new Team(teamSize, 2)
+
+    const teamOrder = Math.random() > 0.5 ? [this.team1, this.team2] : [this.team2, this.team1];
+    this.teamOrder = {
+      first: teamOrder[0],
+      second: teamOrder[1]
+    }
   }
 
   setStarted(value: Boolean) {
@@ -73,14 +78,12 @@ export class ConGame {
     return this.teamOrder;
   }
 
-  setTeamOrder(teamOrder: [Team, Team]) {
-    // make sure that the teams that are passed are the same instances that are in the game
-    if (
-      (teamOrder[0] !== this.team1 && teamOrder[0] !== this.team2) ||
-      (teamOrder[0] !== this.team2 && teamOrder[0] !== this.team1)
-    ) throw new NotFoundError("Team", "Team(s) not found in game")
+  getTeamGoingFirst() {
+    return this.teamOrder.first;
+  }
 
-    this.teamOrder = teamOrder;
+  getTeamGoingSecond() {
+    return this.teamOrder.second;
   }
 
   getPlayerOrder() {
@@ -96,6 +99,19 @@ export class ConGame {
 
     if (this.playerOrder[playerOrderIndex] === player) throw new ValidationError("Player Order", "Player is already in that position")
     this.playerOrder[playerOrderIndex] = player;
+  }
+
+  setPlayerOrderForTeam(playerOrder: [Player, Player]) {
+    if (this.numPlayersTotal === 2) throw new ValidationError("Player Order", "Cannot set player order for a 2 player game")
+    const teamNumber = playerOrder[0].getTeam().getTeamNumber();
+
+    if (teamNumber === this.getTeamGoingFirst().getTeamNumber()) {
+      this.setPlayerOrder(playerOrder[0], 1)
+      this.setPlayerOrder(playerOrder[1], 3)
+    } else {
+      this.setPlayerOrder(playerOrder[0], 2)
+      this.setPlayerOrder(playerOrder[1], 4)
+    }
   }
 
   joinTeam(playerId: Player['id'], teamNumber: Team['teamNumber']) {
