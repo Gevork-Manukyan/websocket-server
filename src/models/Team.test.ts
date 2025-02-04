@@ -165,6 +165,20 @@ describe("Team", () => {
     })
 
     describe("swapWarriors method", () => {
-        // TODO: Implement
-    })
+        test("should swap warriors in a single-player team", () => {
+            // TODO: Implement test logic
+        });
+    
+        test("should swap warriors for the left-side player in a two-player team", () => {
+            // TODO: Implement test logic
+        });
+    
+        test("should swap warriors for the right-side player in a two-player team", () => {
+            // TODO: Implement test logic
+        });
+    
+        test("should throw an error if the element does not match any sage", () => {
+            // TODO: Implement test logic
+        });
+    });
 })

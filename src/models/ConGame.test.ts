@@ -81,6 +81,58 @@ describe("ConGame", () => {
         expect(() => mockGame.setPlayerSage("player-2", "Cedar")).toThrow(SageUnavailableError);
       });
     });
+
+    describe("getTeamOrder", () => {
+      test("should return the correct team order", () => {
+        // Implement test logic
+      });
+    });
+
+    describe("getTeamGoingFirst", () => {
+      test("should return the team that is going first", () => {
+        // Implement test logic
+      });
+    });
+
+    describe("getTeamGoingSecond", () => {
+      test("should return the team that is going second", () => {
+        // Implement test logic
+      });
+    });
+
+    describe("getPlayerOrder", () => {
+      test("should return the correct player order", () => {
+        // Implement test logic
+      });
+    });
+
+    describe("setPlayerOrder", () => {
+      test("should correctly set the player order", () => {
+        // Implement test logic
+      });
+      
+      test("should throw NotFoundError if player order is not set", () => {
+        // Implement test logic
+      });
+      
+      test("should throw NotFoundError for invalid player order", () => {
+        // Implement test logic
+      });
+      
+      test("should throw ValidationError if player is already in the position", () => {
+        // Implement test logic
+      });
+    });
+
+    describe("setPlayerOrderForTeam", () => {
+      test("should correctly set player order for a team", () => {
+        // Implement test logic
+      });
+      
+      test("should throw ValidationError if game is 2 players", () => {
+        // Implement test logic
+      });
+    });
   
     describe("joinTeam", () => {
       test("adds a player to the selected team", () => {

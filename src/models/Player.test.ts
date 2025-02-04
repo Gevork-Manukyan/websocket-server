@@ -34,6 +34,50 @@ describe("constructor", () => {
     })
 })
 
+describe("setGold method", () => {
+    test("should correctly set the player's gold amount", () => {
+        // TODO: Implement test
+    });
+});
+
+describe("setLevel method", () => {
+    test("should correctly set the player's level", () => {
+        // TODO: Implement test
+    });
+});
+
+describe("setHand method", () => {
+    test("should correctly set the player's hand", () => {
+        // TODO: Implement test
+    });
+});
+
+describe("setDeck method", () => {
+    test("should correctly set the player's deck", () => {
+        // TODO: Implement test
+    });
+});
+
+describe("setDiscardPile method", () => {
+    test("should correctly set the player's discard pile", () => {
+        // TODO: Implement test
+    });
+});
+
+describe("getElement method", () => {
+    test("should return the player's element", () => {
+        // TODO: Implement test
+    });
+
+    test("should throw NotFoundError if sage is not set", () => {
+        // TODO: Implement test
+    });
+
+    test("should throw NotFoundError if decklist is not set", () => {
+        // TODO: Implement test
+    });
+});
+
 describe("toggleReady method", () => {
     test("should toggle player to be ready", (done) => {
         const player = new Player(testPlayerId)
@@ -54,7 +98,7 @@ describe("toggleReady method", () => {
     })
 })
 
-describe("adding cards to deck", () => {
+describe("addCardsToDeck", () => {
     test("should add a single card (using addCardToDeck)", (done) => {
         const player = new Player(testPlayerId)
         player.addCardToDeck(Cedar)
@@ -139,57 +183,57 @@ describe("chooseWarriors", () => {
               ])
           ).toThrow(ValidationError);
     });
+})
 
-    describe("swapWarriors", () => {
-        test("swaps the player's warriors", () => {
-            const player = new Player("player-1");
-            player.setTeam({
-                swapWarriors: jest.fn(),
-            } as Partial<Team> as Team);
-            player.setSage("Cedar")
-            player.setDecklist(TwigDeck);
-        
-            player.swapWarriors();
-        
-            expect(player.getTeam()?.swapWarriors).toHaveBeenCalled();
-        });
+describe("swapWarriors", () => {
+    test("swaps the player's warriors", () => {
+        const player = new Player("player-1");
+        player.setTeam({
+            swapWarriors: jest.fn(),
+        } as Partial<Team> as Team);
+        player.setSage("Cedar")
+        player.setDecklist(TwigDeck);
+    
+        player.swapWarriors();
+    
+        expect(player.getTeam()?.swapWarriors).toHaveBeenCalled();
+    });
 
-        test("throws NotFoundError if player does not have a team", () => {
-            const player = new Player("player-1");
-            player.setTeam(null);
-        
-            expect(() => player.swapWarriors()).toThrow(Error);
-        });
+    test("throws NotFoundError if player does not have a team", () => {
+        const player = new Player("player-1");
+        player.setTeam(null);
+    
+        expect(() => player.swapWarriors()).toThrow(Error);
+    });
+})
+
+describe("finishedPlayerSetup", () => {
+    test("should set the player as finished setup", () => {
+        const player = new Player("player-1");
+        player.isReady = true;
+        player.hasChosenWarriors = true;
+        player.finishPlayerSetup();
+        expect(player.isSetup).toBe(true);
     })
 
-    describe("finishedPlayerSetup", () => {
-        test("should set the player as finished setup", () => {
-            const player = new Player("player-1");
-            player.isReady = true;
-            player.hasChosenWarriors = true;
-            player.finishPlayerSetup();
-            expect(player.isSetup).toBe(true);
-        })
-
-        test("should throw error if player is not ready", () => {
-            const player = new Player("player-1");
-            player.hasChosenWarriors = true;
-            expect(() => player.finishPlayerSetup()).toThrow(NotFoundError);
-        })
-
-        test("should throw error if player has not chosen warriors", () => {
-            const player = new Player("player-1");
-            player.isReady = true;
-            expect(() => player.finishPlayerSetup()).toThrow(NotFoundError);
-        })
+    test("should throw error if player is not ready", () => {
+        const player = new Player("player-1");
+        player.hasChosenWarriors = true;
+        expect(() => player.finishPlayerSetup()).toThrow(NotFoundError);
     })
 
-    describe("cancelPlayerSetup", () => {
-        test("should set the player as not setup", () => {
-            const player = new Player("player-1");
-            player.isSetup = true;
-            player.cancelPlayerSetup();
-            expect(player.isSetup).toBe(false);
-        })
+    test("should throw error if player has not chosen warriors", () => {
+        const player = new Player("player-1");
+        player.isReady = true;
+        expect(() => player.finishPlayerSetup()).toThrow(NotFoundError);
     })
-});
+})
+
+describe("cancelPlayerSetup", () => {
+    test("should set the player as not setup", () => {
+        const player = new Player("player-1");
+        player.isSetup = true;
+        player.cancelPlayerSetup();
+        expect(player.isSetup).toBe(false);
+    })
+})

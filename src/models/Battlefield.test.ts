@@ -33,6 +33,16 @@ describe("Battlefield class", () => {
         });
     })
 
+    describe("getCard method", () => {
+        test("should return null if no card is present", () => {
+            // TODO: Implement test
+        });
+
+        test("should return the card present in the specified space", () => {
+            // TODO: Implement test
+        });
+    });
+
     describe("addCard method", () => {
         test("should add a card to an empty space", () => {
             const battlefield = new Battlefield(1)
@@ -87,6 +97,18 @@ describe("Battlefield class", () => {
             expect(() => battlefield.swapCards(1, 1)).toThrow(ValidationError)
         })
     })
+
+    describe("validateSpaceNumber method", () => {
+        test("should throw an error for an invalid space number", () => {
+            // TODO: Implement test
+        });
+    });
+
+    describe("updateBattlefield method", () => {
+        test("should update the battlefield state correctly", () => {
+            // TODO: Implement test once implemented
+        });
+    });
 })
 
 describe("BattlefieldSpace class", () => {
