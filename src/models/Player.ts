@@ -140,7 +140,7 @@ export class Player {
 
   swapWarriors() {
     if (!this.team) throw new NotFoundError("Team", "Player requires a team before swapping warriors")
-    this.team.swapWarriors(this.getElement())
+    this.team.swapWarriors(this)
   }
 
   finishPlayerSetup() {

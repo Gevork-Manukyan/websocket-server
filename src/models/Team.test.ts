@@ -1,4 +1,4 @@
-import { ConflictError, NotFoundError } from "../services/CustomError/BaseError"
+import { ConflictError, NotFoundError, ValidationError } from "../services/CustomError/BaseError"
 import { AcornSquire, Cedar, Porella, QuillThornback, Sprout, Timber } from "../utils"
 import { LeafDeck, TwigDeck } from "../utils/constants"
 import { Battlefield } from "./Battlefield"
@@ -165,20 +165,52 @@ describe("Team", () => {
     })
 
     describe("swapWarriors method", () => {
+        let mockPlayer: Player;
+
+        beforeEach(() => {
+            mockPlayer = new Player("testPlayerId_1")
+            mockTeam.battlefield.swapCards = jest.fn()
+        })
+
         test("should swap warriors in a single-player team", () => {
-            // TODO: Implement test logic
+            mockTeam.getTeamSize = jest.fn().mockReturnValue(1)
+
+            mockTeam.swapWarriors(mockPlayer)
+
+            expect(mockTeam.getTeamSize).toHaveBeenCalled()
+            expect(mockTeam.battlefield.swapCards).toHaveBeenCalledWith(4, 6)
         });
     
         test("should swap warriors for the left-side player in a two-player team", () => {
-            // TODO: Implement test logic
+            mockTeam.getTeamSize = jest.fn().mockReturnValue(2)
+            mockPlayer.getElement = jest.fn().mockReturnValue(Cedar.element)
+            mockTeam.battlefield.getCard = jest.fn().mockReturnValue(Cedar)
+            
+            mockTeam.swapWarriors(mockPlayer)
+            
+            expect(mockTeam.getTeamSize).toHaveBeenCalled()
+            expect(mockTeam.battlefield.swapCards).toHaveBeenCalledWith(7, 9)
         });
     
         test("should swap warriors for the right-side player in a two-player team", () => {
-            // TODO: Implement test logic
+            mockTeam.getTeamSize = jest.fn().mockReturnValue(2)
+            mockPlayer.getElement = jest.fn()
+                .mockReturnValueOnce("leaf")
+                .mockReturnValueOnce(Cedar.element)
+            mockTeam.battlefield.getCard = jest.fn().mockReturnValue(Cedar)
+            
+            mockTeam.swapWarriors(mockPlayer)
+            
+            expect(mockTeam.getTeamSize).toHaveBeenCalled()
+            expect(mockTeam.battlefield.swapCards).toHaveBeenCalledWith(10, 12)
         });
     
         test("should throw an error if the element does not match any sage", () => {
-            // TODO: Implement test logic
+            mockTeam.getTeamSize = jest.fn().mockReturnValue(2)
+            mockPlayer.getElement = jest.fn().mockReturnValueOnce("leaf")
+            mockTeam.battlefield.getCard = jest.fn().mockReturnValue(Cedar)
+
+            expect(() => (mockTeam.swapWarriors(mockPlayer))).toThrow(ValidationError)
         });
     });
 })

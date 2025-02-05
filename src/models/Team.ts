@@ -101,7 +101,7 @@ export class Team {
         }
     }
 
-    swapWarriors(element: Element) {
+    swapWarriors(player: Player) {
         // One player on Team
         if (this.getTeamSize() === 1) {
             this.battlefield.swapCards(4, 6)
@@ -109,10 +109,10 @@ export class Team {
         }
 
         // Two players on Team
-        if (element === this.battlefield.getCard(8)?.element) {
+        if (player.getElement() === this.battlefield.getCard(8)?.element) {
             this.battlefield.swapCards(7, 9)
         }
-        else if (element === this.battlefield.getCard(11)?.element) {
+        else if (player.getElement() === this.battlefield.getCard(11)?.element) {
             this.battlefield.swapCards(10, 12)
         } 
         else {
