@@ -34,33 +34,52 @@ describe("constructor", () => {
     })
 })
 
-describe("setGold method", () => {
+describe("team getter and setters", () => {
+    test("should set the player's team", () => {
+        const player = new Player(testPlayerId);
+        const team = new Team(1, 1);
+        player.setTeam(team);
+        expect(player.getTeam()).toBe(team);
+    })
+})
+
+describe("gold getter and setters", () => {
     test("should correctly set the player's gold amount", () => {
-        // TODO: Implement test
+        const player = new Player(testPlayerId);
+        player.setGold(100);
+        expect(player.getGold()).toBe(100);
     });
 });
 
-describe("setLevel method", () => {
+describe("level getter and setters", () => {
     test("should correctly set the player's level", () => {
-        // TODO: Implement test
+        const player = new Player(testPlayerId);
+        player.setLevel(2);
+        expect(player.getLevel()).toBe(2);
     });
 });
 
-describe("setHand method", () => {
+describe("hand getter and setters", () => {
     test("should correctly set the player's hand", () => {
-        // TODO: Implement test
+        const player = new Player(testPlayerId);
+        player.setHand([Cedar]);
+        expect(player.getHand()).toContainEqual(Cedar);
     });
 });
 
-describe("setDeck method", () => {
+describe("deck getter and setters", () => {
     test("should correctly set the player's deck", () => {
-        // TODO: Implement test
+        const player = new Player(testPlayerId);
+        player.setDeck([Cedar]);
+        expect(player.getDeck()).toContainEqual(Cedar);
     });
 });
 
-describe("setDiscardPile method", () => {
+describe("discard pile getter and setters", () => {
     test("should correctly set the player's discard pile", () => {
-        // TODO: Implement test
+        const player = new Player(testPlayerId);
+        player.setDiscardPile([Cedar]);
+        expect(player.getDiscardPile()).toContainEqual(Cedar);
     });
 });
 
