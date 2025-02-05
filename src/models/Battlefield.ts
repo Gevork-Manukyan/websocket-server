@@ -148,6 +148,14 @@ export class Battlefield {
         return this.fieldArray[spaceNumber - 1];
     }
 
+    private validateSpaceNumber(spaceNumber: SpaceOptions): asserts spaceNumber is OnePlayerSpaceOptions | TwoPlayerSpaceOptions {
+        const maxSpaceNumber = this.numPlayersOnTeam === 1 ? ONE_PLAYER_SPACE_MAX : TWO_PLAYER_SPACE_MAX;
+    
+        if (spaceNumber < 1 || spaceNumber > maxSpaceNumber) {
+            throw new ValidationError(`Invalid space for ${this.numPlayersOnTeam}-player battlefield: ${spaceNumber}`, "INVALID_INPUT");
+        }
+    }
+
     getCard(spaceNumber: SpaceOptions) {
         return this.getBattlefieldSpace(spaceNumber).value;
     }
@@ -180,14 +188,6 @@ export class Battlefield {
         const space1Value = space1.value
         space1.setValue(space2.value)
         space2.setValue(space1Value)
-    }
-
-    private validateSpaceNumber(spaceNumber: SpaceOptions): asserts spaceNumber is OnePlayerSpaceOptions | TwoPlayerSpaceOptions {
-        const maxSpaceNumber = this.numPlayersOnTeam === 1 ? ONE_PLAYER_SPACE_MAX : TWO_PLAYER_SPACE_MAX;
-    
-        if (spaceNumber < 1 || spaceNumber > maxSpaceNumber) {
-            throw new ValidationError(`Invalid space for ${this.numPlayersOnTeam}-player battlefield: ${spaceNumber}`, "INVALID_INPUT");
-        }
     }
 
     private updateBattlefield() {

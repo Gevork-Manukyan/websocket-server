@@ -4,6 +4,12 @@ import { AcornSquire, Timber } from "../utils";
 import { Battlefield, BattlefieldSpace } from "./Battlefield";
 
 describe("Battlefield class", () => {
+    let mockBattlefield: Battlefield;
+
+    beforeEach(() => {
+        mockBattlefield = new Battlefield(1);
+    })
+
     describe("constructor", () => {
         test("should initialize a one-player battlefield correctly", () => {
             const battlefield = new Battlefield(1);
@@ -33,74 +39,64 @@ describe("Battlefield class", () => {
         });
     })
 
-    describe("getCard method", () => {
-        test("should return null if no card is present", () => {
-            // TODO: Implement test
-        });
-
-        test("should return the card present in the specified space", () => {
-            // TODO: Implement test
-        });
-    });
-
     describe("addCard method", () => {
         test("should add a card to an empty space", () => {
-            const battlefield = new Battlefield(1)
-            battlefield.addCard(Timber, 1)
-            expect(battlefield.getCard(1)).toBe(Timber)
+            mockBattlefield.addCard(Timber, 1)
+            expect(mockBattlefield.getCard(1)).toBe(Timber)
         })
 
         test("should throw an error when adding a card to a non-empty space", () => {
-            const battlefield = new Battlefield(1)
-            battlefield.addCard(Timber, 1)
-            expect(() => battlefield.addCard(Timber, 1)).toThrow(ValidationError)
+            mockBattlefield.addCard(Timber, 1)
+            expect(() => mockBattlefield.addCard(Timber, 1)).toThrow(ValidationError)
         })
     })
 
     describe("removeCard method", () => {
         test("should remove a card from a space", () => {
-            const battlefield = new Battlefield(1)
-            battlefield.addCard(Timber, 1)
-            const removedCard = battlefield.removeCard(1)
-            expect(battlefield.getCard(1)).toBe(null)
+            mockBattlefield.addCard(Timber, 1)
+            const removedCard = mockBattlefield.removeCard(1)
+            expect(mockBattlefield.getCard(1)).toBe(null)
             expect(removedCard).toBe(Timber)
         })
 
         test("should throw an error if removing card from empty space", () => {
-            const battlefield = new Battlefield(1)
-            expect(() => battlefield.removeCard(1)).toThrow(NullSpaceError)
+            expect(() => mockBattlefield.removeCard(1)).toThrow(NullSpaceError)
         })
     })
 
     describe("swapCards method", () => {
         test("should swap two cards between spaces", () => {
-            const battlefield = new Battlefield(1)
-            battlefield.addCard(Timber, 1)
-            battlefield.addCard(AcornSquire, 6)
-            battlefield.swapCards(1, 6)
-            expect(battlefield.getCard(1)).toBe(AcornSquire)
-            expect(battlefield.getCard(6)).toBe(Timber)
+            mockBattlefield.addCard(Timber, 1)
+            mockBattlefield.addCard(AcornSquire, 6)
+            mockBattlefield.swapCards(1, 6)
+            expect(mockBattlefield.getCard(1)).toBe(AcornSquire)
+            expect(mockBattlefield.getCard(6)).toBe(Timber)
         })
 
         test("should throw an error if either space is empty", () => {
-            const battlefield = new Battlefield(1)
-            battlefield.addCard(Timber, 3)
+            mockBattlefield.addCard(Timber, 3)
 
-            expect(() => battlefield.swapCards(3, 6)).toThrow(NullSpaceError)
-            expect(() => battlefield.swapCards(1, 3)).toThrow(NullSpaceError)
-            expect(() => battlefield.swapCards(1, 6)).toThrow(NullSpaceError)
+            expect(() => mockBattlefield.swapCards(3, 6)).toThrow(NullSpaceError)
+            expect(() => mockBattlefield.swapCards(1, 3)).toThrow(NullSpaceError)
+            expect(() => mockBattlefield.swapCards(1, 6)).toThrow(NullSpaceError)
         })
 
         test("should throw an error if swapping a space with itself", () => {
-            const battlefield = new Battlefield(1)
-            battlefield.addCard(Timber, 3)
-            expect(() => battlefield.swapCards(1, 1)).toThrow(ValidationError)
+            mockBattlefield.addCard(Timber, 3)
+            expect(() => mockBattlefield.swapCards(1, 1)).toThrow(ValidationError)
+        })
+    })
+
+    describe("getBattlefieldSpace method", () => {
+        test("should retrieve the correct battlefield space", () => {
+            mockBattlefield.getCard(1)
+            expect(mockBattlefield.getCard(1)).toBe(null)
         })
     })
 
     describe("validateSpaceNumber method", () => {
         test("should throw an error for an invalid space number", () => {
-            // TODO: Implement test
+            expect(() => mockBattlefield.getCard(7)).toThrow(ValidationError)
         });
     });
 
