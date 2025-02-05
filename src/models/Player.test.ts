@@ -85,15 +85,22 @@ describe("discard pile getter and setters", () => {
 
 describe("getElement method", () => {
     test("should return the player's element", () => {
-        // TODO: Implement test
+        const player = new Player(testPlayerId);
+        player.setSage("Cedar");
+        player.setDecklist(TwigDeck);
+        expect(player.getElement()).toBe("twig");
     });
 
     test("should throw NotFoundError if sage is not set", () => {
-        // TODO: Implement test
+        const player = new Player(testPlayerId);
+        player.setDecklist(TwigDeck);
+        expect(() => player.getElement()).toThrow(NotFoundError);
     });
 
     test("should throw NotFoundError if decklist is not set", () => {
-        // TODO: Implement test
+        const player = new Player(testPlayerId);
+        player.setSage("Cedar");
+        expect(() => player.getElement()).toThrow(NotFoundError);
     });
 });
 
