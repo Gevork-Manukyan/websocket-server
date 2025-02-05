@@ -12,7 +12,8 @@ type TeamOrder = {
   second: Team;
 }
 
-type PlayerOrder = [Player, Player] | [Player, Player, Player, Player];
+type PlayerOrNull = Player | null;
+type PlayerOrder = [PlayerOrNull, PlayerOrNull] | [PlayerOrNull, PlayerOrNull, PlayerOrNull, PlayerOrNull];
 
 export class ConGame {
   id: gameId;
@@ -25,7 +26,7 @@ export class ConGame {
   team1: Team;
   team2: Team;
   private teamOrder: TeamOrder;
-  private playerOrder!: PlayerOrder;
+  private playerOrder: PlayerOrder;
   creatureShop: ElementalCard[] = [];
   itemShop: ItemCard[] = [];
 
@@ -42,6 +43,8 @@ export class ConGame {
       first: teamOrder[0],
       second: teamOrder[1]
     }
+
+    this.playerOrder = numPlayers === 2 ? [null, null] : [null, null, null, null];
   }
 
   setStarted(value: Boolean) {
@@ -87,18 +90,19 @@ export class ConGame {
   }
 
   getPlayerOrder() {
+    console.log(this)
     return this.playerOrder;
   }
 
   setPlayerOrder(player: Player, playerOrder: PlayerOrderOptions) {
-    if (this.playerOrder === null) throw new NotFoundError("Player Order", "Player order not set")
     if (playerOrder < 1 || playerOrder > this.numPlayersTotal) throw new NotFoundError("Player Order", "Invalid player order")
-    if (this.numPlayersTotal === 4 && playerOrder > 2) throw new NotFoundError("Player Order", "Invalid player order for 4 player game")
+    if (this.numPlayersTotal === 2 && playerOrder > 2) throw new NotFoundError("Player Order", "Invalid player order for 2 player game")
 
     const playerOrderIndex = playerOrder - 1;
 
     if (this.playerOrder[playerOrderIndex] === player) throw new ValidationError("Player Order", "Player is already in that position")
     this.playerOrder[playerOrderIndex] = player;
+    console.log(this)
   }
 
   setPlayerOrderForTeam(playerOrder: [Player, Player]) {

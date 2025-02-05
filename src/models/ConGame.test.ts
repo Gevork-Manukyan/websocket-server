@@ -16,10 +16,20 @@ describe("ConGame", () => {
       test("initializes the game with the correct properties", () => {
         expect(mockGame.id).toBe("game-1");
         expect(mockGame.isStarted).toBe(false);
+        expect(mockGame.hasFinishedSetup).toBe(false);
         expect(mockGame.numPlayersTotal).toBe(4);
         expect(mockGame.numPlayersReady).toBe(0);
+        expect(mockGame.numPlayersFinishedSetup).toBe(0);
+        expect(mockGame.players).toEqual([]);
         expect(mockGame.team1).toBeInstanceOf(Team);
         expect(mockGame.team2).toBeInstanceOf(Team);
+        expect(mockGame.getTeamOrder()).toEqual({
+          first: expect.any(Team),
+          second: expect.any(Team),
+        });
+        expect(mockGame.getPlayerOrder()).toEqual([null, null, null, null]);
+        expect(mockGame.creatureShop).toEqual([]);
+        expect(mockGame.itemShop).toEqual([]);
       });
     });
   
@@ -104,8 +114,28 @@ describe("ConGame", () => {
     });
 
     describe("getPlayerOrder", () => {
-      test("should return the correct player order", () => {
-        // Implement test logic
+      test("should return the correct player order (2-players)", () => {
+        const newMockGame = new ConGame("game-2", 2);
+        const player1 = new Player("player-1")
+        const player2 = new Player("player-2")
+        newMockGame.setPlayerOrder(player1, 1);
+        newMockGame.setPlayerOrder(player2, 2);
+
+        expect(newMockGame.getPlayerOrder()).toEqual([player1, player2]);
+      });
+
+      test("should return the correct player order (4-players)", () => {
+        mockGame = new ConGame("game-2", 4);
+        const player1 = new Player("player-1")
+        const player2 = new Player("player-2")
+        const player3 = new Player("player-3")
+        const player4 = new Player("player-4")
+        mockGame.setPlayerOrder(player1, 1);
+        mockGame.setPlayerOrder(player2, 2);
+        mockGame.setPlayerOrder(player3, 3);
+        mockGame.setPlayerOrder(player4, 4);
+
+        expect(mockGame.getPlayerOrder()).toEqual([player1, player2, player3, player4])
       });
     });
 
