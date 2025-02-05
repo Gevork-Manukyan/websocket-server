@@ -107,6 +107,7 @@ gameNamespace.on("connection", (socket) => {
     const player = game.getPlayer(socket.id);
     player.finishPlayerSetup();
     game.incrementPlayersFinishedSetup();
+    socket.emit(`${PlayerFinishedSetupEvent}--success`)
   }));
 
   socket.on(CancelSetupEvent, socketErrorHandler(socket, CancelSetupEvent, async ({ gameId }: CancelSetupData) => {

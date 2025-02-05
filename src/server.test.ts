@@ -3,7 +3,7 @@ import { server } from "./server";
 import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
 import { ConGame, Player } from "./models";
-import { ChoseWarriorsEvent, ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, SelectSageData, StartGameEvent, SwapWarriorsEvent, ToggleReadyStatusData } from "./types/server-types";
+import { ChoseWarriorsEvent, ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, PlayerFinishedSetupEvent, SelectSageData, StartGameEvent, SwapWarriorsEvent, ToggleReadyStatusData } from "./types/server-types";
 import { gameEventEmitter } from "./services/GameEventEmitter";
 import { AcornSquire, QuillThornback } from "./utils";
 
@@ -365,8 +365,23 @@ describe("Server.ts", () => {
         })
     })
 
-    describe("finished-setup", () => {
-        // TODO: implement
+    describe("player-finished-setup", () => {
+        test("should successfully finish setup", (done) => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+            mockGame.getPlayer = jest.fn().mockReturnValue(mockPlayer)
+            mockPlayer.finishPlayerSetup = jest.fn()
+            mockGame.incrementPlayersFinishedSetup = jest.fn()
+
+            clientSocket.emit(PlayerFinishedSetupEvent, { gameId: testGameId })
+
+            clientSocket.once(`${PlayerFinishedSetupEvent}--success`, () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.getPlayer).toHaveBeenCalledWith(expect.any(String))
+                expect(mockPlayer.finishPlayerSetup).toHaveBeenCalled()
+                expect(mockGame.incrementPlayersFinishedSetup).toHaveBeenCalled()
+                done()
+            })
+        })  
     })
 
     describe("leave-game", () => {
