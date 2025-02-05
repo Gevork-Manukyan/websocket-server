@@ -21,7 +21,7 @@ class GameEventEmitter {
   }
 
   emitToRoom(roomId: gameId, eventName: string, data: any = null) {
-    this.io.to(roomId).emit(eventName, data);
+    this.io.in(roomId).emit(eventName, data);
   }
 
   emitPickWarriors(players: Player[]) {
