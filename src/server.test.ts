@@ -3,8 +3,9 @@ import { server } from "./server";
 import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
 import { ConGame, Player } from "./models";
-import { ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, SelectSageData, StartGameEvent, SwapWarriorsEvent, ToggleReadyStatusData } from "./types/server-types";
+import { ChoseWarriorsEvent, ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, SelectSageData, StartGameEvent, SwapWarriorsEvent, ToggleReadyStatusData } from "./types/server-types";
 import { gameEventEmitter } from "./services/GameEventEmitter";
+import { AcornSquire, QuillThornback } from "./utils";
 
 
 let clientSocket: Socket;
@@ -330,7 +331,21 @@ describe("Server.ts", () => {
     
 
     describe("chose-warriors", () => {
-        // TODO: implement
+        test("should successfully choose warriors", (done) => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+            mockGame.getPlayer = jest.fn().mockReturnValue(mockPlayer)
+            mockPlayer.chooseWarriors = jest.fn()
+
+            const choices = [AcornSquire, QuillThornback]
+            clientSocket.emit(ChoseWarriorsEvent, { gameId: testGameId, choices })
+
+            clientSocket.once(`${ChoseWarriorsEvent}--success`, () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.getPlayer).toHaveBeenCalledWith(expect.any(String))
+                expect(mockPlayer.chooseWarriors).toHaveBeenCalledWith(choices)
+                done()
+            })
+        })
     })
 
     describe(SwapWarriorsEvent, () => {
