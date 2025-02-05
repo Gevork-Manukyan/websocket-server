@@ -3,11 +3,17 @@ import { Player } from "../models";
 import { Team } from "../models/Team";
 import { gameId, Sage } from "../types";
 
-export class GameEventEmitter {
-  private io: Server;
+class GameEventEmitter {
+  private static instance: GameEventEmitter;
+  private io!: Server;
 
-  constructor(io: Server) {
-    this.io = io;
+  private constructor() {}
+
+  static getInstance() {
+    if (!GameEventEmitter.instance) 
+      GameEventEmitter.instance = new GameEventEmitter()
+
+    return GameEventEmitter.instance;
   }
 
   emitToPlayer(playerId: string, eventName: string, data: any = null) {
@@ -40,4 +46,5 @@ export class GameEventEmitter {
     this.emitToRoom(roomId, "begin-battle");
   }
 }
-  
+ 
+export const gameEventEmitter = GameEventEmitter.getInstance();
