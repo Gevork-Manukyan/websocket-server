@@ -3,7 +3,8 @@ import { server } from "./server";
 import { PORT } from "./utils/config";
 import { gameStateManager } from "./services/GameStateManager";
 import { ConGame, Player } from "./models";
-import { ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, SelectSageData, SwapWarriorsEvent, ToggleReadyStatusData } from "./types/server-types";
+import { ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, SelectSageData, StartGameEvent, SwapWarriorsEvent, ToggleReadyStatusData } from "./types/server-types";
+import { gameEventEmitter } from "./services/GameEventEmitter";
 
 
 let clientSocket: Socket;
@@ -297,12 +298,36 @@ describe("Server.ts", () => {
     })
 
     describe("start-game", () => {
-        // TODO: implement
-
-        test("should throw an error if a non-host tries to start game", () => {
-
-        })
-    })
+        beforeEach(() => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame);
+            const player1 = new Player(testPlayerId, true);
+            mockGame.getPlayer = jest.fn().mockReturnValue(player1);
+            mockGame.startGame = jest.fn();
+            mockGame.setStarted = jest.fn();
+    
+            gameEventEmitter.emitToPlayer = jest.fn();
+        });
+    
+        test("should start the game if all players are ready", (done) => {
+            clientSocket.emit(StartGameEvent, { gameId: testGameId });
+    
+            setTimeout(() => {
+                expect(mockGame.startGame).toHaveBeenCalled();
+                expect(gameEventEmitter.emitToPlayer).toHaveBeenCalledTimes(mockGame.players.length);
+                expect(mockGame.setStarted).toHaveBeenCalledWith(true);
+                done();
+            }, 50);
+        });
+    
+        test("should throw an error if a non-host tries to start game", (done) => {
+            mockGame.getPlayer = jest.fn().mockReturnValue(mockPlayer);
+            clientSocket.emit(StartGameEvent, { gameId: testGameId });
+            clientSocket.once(`${StartGameEvent}--error`, () => {
+                done()
+            })
+        });
+    });
+    
 
     describe("chose-warriors", () => {
         // TODO: implement

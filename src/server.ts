@@ -3,7 +3,7 @@ import http from "http";
 import { Server } from "socket.io";
 import { ConGame } from "./models/ConGame";
 import { Player } from "./models/Player";
-import { GameEventEmitter } from "./services";
+import { gameEventEmitter } from "./services/GameEventEmitter";
 import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
@@ -25,7 +25,6 @@ const io = new Server(server, {
     methods: ["GET", "POST"], // Allowed HTTP methods
   },
 });
-const gameEventEmitter = new GameEventEmitter(io);
 
 // Creates the gameplay namespace that will handle all gameplay connections
 const gameNamespace = io.of("/gameplay");
