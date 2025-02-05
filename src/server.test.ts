@@ -348,8 +348,21 @@ describe("Server.ts", () => {
         })
     })
 
-    describe(SwapWarriorsEvent, () => {
-        // TODO: implement
+    describe("swap-warriors", () => {
+        test("should successfully swap warriors", (done) => {
+            gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
+            mockGame.getPlayer = jest.fn().mockReturnValue(mockPlayer)
+            mockPlayer.swapWarriors = jest.fn()
+
+            clientSocket.emit(SwapWarriorsEvent, { gameId: testGameId })
+
+            clientSocket.once(`${SwapWarriorsEvent}--success`, () => {
+                expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
+                expect(mockGame.getPlayer).toHaveBeenCalledWith(expect.any(String))
+                expect(mockPlayer.swapWarriors).toHaveBeenCalled()
+                done()
+            })
+        })
     })
 
     describe("finished-setup", () => {
