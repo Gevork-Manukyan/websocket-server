@@ -1,4 +1,4 @@
-import { NotFoundError } from "../services/CustomError/BaseError";
+import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { PlayersNotReadyError, SageUnavailableError } from "../services/CustomError/GameError";
 import { LeafDeck, TwigDeck } from "../utils/constants";
 import { ConGame } from "./ConGame";
@@ -141,19 +141,31 @@ describe("ConGame", () => {
 
     describe("setPlayerOrder", () => {
       test("should correctly set the player order", () => {
-        // Implement test logic
-      });
-      
-      test("should throw NotFoundError if player order is not set", () => {
-        // Implement test logic
+        const player = new Player("player-1");
+        mockGame.addPlayer(player);
+        mockGame.setPlayerOrder(player, 1);
+        expect(mockGame.getPlayerOrder()[0]).toBe(player);
       });
       
       test("should throw NotFoundError for invalid player order", () => {
-        // Implement test logic
+        const player = new Player("player-1");
+        mockGame.addPlayer(player);
+        expect(() => mockGame.setPlayerOrder(player, 5  as unknown as 1 | 2 | 3 | 4)).toThrow(NotFoundError);
+        expect(() => mockGame.setPlayerOrder(player, 0 as unknown as 1 | 2 | 3 | 4)).toThrow(NotFoundError);
+      });
+
+      test("should throw NotFoundError for invalid player order for 2 player game", () => {
+        const newMockGame = new ConGame("game-2", 2);
+        const player = new Player("player-1");
+        newMockGame.addPlayer(player);
+        expect(() => newMockGame.setPlayerOrder(player, 3)).toThrow(NotFoundError);
       });
       
       test("should throw ValidationError if player is already in the position", () => {
-        // Implement test logic
+        const player = new Player("player-1");
+        mockGame.addPlayer(player);
+        mockGame.setPlayerOrder(player, 1);
+        expect(() => mockGame.setPlayerOrder(player, 1)).toThrow(ValidationError);
       });
     });
 

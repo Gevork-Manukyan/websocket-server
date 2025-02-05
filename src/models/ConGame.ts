@@ -90,19 +90,16 @@ export class ConGame {
   }
 
   getPlayerOrder() {
-    console.log(this)
     return this.playerOrder;
   }
 
   setPlayerOrder(player: Player, playerOrder: PlayerOrderOptions) {
     if (playerOrder < 1 || playerOrder > this.numPlayersTotal) throw new NotFoundError("Player Order", "Invalid player order")
-    if (this.numPlayersTotal === 2 && playerOrder > 2) throw new NotFoundError("Player Order", "Invalid player order for 2 player game")
 
     const playerOrderIndex = playerOrder - 1;
 
     if (this.playerOrder[playerOrderIndex] === player) throw new ValidationError("Player Order", "Player is already in that position")
     this.playerOrder[playerOrderIndex] = player;
-    console.log(this)
   }
 
   setPlayerOrderForTeam(playerOrder: [Player, Player]) {
