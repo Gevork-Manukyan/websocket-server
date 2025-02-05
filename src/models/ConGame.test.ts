@@ -1,7 +1,5 @@
-import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
+import { NotFoundError } from "../services/CustomError/BaseError";
 import { PlayersNotReadyError, SageUnavailableError } from "../services/CustomError/GameError";
-import { AcornSquire, QuillThornback, SlumberJack } from "../utils";
-import { GeoWeasel, GraniteRampart } from "../utils/cards";
 import { LeafDeck, TwigDeck } from "../utils/constants";
 import { ConGame } from "./ConGame";
 import { Player } from "./Player";
@@ -84,19 +82,24 @@ describe("ConGame", () => {
 
     describe("getTeamOrder", () => {
       test("should return the correct team order", () => {
-        // Implement test logic
+        expect(mockGame.getTeamOrder()).toEqual({
+          first: expect.any(Team),
+          second: expect.any(Team),
+        })
       });
     });
 
     describe("getTeamGoingFirst", () => {
       test("should return the team that is going first", () => {
-        // Implement test logic
+        const firstTeam = mockGame.getTeamOrder().first;
+        expect(mockGame.getTeamGoingFirst()).toEqual(firstTeam);
       });
     });
 
     describe("getTeamGoingSecond", () => {
       test("should return the team that is going second", () => {
-        // Implement test logic
+        const secondTeam = mockGame.getTeamOrder().second;
+        expect(mockGame.getTeamGoingSecond()).toEqual(secondTeam);
       });
     });
 

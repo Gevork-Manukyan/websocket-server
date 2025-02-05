@@ -2,7 +2,7 @@
 
 import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { PlayersNotReadyError, SageUnavailableError } from "../services/CustomError/GameError";
-import { Sage, ElementalCard, gameId, ItemCard, ElementalWarriorCard } from "../types";
+import { Sage, ElementalCard, gameId, ItemCard } from "../types";
 import { PlayerOrderOptions } from "../types/types";
 import { Player } from "./Player";
 import { Team } from "./Team";
