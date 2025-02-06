@@ -214,6 +214,20 @@ describe("ConGame", () => {
         expect(() => newMockGame.setPlayerOrderForTeam([player1, player2])).toThrow(ValidationError);
       });
     });
+
+    describe("getCurrentPlayerTurn", () => {
+      test("should return the current player turn (null)", () => {
+        expect(mockGame.getCurrentPlayerTurn()).toBe(null);
+      });
+
+      test("should return the current player turn", () => {
+        // TODO: make sure correct
+        const player = new Player("player-1");
+        mockGame.addPlayer(player);
+        mockGame.setPlayerOrder(player, 1);
+        expect(mockGame.getCurrentPlayerTurn()).toBe(player);
+      });
+    })
   
     describe("joinTeam", () => {
       test("adds a player to the selected team", () => {

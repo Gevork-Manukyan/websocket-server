@@ -27,6 +27,7 @@ export class ConGame {
   team2: Team;
   private teamOrder: TeamOrder;
   private playerOrder: PlayerOrder;
+  private currentPlayerTurn: Player | null = null;
   creatureShop: ElementalCard[] = [];
   itemShop: ItemCard[] = [];
 
@@ -113,6 +114,10 @@ export class ConGame {
       this.setPlayerOrder(playerOrder[0], 2)
       this.setPlayerOrder(playerOrder[1], 4)
     }
+  }
+
+  getCurrentPlayerTurn() {
+    return this.currentPlayerTurn;
   }
 
   joinTeam(playerId: Player['id'], teamNumber: Team['teamNumber']) {
