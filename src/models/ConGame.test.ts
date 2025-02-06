@@ -170,12 +170,47 @@ describe("ConGame", () => {
     });
 
     describe("setPlayerOrderForTeam", () => {
-      test("should correctly set player order for a team", () => {
-        // Implement test logic
+      test("should correctly set player order for team 1", () => {
+        const player1 = new Player("player-1");
+        const player2 = new Player("player-2");
+        mockGame.addPlayer(player1);
+        mockGame.addPlayer(player2);
+        mockGame.joinTeam(player1.id, 1);
+        mockGame.joinTeam(player2.id, 1);
+
+        mockGame.getTeamGoingFirst = jest.fn().mockReturnValue(mockGame.team1)
+        mockGame.setPlayerOrder = jest.fn()
+
+        mockGame.setPlayerOrderForTeam([player1, player2]);
+
+        expect(mockGame.getTeamGoingFirst).toHaveBeenCalled()
+        expect(mockGame.setPlayerOrder).toHaveBeenCalledWith(player1, 1)
+        expect(mockGame.setPlayerOrder).toHaveBeenCalledWith(player2, 3)
+      });
+
+      test("should correctly set player order for team 2", () => {
+        const player1 = new Player("player-1");
+        const player2 = new Player("player-2");
+        mockGame.addPlayer(player1);
+        mockGame.addPlayer(player2);
+        mockGame.joinTeam(player1.id, 2);
+        mockGame.joinTeam(player2.id, 2);
+
+        mockGame.getTeamGoingSecond = jest.fn().mockReturnValue(mockGame.team2)
+        mockGame.setPlayerOrder = jest.fn()
+
+        mockGame.setPlayerOrderForTeam([player1, player2]);
+
+        expect(mockGame.getTeamGoingSecond).toHaveBeenCalled()
+        expect(mockGame.setPlayerOrder).toHaveBeenCalledWith(player1, 2)
+        expect(mockGame.setPlayerOrder).toHaveBeenCalledWith(player2, 4)
       });
       
       test("should throw ValidationError if game is 2 players", () => {
-        // Implement test logic
+        const newMockGame = new ConGame("game-2", 2);
+        const player1 = new Player("player-1");
+        const player2 = new Player("player-2");
+        expect(() => newMockGame.setPlayerOrderForTeam([player1, player2])).toThrow(ValidationError);
       });
     });
   
