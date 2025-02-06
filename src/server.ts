@@ -123,11 +123,13 @@ gameNamespace.on("connection", (socket) => {
     const game = gameStateManager.getGame(gameId);
     if (game.numPlayersFinishedSetup !== game.players.length) throw new ValidationError("All players have not finished setup", "players");
 
-    gameEventEmitter.emitTeamOrder(gameId, game.getTeamGoingFirst().getTeamNumber());
+    const firstTeam = game.getTeamGoingFirst()
+    const secondTeam = game.getTeamGoingSecond()
+
+    gameEventEmitter.emitTeamOrder(gameId, firstTeam.getTeamNumber());
 
     if (game.numPlayersTotal === 2) {
-      game.setPlayerOrder(game.getTeamGoingFirst().players[0], 1);
-      game.setPlayerOrder(game.getTeamGoingSecond().players[0], 2);
+      game.setPlayerOrderForAllPlayers([firstTeam.players[0], secondTeam.players[0]])
       gameEventEmitter.emitBeginBattle(gameId);
     }
     else gameEventEmitter.emitChoosePlayerOrder(gameId);

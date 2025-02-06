@@ -94,10 +94,10 @@ export class ConGame {
     return this.playerOrder;
   }
 
-  setPlayerOrder(player: Player, playerOrder: PlayerOrderOptions) {
-    if (playerOrder < 1 || playerOrder > this.numPlayersTotal) throw new NotFoundError("Player Order", "Invalid player order")
+  setPlayerOrder(player: Player, playerOrderNumber: PlayerOrderOptions) {
+    if (playerOrderNumber < 1 || playerOrderNumber > this.numPlayersTotal) throw new NotFoundError("Player Order", "Invalid player order")
 
-    const playerOrderIndex = playerOrder - 1;
+    const playerOrderIndex = playerOrderNumber - 1;
 
     if (this.playerOrder[playerOrderIndex] === player) throw new ValidationError("Player Order", "Player is already in that position")
     this.playerOrder[playerOrderIndex] = player;
@@ -109,11 +109,20 @@ export class ConGame {
     
     if (teamNumber === this.getTeamGoingFirst().getTeamNumber()) {
       this.setPlayerOrder(playerOrder[0], 1)
+      this.currentPlayerTurn = playerOrder[0];
       this.setPlayerOrder(playerOrder[1], 3)
     } else if (teamNumber === this.getTeamGoingSecond().getTeamNumber()) {
       this.setPlayerOrder(playerOrder[0], 2)
       this.setPlayerOrder(playerOrder[1], 4)
     }
+  }
+
+  setPlayerOrderForAllPlayers(playersOrder: PlayerOrder) {
+    playersOrder.forEach((player, index) => {
+      if (player === null) return;
+      this.setPlayerOrder(player, (index + 1) as PlayerOrderOptions)
+      if (index === 0) this.currentPlayerTurn = player;
+    })
   }
 
   getCurrentPlayerTurn() {

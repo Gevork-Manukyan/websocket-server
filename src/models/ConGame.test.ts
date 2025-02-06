@@ -215,6 +215,12 @@ describe("ConGame", () => {
       });
     });
 
+    describe("setPlayerOrderForAllPlayers", () => {
+      test("should correctly set the player order for all players", () => {
+        // TODO: implement
+      })
+    })
+
     describe("getCurrentPlayerTurn", () => {
       test("should return the current player turn (null)", () => {
         expect(mockGame.getCurrentPlayerTurn()).toBe(null);
