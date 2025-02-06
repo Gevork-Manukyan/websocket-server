@@ -196,6 +196,7 @@ describe("ConGame", () => {
         mockGame.joinTeam(player1.id, 2);
         mockGame.joinTeam(player2.id, 2);
 
+        mockGame.getTeamGoingFirst = jest.fn().mockReturnValue(mockGame.team1)
         mockGame.getTeamGoingSecond = jest.fn().mockReturnValue(mockGame.team2)
         mockGame.setPlayerOrder = jest.fn()
 
