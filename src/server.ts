@@ -30,6 +30,7 @@ const io = new Server(server, {
 const gameNamespace = io.of("/gameplay");
 gameNamespace.on("connection", (socket) => {
 
+  /* -------- MIDDLEWARE -------- */
   socket.use(([event, rawData], next) => {
     processEvent(socket, event as keyof SocketEventMap, rawData, next)
   });
@@ -38,6 +39,8 @@ gameNamespace.on("connection", (socket) => {
     console.error("Socket error:", error);
   });
 
+
+  /* -------- GAME SETUP -------- */
   // TODO: create a system to enforce an order of calling events. Shouldn't be able to call events out of order
 
   socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ gameId, numPlayers }: CreateGameData) => {
@@ -148,6 +151,43 @@ gameNamespace.on("connection", (socket) => {
     socket.leave(gameId);
     socket.emit(`${LeaveGameEvent}--success`);
   }));
+
+
+  /* -------- GAME BATTLING -------- */
+  /*
+    PHASE 1
+      Sun Abilities
+
+    PHASE 2
+      Draw Card from deck
+      Swap Cards
+      Summon Card
+      Play Attack/Spell
+      Level Up
+      Sage Ability
+    
+    PHASE 3
+      Buy Card
+        Item Shop
+        Creature Shop
+      Sell Card
+      Summon Bought Card
+      Refresh Shop
+
+    PHASE 4
+      Discard any number of cards
+      Draw Cards until 5
+
+    MISC
+      Instant Cards
+      Creature Affects
+      Reshuffle Discard Pile
+      Gain/Lose Gold
+      Gain/Lose Shield
+      Gain/Lose Boost
+      Take Damage
+  */
+
 });
 
 // Start the server if not in test mode
