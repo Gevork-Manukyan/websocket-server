@@ -130,7 +130,7 @@ gameNamespace.on("connection", (socket) => {
 
     if (game.numPlayersTotal === 2) {
       game.setPlayerOrderForAllPlayers([firstTeam.players[0], secondTeam.players[0]])
-      gameEventEmitter.emitBeginBattle(gameId);
+      gameEventEmitter.emitBeginBattle(gameId, game.getCurrentPlayerTurn()!);
     }
     else gameEventEmitter.emitChoosePlayerOrder(gameId);
 
@@ -145,7 +145,7 @@ gameNamespace.on("connection", (socket) => {
     const player2 = player1.getTeam()?.players.find(player => player.id !== player1.id)!;
     const order: [Player, Player] = playerOrder === 1 ? [player1, player2] : [player2, player1];
     game.setPlayerOrderForTeam(order);    
-    gameEventEmitter.emitBeginBattle(gameId);
+    gameEventEmitter.emitBeginBattle(gameId, game.getCurrentPlayerTurn()!);
   }))
 
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {
