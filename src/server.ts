@@ -158,7 +158,7 @@ gameNamespace.on("connection", (socket) => {
   /* -------- GAME BATTLING -------- */
   /*
     PHASE 1
-      Sun Abilities
+      Daybreak Effects
 
     PHASE 2
       Draw Card from deck
@@ -182,12 +182,18 @@ gameNamespace.on("connection", (socket) => {
 
     MISC
       Instant Cards
-      Creature Affects
+      Triggered Effects
       Reshuffle Discard Pile
       Gain/Lose Gold
       Gain/Lose Shield
       Gain/Lose Boost
       Take Damage
+  */
+
+  /* 4 Player Rules
+    1. Teams play one turn together with 6 action points
+    2. Player can see team mates hand
+    3. Share gold (max 20)
   */
 
 });
