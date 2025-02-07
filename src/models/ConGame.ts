@@ -22,6 +22,7 @@ export class ConGame {
   team1: Team;
   team2: Team;
   private teamOrder: TeamOrder;
+  private currentTurnTeam: keyof TeamOrder = "first";
   creatureShop: ElementalCard[] = [];
   itemShop: ItemCard[] = [];
 
@@ -80,6 +81,14 @@ export class ConGame {
 
   getTeamGoingSecond() {
     return this.teamOrder.second;
+  }
+
+  getCurrentTurnTeam() {
+    return this.teamOrder[this.currentTurnTeam];
+  }
+
+  toggleCurrentTurnTeam() {
+    this.currentTurnTeam = this.currentTurnTeam === "first" ? "second" : "first";
   }
 
   joinTeam(playerId: Player['id'], teamNumber: Team['teamNumber']) {

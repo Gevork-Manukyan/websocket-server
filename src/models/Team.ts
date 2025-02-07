@@ -1,6 +1,6 @@
 import { ConflictError, NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { ElementalWarriorStarterCard } from "../types/card-types";
-import { Decklist, Element } from "../types/types";
+import { Decklist } from "../types/types";
 import { Battlefield } from "./Battlefield";
 import { Player } from "./Player";
 
@@ -9,12 +9,15 @@ export class Team {
     battlefield: Battlefield;
     private teamNumber: 1 | 2;
     private teamSize: 1 | 2;
+    private gold: number = 0;
+    private maxGold: 12 | 20;
   
     constructor(teamSize: Team['teamSize'], teamNumber: Team['teamNumber']) {
         this.players = [];
         this.battlefield = new Battlefield(teamSize);
         this.teamNumber = teamNumber;
         this.teamSize = teamSize;
+        this.maxGold = teamSize === 1 ? 12 : 20;
     }
 
     resetTeam() {
@@ -28,6 +31,27 @@ export class Team {
 
     getTeamSize() {
         return this.teamSize;
+    }
+
+    getGold() {
+        return this.gold;
+    }
+    
+    setGold(amount: number) {
+        if (amount > this.maxGold) throw new ValidationError(`Team cannot have more than ${this.maxGold} gold`, "gold");
+        this.gold = amount;
+    }
+
+    addGold(amount: number) {
+        let newGoldAmount = this.gold + amount;
+        if (newGoldAmount > this.maxGold) newGoldAmount = this.maxGold;
+        this.setGold(newGoldAmount)
+    }
+
+    removeGold(amount: number) {
+        let newGoldAmount = this.gold - amount;
+        if (newGoldAmount < 0) newGoldAmount = 0;
+        this.setGold(newGoldAmount)
     }
 
     addPlayerToTeam(player: Player) {

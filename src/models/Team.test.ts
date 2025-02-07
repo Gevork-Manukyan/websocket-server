@@ -33,6 +33,38 @@ describe("Team", () => {
         done()
     })
 
+    describe("gold manipulation methods", () => {
+        test("should correctly set the team's gold amount", () => {
+            mockTeam.setGold(100);
+            expect(mockTeam.getGold()).toBe(100);
+        });
+
+        test("should throw an error if the amount of gold exceeds the maximum", () => {
+            expect(() => mockTeam.setGold(1000)).toThrow(ValidationError);
+        });
+
+        test("should correctly add gold to the team", () => {
+            mockTeam.addGold(5);
+            expect(mockTeam.getGold()).toBe(5);
+        });
+
+        test("should not exceed the maximum gold amount when adding gold", () => {
+            mockTeam.addGold(100);
+            expect(mockTeam.getGold()).toBe(12);
+        });
+
+        test("should correctly remove gold from the team", () => {
+            mockTeam.setGold(10);
+            mockTeam.removeGold(5);
+            expect(mockTeam.getGold()).toBe(5);
+        });
+
+        test("should not go below zero gold when removing gold", () => {
+            mockTeam.removeGold(100);
+            expect(mockTeam.getGold()).toBe(0);
+        });
+    });
+
     describe("resetTeam method", () => {
         test("should remove all players and create new battlefield", () => {
             const initialBattlefield = mockTeam.battlefield;

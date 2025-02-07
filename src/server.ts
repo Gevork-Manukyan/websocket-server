@@ -171,7 +171,6 @@ gameNamespace.on("connection", (socket) => {
   /* 4 Player Rules
     1. Teams play one turn together with 6 action points
     2. Player can see team mates hand
-    3. Share gold (max 20)
   */
 
 });

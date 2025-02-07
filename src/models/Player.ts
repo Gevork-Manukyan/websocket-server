@@ -14,7 +14,6 @@ export class Player {
   private team: Team | null = null;
   private sage: Sage | null = null;
   private decklist: Decklist | null = null;
-  private gold: number = 0;
   private level: number = 1;
   private hand: Card[] = [];
   private deck: Card[] = [];
@@ -47,14 +46,6 @@ export class Player {
 
   setDecklist(decklist: Decklist) {
     this.decklist = decklist;
-  }
-
-  getGold() {
-    return this.gold;
-  }
-
-  setGold(amount: number) {
-    this.gold = amount;
   }
 
   getLevel() {

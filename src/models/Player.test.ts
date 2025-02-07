@@ -18,7 +18,6 @@ describe("constructor", () => {
         expect(player.getTeam()).toBe(null)
         expect(player.getSage()).toBe(null)
         expect(player.getDecklist()).toBe(null)
-        expect(player.getGold()).toBe(0)
         expect(player.getLevel()).toBe(1)
         expect(player.getHand()).toEqual([])
         expect(player.getDeck()).toEqual([])
@@ -42,14 +41,6 @@ describe("team getter and setters", () => {
         expect(player.getTeam()).toBe(team);
     })
 })
-
-describe("gold getter and setters", () => {
-    test("should correctly set the player's gold amount", () => {
-        const player = new Player(testPlayerId);
-        player.setGold(100);
-        expect(player.getGold()).toBe(100);
-    });
-});
 
 describe("level getter and setters", () => {
     test("should correctly set the player's level", () => {
