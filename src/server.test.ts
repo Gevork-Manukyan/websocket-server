@@ -176,7 +176,7 @@ describe("Server.ts", () => {
         })
 
         test("should toggle the player status to ready", (done) => {
-            mockPlayer.isReady = true
+            mockPlayer.setIsReady(true)
             mockPlayer.setSage("Cedar")
             mockGame.incrementPlayersReady = jest.fn()
 
@@ -192,7 +192,7 @@ describe("Server.ts", () => {
         })
 
         test("should toggle the player status to not ready", (done) => {
-            mockPlayer.isReady = false
+            mockPlayer.setIsReady(false)
             mockPlayer.setSage("Cedar")
             mockGame.decrementPlayersReady = jest.fn()
 

@@ -206,15 +206,14 @@ describe("ConGame", () => {
         expect(mockGame.numPlayersReady).toBe(0)
         expect(mockGame.numPlayersFinishedSetup).toBe(0)
         mockGame.players.forEach(player => {
-          expect(player.isReady).toBe(false)
+          expect(player.getIsReady()).toBe(false)
         })
       })
     })
   
     describe("startGame", () => {
       test("starts the game if all players are ready and host initiates", () => {
-        const hostPlayer = new Player("player-1");
-        hostPlayer.isGameHost = true;
+        const hostPlayer = new Player("player-1", true);
         mockGame.addPlayer(hostPlayer);
         mockGame.numPlayersReady = 4;
   
@@ -229,8 +228,7 @@ describe("ConGame", () => {
       });
   
       test("throws PlayersNotReadyError if not all players are ready", () => {
-        const hostPlayer = new Player("player-1");
-        hostPlayer.isGameHost = true;
+        const hostPlayer = new Player("player-1", true);
         mockGame.addPlayer(hostPlayer);
         mockGame.numPlayersReady = 3;
   

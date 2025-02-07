@@ -10,11 +10,10 @@ const testPlayerId = "testId123"
 describe("constructor", () => {
     test("should call constructor and create default player", (done) => {
         const player = new Player(testPlayerId)
-        const { id, isReady, isGameHost } = player
     
-        expect(id).toBe(testPlayerId)
-        expect(isReady).toBe(false)
-        expect(isGameHost).toBe(false)
+        expect(player.id).toBe(testPlayerId)
+        expect(player.getIsReady()).toBe(false)
+        expect(player.getIsGameHost()).toBe(false)
         expect(player.getTeam()).toBe(null)
         expect(player.getSage()).toBe(null)
         expect(player.getDecklist()).toBe(null)
@@ -28,7 +27,7 @@ describe("constructor", () => {
     test("should call constructor and create host player", (done) => {
         const player = new Player(testPlayerId, true)
     
-        expect(player.isGameHost).toBe(true)
+        expect(player.getIsGameHost()).toBe(true)
         done()
     })
 })
@@ -100,7 +99,7 @@ describe("toggleReady method", () => {
         const player = new Player(testPlayerId)
         player.setSage("Cedar")
         player.toggleReady()
-        expect(player.isReady).toBe(true)
+        expect(player.getIsReady()).toBe(true)
         done()
     })
 
@@ -108,9 +107,9 @@ describe("toggleReady method", () => {
         const player = new Player(testPlayerId)
         player.setSage("Cedar")
         player.toggleReady()
-        expect(player.isReady).toBe(true)
+        expect(player.getIsReady()).toBe(true)
         player.toggleReady()
-        expect(player.isReady).toBe(false)
+        expect(player.getIsReady()).toBe(false)
         done()
     })
 })
@@ -169,7 +168,7 @@ describe("chooseWarriors", () => {
         player.chooseWarriors([AcornSquire, SlumberJack]);
     
         expect(player.getTeam()?.initWarriors).toHaveBeenCalledWith([AcornSquire, SlumberJack]);
-        expect(player.hasChosenWarriors).toBe(true);
+        expect(player.getHasChosenWarriors()).toBe(true);
     });
 
     test("throws ValidationError if the chosen warriors do not match the player's sage element", () => {
@@ -227,21 +226,21 @@ describe("swapWarriors", () => {
 describe("finishedPlayerSetup", () => {
     test("should set the player as finished setup", () => {
         const player = new Player("player-1");
-        player.isReady = true;
-        player.hasChosenWarriors = true;
+        player.setIsReady(true);
+        player.setHasChosenWarriors(true);
         player.finishPlayerSetup();
-        expect(player.isSetup).toBe(true);
+        expect(player.getIsSetup()).toBe(true);
     })
 
     test("should throw error if player is not ready", () => {
         const player = new Player("player-1");
-        player.hasChosenWarriors = true;
+        player.setHasChosenWarriors(true);
         expect(() => player.finishPlayerSetup()).toThrow(NotFoundError);
     })
 
     test("should throw error if player has not chosen warriors", () => {
         const player = new Player("player-1");
-        player.isReady = true;
+        player.setIsReady(true);
         expect(() => player.finishPlayerSetup()).toThrow(NotFoundError);
     })
 })
@@ -249,8 +248,8 @@ describe("finishedPlayerSetup", () => {
 describe("cancelPlayerSetup", () => {
     test("should set the player as not setup", () => {
         const player = new Player("player-1");
-        player.isSetup = true;
+        player.setIsSetup(true);
         player.cancelPlayerSetup();
-        expect(player.isSetup).toBe(false);
+        expect(player.getIsSetup()).toBe(false);
     })
 })

@@ -132,7 +132,7 @@ export class ConGame {
     this.team2.resetTeam()
     this.numPlayersReady = 0;
     this.numPlayersFinishedSetup = 0
-    this.players.forEach(player => player.isReady = false)
+    this.players.forEach(player => player.setIsReady(false))
   }
 
   startGame() {

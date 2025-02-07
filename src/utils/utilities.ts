@@ -73,7 +73,7 @@ export function processEvent<T extends keyof SocketEventMap>(socket: Socket, eve
       if (eventName === event) {
         const player = gameStateManager.getGame(data.gameId as gameId).getPlayer(socket.id);
 
-        if (!player || !player.isGameHost) {
+        if (!player || !player.getIsGameHost()) {
           throw new HostOnlyActionError();
         }
         break;

@@ -78,7 +78,7 @@ gameNamespace.on("connection", (socket) => {
     if (!currPlayer.getSage()) throw new ValidationError("Cannot toggle ready. The sage has not been set.", "sage");
     currPlayer.toggleReady();
 
-    if (currPlayer.isReady) {
+    if (currPlayer.getIsReady()) {
       game.incrementPlayersReady();
       socket.emit("ready-status--ready");
     } else {

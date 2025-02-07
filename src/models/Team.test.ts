@@ -35,8 +35,8 @@ describe("Team", () => {
 
     describe("gold manipulation methods", () => {
         test("should correctly set the team's gold amount", () => {
-            mockTeam.setGold(100);
-            expect(mockTeam.getGold()).toBe(100);
+            mockTeam.setGold(10);
+            expect(mockTeam.getGold()).toBe(10);
         });
 
         test("should throw an error if the amount of gold exceeds the maximum", () => {

@@ -7,10 +7,10 @@ import { Team } from "./Team";
 
 export class Player {
   id: string;
-  isReady: boolean = false;
-  isSetup: boolean = false;
-  hasChosenWarriors: boolean = false;
-  isGameHost: boolean;
+  private isReady: boolean = false;
+  private isSetup: boolean = false;
+  private hasChosenWarriors: boolean = false;
+  private isGameHost: boolean;
   private team: Team | null = null;
   private sage: Sage | null = null;
   private decklist: Decklist | null = null;
@@ -22,6 +22,38 @@ export class Player {
   constructor(socketId: string, isGameHost = false) {
     this.id = socketId;
     this.isGameHost = isGameHost;
+  }
+
+  getIsReady() {
+    return this.isReady;
+  }
+
+  setIsReady(value: boolean) {
+    this.isReady = value;
+  }
+
+  toggleReady() {
+    this.isReady = !this.isReady;
+  }
+
+  getIsSetup() {
+    return this.isSetup;
+  }
+
+  setIsSetup(value: boolean) {
+    this.isSetup = value;
+  }
+
+  getHasChosenWarriors() {
+    return this.hasChosenWarriors;
+  }
+
+  setHasChosenWarriors(value: boolean) {
+    this.hasChosenWarriors = value;
+  }
+
+  getIsGameHost() {
+    return this.isGameHost;
   }
 
   getTeam() {
@@ -85,10 +117,6 @@ export class Player {
     if (!this.decklist) throw new NotFoundError("Decklist", "Player does not have an element")
     
     return this.decklist.sage.element;
-  }
-
-  toggleReady() {
-    this.isReady = !this.isReady;
   }
 
   addCardToDeck(card: Card) {
