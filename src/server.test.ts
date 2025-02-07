@@ -417,7 +417,6 @@ describe("Server.ts", () => {
         test("should confirm all players setup, if all players are ready (2-players)", (done) => {
             const mockTeam = new Team(1, 1)
             mockTeam.addPlayerToTeam(mockPlayer)
-            mockGame.setPlayerOrder = jest.fn()
             mockGame.getTeamGoingFirst = jest.fn().mockReturnValue(mockTeam)
             mockGame.getTeamGoingSecond = jest.fn().mockReturnValue(mockTeam)
 
@@ -425,8 +424,6 @@ describe("Server.ts", () => {
     
             setTimeout(() => {
                 expect(gameEventEmitter.emitToRoom).toHaveBeenCalled();
-                expect(mockGame.setPlayerOrder).toHaveBeenCalledWith(mockPlayer, 1);
-                expect(mockGame.setPlayerOrder).toHaveBeenCalledWith(mockPlayer, 2);
                 expect(gameEventEmitter.emitToRoom).toHaveBeenCalled();
                 expect(mockGame.hasFinishedSetup).toBe(true);
                 done();

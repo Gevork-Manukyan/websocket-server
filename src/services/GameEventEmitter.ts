@@ -38,10 +38,6 @@ class GameEventEmitter {
     this.emitToRoom(roomId, "team-order", firstTeam);
   }
 
-  emitChoosePlayerOrder(roomId: gameId) {
-    this.emitToRoom(roomId, "choose-player-order");
-  }
-
   emitBeginBattle(roomId: gameId, firstTurnPlayer: Player) {
     const { id, ...cleanPlayer } = firstTurnPlayer
     this.emitToRoom(roomId, "begin-battle", cleanPlayer);

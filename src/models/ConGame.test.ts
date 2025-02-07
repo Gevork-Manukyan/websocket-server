@@ -27,7 +27,6 @@ describe("ConGame", () => {
           first: expect.any(Team),
           second: expect.any(Team),
         });
-        expect(mockGame.getPlayerOrder()).toEqual([null, null, null, null]);
         expect(mockGame.creatureShop).toEqual([]);
         expect(mockGame.itemShop).toEqual([]);
       });
@@ -112,128 +111,6 @@ describe("ConGame", () => {
         expect(mockGame.getTeamGoingSecond()).toEqual(secondTeam);
       });
     });
-
-    describe("getPlayerOrder", () => {
-      test("should return the correct player order (2-players)", () => {
-        const newMockGame = new ConGame("game-2", 2);
-        const player1 = new Player("player-1")
-        const player2 = new Player("player-2")
-        newMockGame.setPlayerOrder(player1, 1);
-        newMockGame.setPlayerOrder(player2, 2);
-
-        expect(newMockGame.getPlayerOrder()).toEqual([player1, player2]);
-      });
-
-      test("should return the correct player order (4-players)", () => {
-        mockGame = new ConGame("game-2", 4);
-        const player1 = new Player("player-1")
-        const player2 = new Player("player-2")
-        const player3 = new Player("player-3")
-        const player4 = new Player("player-4")
-        mockGame.setPlayerOrder(player1, 1);
-        mockGame.setPlayerOrder(player2, 2);
-        mockGame.setPlayerOrder(player3, 3);
-        mockGame.setPlayerOrder(player4, 4);
-
-        expect(mockGame.getPlayerOrder()).toEqual([player1, player2, player3, player4])
-      });
-    });
-
-    describe("setPlayerOrder", () => {
-      test("should correctly set the player order", () => {
-        const player = new Player("player-1");
-        mockGame.addPlayer(player);
-        mockGame.setPlayerOrder(player, 1);
-        expect(mockGame.getPlayerOrder()[0]).toBe(player);
-      });
-      
-      test("should throw NotFoundError for invalid player order", () => {
-        const player = new Player("player-1");
-        mockGame.addPlayer(player);
-        expect(() => mockGame.setPlayerOrder(player, 5  as unknown as 1 | 2 | 3 | 4)).toThrow(NotFoundError);
-        expect(() => mockGame.setPlayerOrder(player, 0 as unknown as 1 | 2 | 3 | 4)).toThrow(NotFoundError);
-      });
-
-      test("should throw NotFoundError for invalid player order for 2 player game", () => {
-        const newMockGame = new ConGame("game-2", 2);
-        const player = new Player("player-1");
-        newMockGame.addPlayer(player);
-        expect(() => newMockGame.setPlayerOrder(player, 3)).toThrow(NotFoundError);
-      });
-      
-      test("should throw ValidationError if player is already in the position", () => {
-        const player = new Player("player-1");
-        mockGame.addPlayer(player);
-        mockGame.setPlayerOrder(player, 1);
-        expect(() => mockGame.setPlayerOrder(player, 1)).toThrow(ValidationError);
-      });
-    });
-
-    describe("setPlayerOrderForTeam", () => {
-      test("should correctly set player order for team 1", () => {
-        const player1 = new Player("player-1");
-        const player2 = new Player("player-2");
-        mockGame.addPlayer(player1);
-        mockGame.addPlayer(player2);
-        mockGame.joinTeam(player1.id, 1);
-        mockGame.joinTeam(player2.id, 1);
-
-        mockGame.getTeamGoingFirst = jest.fn().mockReturnValue(mockGame.team1)
-        mockGame.setPlayerOrder = jest.fn()
-
-        mockGame.setPlayerOrderForTeam([player1, player2]);
-
-        expect(mockGame.getTeamGoingFirst).toHaveBeenCalled()
-        expect(mockGame.setPlayerOrder).toHaveBeenCalledWith(player1, 1)
-        expect(mockGame.setPlayerOrder).toHaveBeenCalledWith(player2, 3)
-      });
-
-      test("should correctly set player order for team 2", () => {
-        const player1 = new Player("player-1");
-        const player2 = new Player("player-2");
-        mockGame.addPlayer(player1);
-        mockGame.addPlayer(player2);
-        mockGame.joinTeam(player1.id, 2);
-        mockGame.joinTeam(player2.id, 2);
-
-        mockGame.getTeamGoingFirst = jest.fn().mockReturnValue(mockGame.team1)
-        mockGame.getTeamGoingSecond = jest.fn().mockReturnValue(mockGame.team2)
-        mockGame.setPlayerOrder = jest.fn()
-
-        mockGame.setPlayerOrderForTeam([player1, player2]);
-
-        expect(mockGame.getTeamGoingSecond).toHaveBeenCalled()
-        expect(mockGame.setPlayerOrder).toHaveBeenCalledWith(player1, 2)
-        expect(mockGame.setPlayerOrder).toHaveBeenCalledWith(player2, 4)
-      });
-      
-      test("should throw ValidationError if game is 2 players", () => {
-        const newMockGame = new ConGame("game-2", 2);
-        const player1 = new Player("player-1");
-        const player2 = new Player("player-2");
-        expect(() => newMockGame.setPlayerOrderForTeam([player1, player2])).toThrow(ValidationError);
-      });
-    });
-
-    describe("setPlayerOrderForAllPlayers", () => {
-      test("should correctly set the player order for all players", () => {
-        // TODO: implement
-      })
-    })
-
-    describe("getCurrentPlayerTurn", () => {
-      test("should return the current player turn (null)", () => {
-        expect(mockGame.getCurrentPlayerTurn()).toBe(null);
-      });
-
-      test("should return the current player turn", () => {
-        // TODO: make sure correct
-        const player = new Player("player-1");
-        mockGame.addPlayer(player);
-        mockGame.setPlayerOrder(player, 1);
-        expect(mockGame.getCurrentPlayerTurn()).toBe(player);
-      });
-    })
   
     describe("joinTeam", () => {
       test("adds a player to the selected team", () => {

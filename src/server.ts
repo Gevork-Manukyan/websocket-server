@@ -122,31 +122,9 @@ gameNamespace.on("connection", (socket) => {
   socket.on(AllPlayersSetupEvent, socketErrorHandler(socket, AllPlayersSetupEvent, async ({ gameId }: AllPlayersSetupData) => {
     const game = gameStateManager.getGame(gameId);
     if (game.numPlayersFinishedSetup !== game.players.length) throw new ValidationError("All players have not finished setup", "players");
-
-    const firstTeam = game.getTeamGoingFirst()
-    const secondTeam = game.getTeamGoingSecond()
-
-    gameEventEmitter.emitTeamOrder(gameId, firstTeam.getTeamNumber());
-
-    if (game.numPlayersTotal === 2) {
-      game.setPlayerOrderForAllPlayers([firstTeam.players[0], secondTeam.players[0]])
-      gameEventEmitter.emitBeginBattle(gameId, game.getCurrentPlayerTurn()!);
-    }
-    else gameEventEmitter.emitChoosePlayerOrder(gameId);
-
+    gameEventEmitter.emitTeamOrder(gameId, game.getTeamGoingFirst().getTeamNumber());
     game.hasFinishedSetup = true;
   }));
-
-  socket.on(PlayerOrderChosenEvent, socketErrorHandler(socket, PlayerOrderChosenEvent, async ({ gameId, playerOrder }: PlayerOrderChosenData) => {
-    const game = gameStateManager.getGame(gameId);
-    if (game.numPlayersTotal === 2) throw new ValidationError("Cannot choose player order for a 2 player game", "players");
-
-    const player1 = game.getPlayer(socket.id);
-    const player2 = player1.getTeam()?.players.find(player => player.id !== player1.id)!;
-    const order: [Player, Player] = playerOrder === 1 ? [player1, player2] : [player2, player1];
-    game.setPlayerOrderForTeam(order);    
-    gameEventEmitter.emitBeginBattle(gameId, game.getCurrentPlayerTurn()!);
-  }))
 
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {
     gameStateManager.getGame(gameId).removePlayer(socket.id);
