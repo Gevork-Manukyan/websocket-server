@@ -11,6 +11,8 @@ export class Team {
     private teamSize: 1 | 2;
     private gold: number = 0;
     private maxGold: 12 | 20;
+    private actionPoints: number;
+    private maxActionPoints: 3 | 6;
   
     constructor(teamSize: Team['teamSize'], teamNumber: Team['teamNumber']) {
         this.players = [];
@@ -18,6 +20,8 @@ export class Team {
         this.teamNumber = teamNumber;
         this.teamSize = teamSize;
         this.maxGold = teamSize === 1 ? 12 : 20;
+        this.maxActionPoints = teamSize === 1 ? 3 : 6;
+        this.actionPoints = this.maxActionPoints;
     }
 
     resetTeam() {
