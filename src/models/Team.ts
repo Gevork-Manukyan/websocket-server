@@ -58,6 +58,19 @@ export class Team {
         this.setGold(newGoldAmount)
     }
 
+    getActionPoints() {
+        return this.actionPoints;
+    }
+
+    resetActionPoints() {
+        this.actionPoints = this.maxActionPoints;
+    }
+
+    decrementActionPoints() {
+        if (this.actionPoints === 0) throw new ValidationError("Team has no action points left", "actionPoints");
+        this.actionPoints -= 1;
+    }
+
     addPlayerToTeam(player: Player) {
         if (this.players.length === (this.teamSize)) throw new ConflictError(`Team ${this.teamNumber} is full`);
         this.players.push(player)
