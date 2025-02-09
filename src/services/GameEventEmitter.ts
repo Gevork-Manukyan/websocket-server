@@ -34,8 +34,9 @@ class GameEventEmitter {
     socket.to(roomId).emit("sage-selected", sage);
   }
 
-  emitTeamOrder(roomId: gameId, firstTeam: Team['teamNumber']) {
-    this.emitToRoom(roomId, "team-order", firstTeam);
+  emitTeamOrder(roomId: gameId, firstTeam: Team) {
+    // TODO: Emit to all players on team going first. Emit to other team they are waiting.
+    // this.emitToRoom(roomId, "team-order", firstTeam);
   }
 
   emitBeginBattle(roomId: gameId, firstTurnPlayer: Player) {

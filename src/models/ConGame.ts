@@ -3,6 +3,7 @@
 import { NotFoundError } from "../services/CustomError/BaseError";
 import { PlayersNotReadyError, SageUnavailableError } from "../services/CustomError/GameError";
 import { Sage, ElementalCard, gameId, ItemCard } from "../types";
+import { BambooBerserker, Bruce, CackleRipclaw, CamouChameleon, CurrentConjurer, Dewy, DistantDoubleStrike, ElementalIncantation, ElementalSwap, ExchangeOfNature, FarsightFrenzy, Flint, FocusedFury, ForageThumper, Herbert, HummingHerald, IguanaGuard, LumberClaw, MagicEtherStrike, MeleeShield, MossViper, Mush, NaturalDefense, NaturesWrath, OakLumbertron, Obliterate, PineSnapper, PrimitiveStrike, ProjectileBlast, RangedBarrier, Redstone, ReinforcedImpact, RoamingRazor, Rocco, RubyGuardian, RunePuma, ShrubBeetle, SplashBasilisk, SplinterStinger, StoneDefender, SurgesphereMonk, TerrainTumbler, TwineFeline, TyphoonFist, Wade, WhirlWhipper, Willow } from "../utils/cards";
 import { Player } from "./Player";
 import { Team } from "./Team";
 
@@ -135,12 +136,14 @@ export class ConGame {
     this.players.forEach(player => player.setIsReady(false))
   }
 
-  startGame() {
+  initGame() {
     // All players must be ready
     if (this.numPlayersReady !== this.numPlayersTotal) throw new PlayersNotReadyError(this.numPlayersReady, this.numPlayersTotal)
 
     this.initPlayerDecks();
     this.initPlayerFields();
+    this.initCreatureShop();
+    this.initItemShop();
     
     this.setStarted(true)
   }
@@ -155,5 +158,99 @@ export class ConGame {
 
     this.team1.initBattlefield(team1Decklists)
     this.team2.initBattlefield(team2Decklists)
+  }
+
+  initCreatureShop() {
+    this.creatureShop = [
+      Willow,
+      Willow,
+      Bruce,
+      Bruce,
+      OakLumbertron,
+      TwineFeline,
+      CamouChameleon,
+      LumberClaw,
+      SplinterStinger,
+      PineSnapper,
+      Rocco,
+      Rocco,
+      Flint,
+      Flint,
+      CackleRipclaw,
+      Redstone,
+      RunePuma,
+      StoneDefender,
+      TerrainTumbler,
+      RubyGuardian,
+      Mush,
+      Mush,
+      Herbert,
+      Herbert,
+      MossViper,
+      BambooBerserker,
+      IguanaGuard,
+      HummingHerald,
+      ShrubBeetle,
+      ForageThumper,
+      Dewy,
+      Dewy,
+      Wade,
+      Wade,
+      RoamingRazor,
+      CurrentConjurer,
+      TyphoonFist,
+      WhirlWhipper,
+      SurgesphereMonk,
+      SplashBasilisk
+    ]
+  }
+
+  initItemShop() {
+    this.itemShop = [
+      DistantDoubleStrike,
+      DistantDoubleStrike,
+      FarsightFrenzy,
+      FarsightFrenzy,
+      FarsightFrenzy,
+      FocusedFury,
+      FocusedFury,
+      FocusedFury,
+      MagicEtherStrike,
+      MagicEtherStrike,
+      NaturesWrath,
+      NaturesWrath,
+      NaturesWrath,
+      PrimitiveStrike,
+      PrimitiveStrike,
+      ProjectileBlast,
+      ProjectileBlast,
+      ProjectileBlast,
+      ReinforcedImpact,
+      ReinforcedImpact,
+      ReinforcedImpact,
+      ReinforcedImpact,
+      ElementalIncantation,
+      ElementalIncantation,
+      ElementalSwap,
+      ElementalSwap,
+      ExchangeOfNature,
+      ExchangeOfNature,
+      Obliterate,
+      Obliterate,
+      NaturalDefense,
+      NaturalDefense,
+      NaturalDefense,
+      NaturalDefense,
+      RangedBarrier,
+      RangedBarrier,
+      RangedBarrier,
+      MeleeShield,
+      MeleeShield,
+      MeleeShield,
+    ]
+  }
+
+  beganBattle() {
+    
   }
 }

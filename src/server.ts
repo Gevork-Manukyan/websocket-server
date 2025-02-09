@@ -90,7 +90,7 @@ gameNamespace.on("connection", (socket) => {
   socket.on(StartGameEvent, socketErrorHandler(socket, StartGameEvent, async ({ gameId }: StartGameData) => {
     const game = gameStateManager.getGame(gameId);
 
-    game.startGame();
+    game.initGame();
     gameEventEmitter.emitPickWarriors(game.players);
     game.setStarted(true);
   }));
@@ -122,7 +122,7 @@ gameNamespace.on("connection", (socket) => {
   socket.on(AllPlayersSetupEvent, socketErrorHandler(socket, AllPlayersSetupEvent, async ({ gameId }: AllPlayersSetupData) => {
     const game = gameStateManager.getGame(gameId);
     if (game.numPlayersFinishedSetup !== game.players.length) throw new ValidationError("All players have not finished setup", "players");
-    gameEventEmitter.emitTeamOrder(gameId, game.getTeamGoingFirst().getTeamNumber());
+    gameEventEmitter.emitTeamOrder(gameId, game.getTeamGoingFirst());
     game.hasFinishedSetup = true;
   }));
 

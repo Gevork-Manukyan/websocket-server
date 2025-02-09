@@ -220,7 +220,7 @@ describe("ConGame", () => {
         mockGame.initPlayerDecks = jest.fn()
         mockGame.initPlayerFields = jest.fn()
 
-        mockGame.startGame();
+        mockGame.initGame();
   
         expect(mockGame.isStarted).toBe(true);
         expect(mockGame.initPlayerDecks).toHaveBeenCalled();
@@ -232,7 +232,7 @@ describe("ConGame", () => {
         mockGame.addPlayer(hostPlayer);
         mockGame.numPlayersReady = 3;
   
-        expect(() => mockGame.startGame()).toThrow(PlayersNotReadyError);
+        expect(() => mockGame.initGame()).toThrow(PlayersNotReadyError);
       });
     });
 
