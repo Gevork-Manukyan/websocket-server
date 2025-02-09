@@ -1,6 +1,6 @@
 // Command of Nature (C.O.N)
 
-import { NotFoundError } from "../services/CustomError/BaseError";
+import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { NotEnoughGoldError, PlayersNotReadyError, SageUnavailableError, ShopFullError } from "../services/CustomError/GameError";
 import { Sage, ElementalCard, gameId, ItemCard } from "../types";
 import { BambooBerserker, Bruce, CackleRipclaw, CamouChameleon, CurrentConjurer, Dewy, DistantDoubleStrike, ElementalIncantation, ElementalSwap, ExchangeOfNature, FarsightFrenzy, Flint, FocusedFury, ForageThumper, Herbert, HummingHerald, IguanaGuard, LumberClaw, MagicEtherStrike, MeleeShield, MossViper, Mush, NaturalDefense, NaturesWrath, OakLumbertron, Obliterate, PineSnapper, PrimitiveStrike, ProjectileBlast, RangedBarrier, Redstone, ReinforcedImpact, RoamingRazor, Rocco, RubyGuardian, RunePuma, ShrubBeetle, SplashBasilisk, SplinterStinger, StoneDefender, SurgesphereMonk, TerrainTumbler, TwineFeline, TyphoonFist, Wade, WhirlWhipper, Willow } from "../utils/cards";
@@ -307,9 +307,15 @@ export class ConGame {
 }
 
 export class ActiveConGame extends ConGame {
+  private currentPhase: "phase1" | "phase2" | "phase3" | "phase4" = "phase1";
+  private actionPoints: number;
+  private maxActionPoints: 3 | 6;
 
   constructor(conGame: ConGame) {
     super(conGame.id, conGame.numPlayersTotal);
+
+    this.maxActionPoints = this.numPlayersTotal === 2 ? 3 : 6;
+    this.actionPoints = this.maxActionPoints;
   }
 
   getGameState(playerId: Player['id']) {
@@ -326,8 +332,21 @@ export class ActiveConGame extends ConGame {
     }
     
     // TODO: if teammate then add some of their info
-    
+
     return gameState;
+  }
+
+  getActionPoints() {
+    return this.actionPoints;
+  }
+
+  resetActionPoints() {
+    this.actionPoints = this.maxActionPoints;
+  }
+
+  decrementActionPoints() {
+    if (this.actionPoints === 0) throw new ValidationError("Team has no action points left", "actionPoints");
+    this.actionPoints -= 1;
   }
 
   buyCreature(playerId: Player['id'], creatureShopIndex: ShopIndex) {
@@ -352,4 +371,6 @@ export class ActiveConGame extends ConGame {
     if (shop === this.creatureShop) this.addCardToCreatureShop();
     else this.addCardToItemShop();
   }
+
+  
 }

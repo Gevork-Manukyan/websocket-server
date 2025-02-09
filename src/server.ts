@@ -154,9 +154,9 @@ gameNamespace.on("connection", (socket) => {
       Sage Ability
     
     PHASE 3
-      Buy Card
-        Item Shop
-        Creature Shop
+      Buy Card ✅
+        Item Shop ✅
+        Creature Shop ✅
       Sell Card
       Summon Bought Card
       Refresh Shop
