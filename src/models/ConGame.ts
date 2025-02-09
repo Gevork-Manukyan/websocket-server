@@ -1,7 +1,7 @@
 // Command of Nature (C.O.N)
 
 import { NotFoundError } from "../services/CustomError/BaseError";
-import { PlayersNotReadyError, SageUnavailableError } from "../services/CustomError/GameError";
+import { NotEnoughGoldError, PlayersNotReadyError, SageUnavailableError, ShopFullError } from "../services/CustomError/GameError";
 import { Sage, ElementalCard, gameId, ItemCard } from "../types";
 import { BambooBerserker, Bruce, CackleRipclaw, CamouChameleon, CurrentConjurer, Dewy, DistantDoubleStrike, ElementalIncantation, ElementalSwap, ExchangeOfNature, FarsightFrenzy, Flint, FocusedFury, ForageThumper, Herbert, HummingHerald, IguanaGuard, LumberClaw, MagicEtherStrike, MeleeShield, MossViper, Mush, NaturalDefense, NaturesWrath, OakLumbertron, Obliterate, PineSnapper, PrimitiveStrike, ProjectileBlast, RangedBarrier, Redstone, ReinforcedImpact, RoamingRazor, Rocco, RubyGuardian, RunePuma, ShrubBeetle, SplashBasilisk, SplinterStinger, StoneDefender, SurgesphereMonk, TerrainTumbler, TwineFeline, TyphoonFist, Wade, WhirlWhipper, Willow } from "../utils/cards";
 import { Player } from "./Player";
@@ -11,6 +11,8 @@ type TeamOrder = {
   first: Team;
   second: Team;
 }
+
+type ShopIndex = 0 | 1 | 2;
 
 export class ConGame {
   id: gameId;
@@ -24,8 +26,10 @@ export class ConGame {
   team2: Team;
   private teamOrder: TeamOrder;
   private currentTurnTeam: keyof TeamOrder = "first";
-  creatureShop: ElementalCard[] = [];
-  itemShop: ItemCard[] = [];
+  private creatureShop: ElementalCard[] = [];
+  private currentCreatureShopCards: ElementalCard[] = [];
+  private itemShop: ItemCard[] = [];
+  private currentItemShopCards: ItemCard[] = [];
 
   constructor(gameId: ConGame['id'], numPlayers: ConGame['numPlayersTotal']) {
     this.id = gameId;
@@ -92,6 +96,61 @@ export class ConGame {
     this.currentTurnTeam = this.currentTurnTeam === "first" ? "second" : "first";
   }
 
+  getCreatureShop() {
+    return this.creatureShop;
+  }
+
+  getCurrentCreatureShopCards() {
+    return this.currentCreatureShopCards;
+  }
+
+  addCardToCreatureShop() {
+    this.addCardToShop(this.creatureShop);
+  }
+
+  buyCreature(playerId: Player['id'], creatureShopIndex: ShopIndex) {
+    this.buyCard(playerId, creatureShopIndex, this.creatureShop);
+  }
+
+  getItemShop() {
+    return this.itemShop;
+  }
+
+  getCurrentItemShopCards() {
+    return this.currentItemShopCards;
+  }
+
+  addCardToItemShop() {
+    this.addCardToShop(this.itemShop);
+  }
+
+  buyItem(playerId: Player['id'], itemShopIndex: ShopIndex) {
+    this.buyCard(playerId, itemShopIndex, this.itemShop);
+  }
+
+  private addCardToShop<T extends ElementalCard | ItemCard>(shop: T[]) {
+    const shopType = shop === this.creatureShop ? "creature" : "item";
+    if (shop.length === 3) throw new ShopFullError(shopType);
+    const randomIndex = Math.floor(Math.random() * shop.length);
+    const card = shop[randomIndex];
+    shop.push(card);
+    shop.splice(randomIndex, 1);
+  }
+
+  private buyCard(playerId: Player['id'], shopIndex: ShopIndex, shop: ElementalCard[] | ItemCard[]) {
+    const currentShopCards = shop === this.creatureShop ? this.currentCreatureShopCards : this.currentItemShopCards;
+    const player = this.getPlayer(playerId);
+    const playerTeam = player.getTeam()!;
+    const card = currentShopCards[shopIndex];
+    const cost = card.price;
+    if (playerTeam.getGold() < cost) throw new NotEnoughGoldError();
+
+    player.addCardToDeck(card);
+    playerTeam.removeGold(cost);
+    if (shop === this.creatureShop) this.addCardToCreatureShop();
+    else this.addCardToItemShop();
+  }
+  
   joinTeam(playerId: Player['id'], teamNumber: Team['teamNumber']) {
     const teamSelected = teamNumber === 1 ? this.team1 : this.team2;
     const player = this.getPlayer(playerId);
@@ -203,6 +262,10 @@ export class ConGame {
       SurgesphereMonk,
       SplashBasilisk
     ]
+
+    this.addCardToCreatureShop();
+    this.addCardToCreatureShop();
+    this.addCardToCreatureShop();
   }
 
   initItemShop() {
@@ -248,6 +311,21 @@ export class ConGame {
       MeleeShield,
       MeleeShield,
     ]
+  }
+
+  getGameState(playerId: Player['id']) {
+    const player = this.getPlayer(playerId);
+    const team = player.getTeam();
+    // TODO: if teammate then add some of their info
+    const enemyTeam = team === this.team1 ? this.team2 : this.team1;
+
+    return {
+      game: {},
+      team: {},
+      player: {},
+      teammate: {},
+      enemyTeam: {}
+    }
   }
 
   beganBattle() {

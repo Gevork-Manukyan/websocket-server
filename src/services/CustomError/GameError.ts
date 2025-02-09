@@ -50,5 +50,16 @@ export class NullSpaceError extends CustomError {
       super(message, "NULL_SPACE");
       this.spaceNumber = spaceNumber;
     }
-  }
-  
+}
+
+export class ShopFullError extends ConflictError {
+    constructor(shop: "creature" | "item") {
+        super(`Cannot add more cards to the ${shop} shop`);
+    }
+}
+
+export class NotEnoughGoldError extends ConflictError {
+    constructor() {
+        super("Not enough gold to purchase this card");
+    }
+}
