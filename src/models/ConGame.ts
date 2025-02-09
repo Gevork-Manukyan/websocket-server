@@ -16,20 +16,20 @@ type ShopIndex = 0 | 1 | 2;
 
 export class ConGame {
   id: gameId;
-  isStarted: Boolean = false;
-  hasFinishedSetup: Boolean = false;
+  isStarted: boolean = false;
+  protected hasFinishedSetup: boolean = false;
   numPlayersTotal: 2 | 4;
   numPlayersReady: number = 0;
   numPlayersFinishedSetup: number = 0;
   players: Player[] = [];
   team1: Team;
   team2: Team;
-  private teamOrder: TeamOrder;
-  private currentTurnTeam: keyof TeamOrder = "first";
-  private creatureShop: ElementalCard[] = [];
-  private currentCreatureShopCards: ElementalCard[] = [];
-  private itemShop: ItemCard[] = [];
-  private currentItemShopCards: ItemCard[] = [];
+  protected teamOrder: TeamOrder;
+  protected currentTurnTeam: keyof TeamOrder = "first";
+  protected creatureShop: ElementalCard[] = [];
+  protected currentCreatureShopCards: ElementalCard[] = [];
+  protected itemShop: ItemCard[] = [];
+  protected currentItemShopCards: ItemCard[] = [];
 
   constructor(gameId: ConGame['id'], numPlayers: ConGame['numPlayersTotal']) {
     this.id = gameId;
@@ -46,8 +46,12 @@ export class ConGame {
     }
   }
 
-  setStarted(value: Boolean) {
+  setStarted(value: boolean) {
     this.isStarted = value;
+  }
+
+  getHasFinishedSetup() {
+    return this.hasFinishedSetup;
   }
 
   addPlayer(player: Player) {
@@ -105,11 +109,7 @@ export class ConGame {
   }
 
   addCardToCreatureShop() {
-    this.addCardToShop(this.creatureShop);
-  }
-
-  buyCreature(playerId: Player['id'], creatureShopIndex: ShopIndex) {
-    this.buyCard(playerId, creatureShopIndex, this.creatureShop);
+    this.addCardToShop(this.creatureShop, this.currentCreatureShopCards);
   }
 
   getItemShop() {
@@ -121,34 +121,17 @@ export class ConGame {
   }
 
   addCardToItemShop() {
-    this.addCardToShop(this.itemShop);
+    this.addCardToShop(this.itemShop, this.currentItemShopCards);
   }
 
-  buyItem(playerId: Player['id'], itemShopIndex: ShopIndex) {
-    this.buyCard(playerId, itemShopIndex, this.itemShop);
-  }
-
-  private addCardToShop<T extends ElementalCard | ItemCard>(shop: T[]) {
+  private addCardToShop<T extends ElementalCard | ItemCard>(shop: T[], currentShopCards: T[]) {
     const shopType = shop === this.creatureShop ? "creature" : "item";
     if (shop.length === 3) throw new ShopFullError(shopType);
+    
     const randomIndex = Math.floor(Math.random() * shop.length);
     const card = shop[randomIndex];
-    shop.push(card);
+    currentShopCards.push(card);
     shop.splice(randomIndex, 1);
-  }
-
-  private buyCard(playerId: Player['id'], shopIndex: ShopIndex, shop: ElementalCard[] | ItemCard[]) {
-    const currentShopCards = shop === this.creatureShop ? this.currentCreatureShopCards : this.currentItemShopCards;
-    const player = this.getPlayer(playerId);
-    const playerTeam = player.getTeam()!;
-    const card = currentShopCards[shopIndex];
-    const cost = card.price;
-    if (playerTeam.getGold() < cost) throw new NotEnoughGoldError();
-
-    player.addCardToDeck(card);
-    playerTeam.removeGold(cost);
-    if (shop === this.creatureShop) this.addCardToCreatureShop();
-    else this.addCardToItemShop();
   }
   
   joinTeam(playerId: Player['id'], teamNumber: Team['teamNumber']) {
@@ -311,24 +294,62 @@ export class ConGame {
       MeleeShield,
       MeleeShield,
     ]
+
+    this.addCardToItemShop();
+    this.addCardToItemShop();
+    this.addCardToItemShop();
+  }
+
+  finishedSetup(): ActiveConGame {
+    this.hasFinishedSetup = true;
+    return new ActiveConGame(this);
+  }
+}
+
+export class ActiveConGame extends ConGame {
+
+  constructor(conGame: ConGame) {
+    super(conGame.id, conGame.numPlayersTotal);
   }
 
   getGameState(playerId: Player['id']) {
     const player = this.getPlayer(playerId);
     const team = player.getTeam();
-    // TODO: if teammate then add some of their info
     const enemyTeam = team === this.team1 ? this.team2 : this.team1;
-
-    return {
+    
+    const gameState = {
       game: {},
       team: {},
       player: {},
       teammate: {},
       enemyTeam: {}
     }
+    
+    // TODO: if teammate then add some of their info
+    
+    return gameState;
   }
 
-  beganBattle() {
-    
+  buyCreature(playerId: Player['id'], creatureShopIndex: ShopIndex) {
+    this.buyCard(playerId, creatureShopIndex, this.creatureShop);
+  }
+
+  buyItem(playerId: Player['id'], itemShopIndex: ShopIndex) {
+    this.buyCard(playerId, itemShopIndex, this.itemShop);
+  }
+
+  private buyCard(playerId: Player['id'], shopIndex: ShopIndex, shop: ElementalCard[] | ItemCard[]) {
+    const currentShopCards = shop === this.creatureShop ? this.currentCreatureShopCards : this.currentItemShopCards;
+    const player = this.getPlayer(playerId);
+    const playerTeam = player.getTeam()!;
+    const card = currentShopCards[shopIndex];
+    const cost = card.price;
+    if (playerTeam.getGold() < cost) throw new NotEnoughGoldError();
+
+    player.addCardToDeck(card);
+    playerTeam.removeGold(cost);
+    currentShopCards.splice(shopIndex, 1);
+    if (shop === this.creatureShop) this.addCardToCreatureShop();
+    else this.addCardToItemShop();
   }
 }
