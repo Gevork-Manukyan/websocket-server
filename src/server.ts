@@ -35,7 +35,7 @@ gameNamespace.on("connection", (socket) => {
     processEvent(socket, event as keyof SocketEventMap, rawData, next)
   });
 
-  socket.on("error", (error) => {
+  socket.on("error", (error: Error) => {
     console.error("Socket error:", error);
   });
 
