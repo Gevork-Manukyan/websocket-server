@@ -1,6 +1,14 @@
 import { ConGame } from "../models";
-import { CurrentGames, gameId } from "../types";
+import { GameState } from "../models/GameState";
+import { gameId } from "../types";
 import { ConflictError } from "./CustomError/BaseError";
+
+type CurrentGames = {
+    [key: gameId]: {
+        game: ConGame;
+        state: GameState;
+    }
+};
 
 class GameStateManager {
     private static instance: GameStateManager;
@@ -16,13 +24,18 @@ class GameStateManager {
     }
 
     getGame(gameId: gameId) {
-        return this.currentGames[gameId];
+        return this.currentGames[gameId].game;
+    }
+
+    getGameState(gameId: gameId) {
+        return this.currentGames[gameId].state;
     }
 
     addGame(game: ConGame) {
         if (this.currentGames[game.id] !== undefined) throw new ConflictError(`There is already an existing game with the given ID`)
-        this.currentGames[game.id] = game;
-        return this.currentGames[game.id]
+        this.currentGames[game.id].game = game;
+        this.currentGames[game.id].state = new GameState();
+        return this.currentGames[game.id].game;
     }
 
     deleteGame(gameId: gameId) {
@@ -31,7 +44,7 @@ class GameStateManager {
     }
 
     resetGameStateManager() {
-        this.currentGames = {}
+        this.currentGames = {};
     }
 }
 

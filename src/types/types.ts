@@ -9,10 +9,6 @@ export const SageSchema = z.enum(["Cedar", "Gravel", "Porella", "Torrent"]);
 export type Element = z.infer<typeof ElementSchema>;
 export type Sage = z.infer<typeof SageSchema>;
 
-export type CurrentGames = {
-  [key: gameId]: ConGame;
-};
-
 export type Decklist = {
   sage: ElementalSage;
   champions: {
