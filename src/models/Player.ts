@@ -64,6 +64,11 @@ export class Player {
     this.team = team;
   }
 
+  getTeammate() {
+    if (!this.team) throw new NotFoundError("Team", "Player does not have a team")
+    return this.team.players.find(player => player.id !== this.id)!;
+  }
+
   getSage() {
     return this.sage;
   }
@@ -179,6 +184,14 @@ export class Player {
 
   
   /* -------- GAME ACTIONS -------- */
+
+  getPlayerState() {
+    return {
+      sage: this.sage,
+      level: this.level,
+      hand: this.hand,
+    }
+  }
 
   drawCard() {
     const drawnCard = drawCardFromDeck(this.deck)

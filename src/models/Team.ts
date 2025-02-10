@@ -143,4 +143,11 @@ export class Team {
             throw new ValidationError("Player can only swap their own warriors", "element")
         }
     }
+
+    getTeamState() {
+        return {
+            gold: this.gold,
+           // TODO: battlefield info
+        }
+    }
 }

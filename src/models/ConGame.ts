@@ -3,6 +3,7 @@
 import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { NotEnoughGoldError, PlayersNotReadyError, SageUnavailableError, ShopFullError } from "../services/CustomError/GameError";
 import { Sage, ElementalCard, gameId, ItemCard } from "../types";
+import { Decklist } from "../types/types";
 import { BambooBerserker, Bruce, CackleRipclaw, CamouChameleon, CurrentConjurer, Dewy, DistantDoubleStrike, ElementalIncantation, ElementalSwap, ExchangeOfNature, FarsightFrenzy, Flint, FocusedFury, ForageThumper, Herbert, HummingHerald, IguanaGuard, LumberClaw, MagicEtherStrike, MeleeShield, MossViper, Mush, NaturalDefense, NaturesWrath, OakLumbertron, Obliterate, PineSnapper, PrimitiveStrike, ProjectileBlast, RangedBarrier, Redstone, ReinforcedImpact, RoamingRazor, Rocco, RubyGuardian, RunePuma, ShrubBeetle, SplashBasilisk, SplinterStinger, StoneDefender, SurgesphereMonk, TerrainTumbler, TwineFeline, TyphoonFist, Wade, WhirlWhipper, Willow } from "../utils/cards";
 import { drawCardFromDeck } from "../utils/utilities";
 import { Player } from "./Player";
@@ -315,30 +316,36 @@ export class ActiveConGame extends ConGame {
   }
 
   getGameState(playerId: Player['id']) {
+    const isFourPlayers = this.numPlayersTotal === 4;
+
     const player = this.getPlayer(playerId);
-    const team = player.getTeam();
+    const teammate = player.getTeammate();
+    const team = player.getTeam()!;
+
     const enemyTeam = team === this.team1 ? this.team2 : this.team1;
-    
+    const enemyTeamPlayer1 = enemyTeam.players[0];
+    const enemyTeamPlayer2 = enemyTeam.players[1];
+
     const gameState = {
       game: {
+        isTurn: this.getCurrentTurnTeam() === team,
         currentPhase: this.currentPhase,
         actionPoints: this.actionPoints,
+        creatureShop: this.currentCreatureShopCards,
+        itemShop: this.currentItemShopCards
       },
-      team: {
-        // TODO: battlefield info
-        gold: team?.getGold(),
-      },
-      player: {
-        sage: player.getSage(),
-        level: player.getLevel(),
-        hand: player.getHand(),
-      },
-      teammate: {},
-      enemyTeam: {}
+      team: team.getTeamState(),
+      player: player.getPlayerState(),
+      // If 4 players then add teammate info
+      ...(isFourPlayers ? { teammate: teammate.getPlayerState() } : {}),
+      enemyTeam: {
+        team: enemyTeam.getTeamState(),
+        player1: enemyTeamPlayer1.getPlayerState(),
+        // If 4 players then add enemy player 2 info
+        ...(isFourPlayers ? { player2: enemyTeamPlayer2.getPlayerState() } : {})
+      }
     }
     
-    // TODO: if teammate then add some of their info
-
     return gameState;
   }
 
