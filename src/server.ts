@@ -44,7 +44,7 @@ gameNamespace.on("connection", (socket) => {
   // TODO: create a system to enforce an order of calling events. Shouldn't be able to call events out of order
 
   socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ gameId, numPlayers }: CreateGameData) => {
-    const newGame = gameStateManager.addGame(new ConGame(gameId, numPlayers));
+    const newGame = gameStateManager.createGame(gameId, numPlayers);
     newGame.addPlayer(new Player(socket.id, true)); // First player to join is the host
     socket.join(gameId);
     socket.emit(`${CreateGameEvent}--success`);

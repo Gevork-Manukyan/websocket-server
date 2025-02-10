@@ -24,18 +24,21 @@ class GameStateManager {
     }
 
     getGame(gameId: gameId) {
-        return this.currentGames[gameId].game;
+        return this.currentGames[gameId]?.game;
     }
 
     getGameState(gameId: gameId) {
-        return this.currentGames[gameId].state;
+        return this.currentGames[gameId]?.state;
     }
 
-    addGame(game: ConGame) {
-        if (this.currentGames[game.id] !== undefined) throw new ConflictError(`There is already an existing game with the given ID`)
-        this.currentGames[game.id].game = game;
-        this.currentGames[game.id].state = new GameState();
-        return this.currentGames[game.id].game;
+    createGame(gameId: gameId, numPlayers: ConGame['numPlayersTotal']) {
+        if (this.currentGames[gameId] !== undefined) throw new ConflictError(`There is already an existing game with the given ID`)
+        this.currentGames[gameId] = {
+            game: new ConGame(gameId, numPlayers),
+            state: new GameState()
+        };
+
+        return this.currentGames[gameId].game;
     }
 
     deleteGame(gameId: gameId) {

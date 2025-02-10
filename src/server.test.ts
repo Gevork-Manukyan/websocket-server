@@ -63,13 +63,13 @@ describe("Server.ts", () => {
 
     describe("create-game event", () => {
         test("should create a new game with given game ID and add the player", (done) => {
-            gameStateManager.addGame = jest.fn().mockReturnValue(mockGame)
+            gameStateManager.createGame = jest.fn().mockReturnValue(mockGame)
             mockGame.addPlayer = jest.fn()
             
             clientSocket.emit("create-game", { gameId: testGameId, numPlayers } as CreateGameData)
 
             clientSocket.once("create-game--success", () => {
-                expect(gameStateManager.addGame).toHaveBeenCalledWith(expect.any(ConGame))
+                expect(gameStateManager.createGame).toHaveBeenCalledWith(expect.any(ConGame))
                 expect(mockGame.addPlayer).toHaveBeenCalledWith(expect.objectContaining({
                     id: expect.any(String),
                     isGameHost: true,

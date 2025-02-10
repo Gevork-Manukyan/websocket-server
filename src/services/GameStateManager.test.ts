@@ -6,6 +6,7 @@ import { gameStateManager } from "./GameStateManager";
 
 describe("GameStateManager", () => {
   let mockGame: ConGame;
+  const originalGetGame = gameStateManager.getGame;
 
   beforeEach(() => {
     // Reset the singleton's state before each test
@@ -13,6 +14,9 @@ describe("GameStateManager", () => {
 
     // Mock a ConGame instance
     mockGame = new ConGame("game-1" as gameId, 4);
+
+    gameStateManager.createGame(mockGame.id, mockGame.numPlayersTotal);
+    gameStateManager.getGame = jest.fn().mockReturnValue(mockGame);
   });
 
   describe("getInstance", () => {
@@ -25,31 +29,29 @@ describe("GameStateManager", () => {
 
   describe("addGame", () => {
     test("adds a new game to the current games", () => {
-      gameStateManager.addGame(mockGame);
-
       const retrievedGame = gameStateManager.getGame("game-1" as gameId);
-      expect(retrievedGame).toBe(mockGame);
+      expect(retrievedGame).toEqual(mockGame);
     });
 
     test("returns the added game after adding test", () => {
-      const addedGame = gameStateManager.addGame(mockGame);
-      expect(addedGame).toBe(mockGame);
+      const newGame = new ConGame("game-2" as gameId, 2);
+      const addedGame = gameStateManager.createGame(newGame.id, newGame.numPlayersTotal);
+      expect(addedGame).toEqual(newGame);
     });
 
     test("throws an error if a game with the ID already exists", () => {
-      gameStateManager.addGame(mockGame)
-      expect(() => gameStateManager.addGame(mockGame)).toThrow(ConflictError)
+      expect(() => gameStateManager.createGame(mockGame.id, mockGame.numPlayersTotal)).toThrow(ConflictError)
     })
   });
 
   describe("getGame", () => {
     test("retrieves an existing game by its ID", () => {
-      gameStateManager.addGame(mockGame);
       const retrievedGame = gameStateManager.getGame("game-1" as gameId);
       expect(retrievedGame).toBe(mockGame);
     });
 
     test("returns undefined for a non-existent game ID", () => {
+      gameStateManager.getGame = originalGetGame;
       const retrievedGame = gameStateManager.getGame("non-existent-game" as gameId);
       expect(retrievedGame).toBeUndefined();
     });
@@ -57,10 +59,10 @@ describe("GameStateManager", () => {
 
   describe("deleteGame", () => {
     test("removes an existing game by its ID", () => {
-      gameStateManager.addGame(mockGame);
-      gameStateManager.deleteGame("game-1" as gameId);
+      gameStateManager.getGame = originalGetGame;
+      gameStateManager.deleteGame(mockGame.id as gameId);
 
-      const retrievedGame = gameStateManager.getGame("game-1" as gameId);
+      const retrievedGame = gameStateManager.getGame(mockGame.id as gameId);
       expect(retrievedGame).toBeUndefined();
     });
 
@@ -71,7 +73,7 @@ describe("GameStateManager", () => {
 
   describe("resetGameStateManager", () => {
     test("resets the current games to an empty object", () => {
-      gameStateManager.addGame(mockGame);
+      gameStateManager.getGame = originalGetGame;
       gameStateManager.resetGameStateManager();
 
       const retrievedGame = gameStateManager.getGame("game-1" as gameId);
