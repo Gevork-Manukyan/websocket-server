@@ -147,7 +147,7 @@ export class Team {
     getTeamState() {
         return {
             gold: this.gold,
-           // TODO: battlefield info
+            battlefield: this.battlefield.getBattlefieldState()
         }
     }
 }

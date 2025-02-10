@@ -9,7 +9,7 @@ const TWO_PLAYER_SPACE_MAX = 12;
 type SpaceOptions = OnePlayerSpaceOptions | TwoPlayerSpaceOptions
 
 export class Battlefield {
-    private fieldArray: (BattlefieldSpace)[] = [];
+    private fieldArray: BattlefieldSpace[] = [];
     private numPlayersOnTeam: 1 | 2;
 
     constructor(numPlayersOnTeam: Battlefield['numPlayersOnTeam']) {
@@ -193,6 +193,10 @@ export class Battlefield {
     private updateBattlefield() {
         //TODO: implement
     }
+
+    getBattlefieldState() {
+        return this.fieldArray.map(space => space.getBattlefieldSpaceState())
+    }
 }
 
 type Direction = "TL" | "T" | "TR" | "L" | "R" | "BL" | "B" | "BR"
@@ -232,5 +236,12 @@ export class BattlefieldSpace {
 
     getDirection(direction: Direction) {
         return this.connections[direction];
+    }
+
+    getBattlefieldSpaceState() {
+        return {
+            spaceNumber: this.spaceNumber,
+            value: this.value,
+        }
     }
 }
