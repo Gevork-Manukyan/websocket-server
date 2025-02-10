@@ -4,6 +4,7 @@ import { NotFoundError, ValidationError } from "../services/CustomError/BaseErro
 import { NotEnoughGoldError, PlayersNotReadyError, SageUnavailableError, ShopFullError } from "../services/CustomError/GameError";
 import { Sage, ElementalCard, gameId, ItemCard } from "../types";
 import { BambooBerserker, Bruce, CackleRipclaw, CamouChameleon, CurrentConjurer, Dewy, DistantDoubleStrike, ElementalIncantation, ElementalSwap, ExchangeOfNature, FarsightFrenzy, Flint, FocusedFury, ForageThumper, Herbert, HummingHerald, IguanaGuard, LumberClaw, MagicEtherStrike, MeleeShield, MossViper, Mush, NaturalDefense, NaturesWrath, OakLumbertron, Obliterate, PineSnapper, PrimitiveStrike, ProjectileBlast, RangedBarrier, Redstone, ReinforcedImpact, RoamingRazor, Rocco, RubyGuardian, RunePuma, ShrubBeetle, SplashBasilisk, SplinterStinger, StoneDefender, SurgesphereMonk, TerrainTumbler, TwineFeline, TyphoonFist, Wade, WhirlWhipper, Willow } from "../utils/cards";
+import { drawCardFromDeck } from "../utils/utilities";
 import { Player } from "./Player";
 import { Team } from "./Team";
 
@@ -25,7 +26,6 @@ export class ConGame {
   team1: Team;
   team2: Team;
   protected teamOrder: TeamOrder;
-  protected currentTurnTeam: keyof TeamOrder = "first";
   protected creatureShop: ElementalCard[] = [];
   protected currentCreatureShopCards: ElementalCard[] = [];
   protected itemShop: ItemCard[] = [];
@@ -92,14 +92,6 @@ export class ConGame {
     return this.teamOrder.second;
   }
 
-  getCurrentTurnTeam() {
-    return this.teamOrder[this.currentTurnTeam];
-  }
-
-  toggleCurrentTurnTeam() {
-    this.currentTurnTeam = this.currentTurnTeam === "first" ? "second" : "first";
-  }
-
   getCreatureShop() {
     return this.creatureShop;
   }
@@ -128,10 +120,8 @@ export class ConGame {
     const shopType = shop === this.creatureShop ? "creature" : "item";
     if (shop.length === 3) throw new ShopFullError(shopType);
     
-    const randomIndex = Math.floor(Math.random() * shop.length);
-    const card = shop[randomIndex];
+    const card = drawCardFromDeck(shop);
     currentShopCards.push(card);
-    shop.splice(randomIndex, 1);
   }
   
   joinTeam(playerId: Player['id'], teamNumber: Team['teamNumber']) {
@@ -183,6 +173,7 @@ export class ConGame {
     if (this.numPlayersReady !== this.numPlayersTotal) throw new PlayersNotReadyError(this.numPlayersReady, this.numPlayersTotal)
 
     this.initPlayerDecks();
+    this.initPlayerHands();
     this.initPlayerFields();
     this.initCreatureShop();
     this.initItemShop();
@@ -192,6 +183,10 @@ export class ConGame {
 
   initPlayerDecks() {
     this.players.forEach(player => player.initDeck())
+  }
+
+  initPlayerHands() {
+    this.players.forEach(player => player.initHand())
   }
 
   initPlayerFields() {
@@ -307,6 +302,7 @@ export class ConGame {
 }
 
 export class ActiveConGame extends ConGame {
+  private currentTurnTeam: keyof TeamOrder = "first";
   private currentPhase: "phase1" | "phase2" | "phase3" | "phase4" = "phase1";
   private actionPoints: number;
   private maxActionPoints: 3 | 6;
@@ -324,9 +320,19 @@ export class ActiveConGame extends ConGame {
     const enemyTeam = team === this.team1 ? this.team2 : this.team1;
     
     const gameState = {
-      game: {},
-      team: {},
-      player: {},
+      game: {
+        currentPhase: this.currentPhase,
+        actionPoints: this.actionPoints,
+      },
+      team: {
+        // TODO: battlefield info
+        gold: team?.getGold(),
+      },
+      player: {
+        sage: player.getSage(),
+        level: player.getLevel(),
+        hand: player.getHand(),
+      },
       teammate: {},
       enemyTeam: {}
     }
@@ -334,6 +340,37 @@ export class ActiveConGame extends ConGame {
     // TODO: if teammate then add some of their info
 
     return gameState;
+  }
+
+  getCurrentTurnTeam() {
+    return this.teamOrder[this.currentTurnTeam];
+  }
+
+  toggleCurrentTurnTeam() {
+    this.currentTurnTeam = this.currentTurnTeam === "first" ? "second" : "first";
+  }
+
+  getCurrentPhase() {
+    return this.currentPhase;
+  }
+
+  endPhase1() {
+    this.currentPhase = "phase2";
+  }
+
+  endPhase2() {
+    this.currentPhase = "phase3";
+  }
+
+  endPhase3() {
+    this.currentPhase = "phase4";
+  }
+
+  endPhase4() {
+    // TODO: end turn and reset all variables
+    this.currentPhase = "phase1";
+    this.toggleCurrentTurnTeam();
+    this.resetActionPoints();
   }
 
   getActionPoints() {

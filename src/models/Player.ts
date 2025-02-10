@@ -2,7 +2,7 @@ import { NotFoundError, ValidationError } from "../services/CustomError/BaseErro
 import { Card, Sage } from "../types";
 import { ElementalWarriorStarterCard } from "../types/card-types";
 import { Decklist } from "../types/types";
-import { getSageDecklist } from "../utils/utilities";
+import { drawCardFromDeck, getSageDecklist } from "../utils/utilities";
 import { Team } from "./Team";
 
 export class Player {
@@ -84,24 +84,29 @@ export class Player {
     return this.level;
   }
 
-  setLevel(level: number) {
-    this.level = level;
+  levelUp() {
+    if (this.level === 8) return;
+    this.level += 1;
   }
 
   getHand() {
     return this.hand;
   }
 
-  setHand(hand: Card[]) {
-    this.hand = hand;
+  addCardToHand(card: Card) {
+    this.hand.push(card);
   }
 
   getDeck() {
     return this.deck;
   }
 
-  setDeck(deck: Card[]) {
-    this.deck = deck;
+  addCardToDeck(card: Card) {
+    this.deck.push(card)
+  }
+
+  addCardsToDeck(cards: Card[]) {
+    this.deck = this.deck.concat(cards)
   }
 
   getDiscardPile() {
@@ -119,14 +124,6 @@ export class Player {
     return this.decklist.sage.element;
   }
 
-  addCardToDeck(card: Card) {
-    this.deck.push(card)
-  }
-
-  addCardsToDeck(cards: Card[]) {
-    this.deck = this.deck.concat(cards)
-  }
-
   initDeck() {
     if (!this.isReady) throw new ValidationError("Cannot initialize the deck. Player is not ready", "isReady")
     this.setDecklist(getSageDecklist(this.sage))
@@ -134,6 +131,14 @@ export class Player {
     const decklist = this.decklist!
     const basicStarter = decklist.basic
     this.addCardsToDeck([basicStarter, ...decklist.items])
+  }
+
+  initHand() {
+    this.drawCard();
+    this.drawCard();
+    this.drawCard();
+    this.drawCard();
+    this.drawCard();
   }
 
   chooseWarriors(choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
@@ -170,5 +175,13 @@ export class Player {
 
   cancelPlayerSetup() {
     this.isSetup = false;
+  }
+
+  
+  /* -------- GAME ACTIONS -------- */
+
+  drawCard() {
+    const drawnCard = drawCardFromDeck(this.deck)
+    this.addCardToHand(drawnCard)
   }
 }
