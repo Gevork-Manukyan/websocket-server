@@ -16,6 +16,10 @@ const selectSageSchema = z.object({
   sage: SageSchema,
 });
 
+const allSagesSelectedSchema = z.object({
+  gameId: z.string(),
+});
+
 const toggleReadyStatusSchema = z.object({
   gameId: z.string(),
 });
@@ -66,6 +70,7 @@ const leaveGameSchema = z.object({
 export const CreateGameEvent = "create-game" as const;
 export const JoinGameEvent = "join-game" as const;
 export const SelectSageEvent = "select-sage" as const;
+export const AllSagesSelectedEvent = "all-sages-selected" as const;
 export const ToggleReadyStatusEvent = "toggle-ready-status" as const;
 export const JoinTeamEvent = "join-team" as const;
 export const ClearTeamsEvent = "clear-teams" as const;
@@ -83,6 +88,7 @@ export const EventSchemas = {
   [CreateGameEvent]: createGameSchema,
   [JoinGameEvent]: joinGameSchema,
   [SelectSageEvent]: selectSageSchema,
+  [AllSagesSelectedEvent]: allSagesSelectedSchema,
   [ToggleReadyStatusEvent]: toggleReadyStatusSchema,
   [JoinTeamEvent]: joinTeamSchema,
   [ClearTeamsEvent]: clearTeamsSchema,
@@ -100,6 +106,7 @@ export const EventSchemas = {
 export type CreateGameData = z.infer<typeof createGameSchema>;
 export type JoinGameData = z.infer<typeof joinGameSchema>;
 export type SelectSageData = z.infer<typeof selectSageSchema>;
+export type AllSagesSelectedData = z.infer<typeof allSagesSelectedSchema>;
 export type ToggleReadyStatusData = z.infer<typeof toggleReadyStatusSchema>;
 export type JoinTeamData = z.infer<typeof joinTeamSchema>;
 export type ClearTeamsData = z.infer<typeof clearTeamsSchema>;
@@ -117,6 +124,7 @@ export type SocketEventMap = {
   [CreateGameEvent]: CreateGameData;
   [JoinGameEvent]: JoinGameData;
   [SelectSageEvent]: SelectSageData;
+  [AllSagesSelectedEvent]: AllSagesSelectedData;
   [ToggleReadyStatusEvent]: ToggleReadyStatusData;
   [JoinTeamEvent]: JoinTeamData;
   [ClearTeamsEvent]: ClearTeamsData;
