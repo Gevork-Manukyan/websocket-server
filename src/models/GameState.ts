@@ -70,7 +70,10 @@ export class GameState {
     }
 
     getCurrentTransition() {
-        return this.currentTransition;
+        return {
+            currentState: this.currentTransition.currentStateValue,
+            possibleInputs: this.currentTransition.possibleInputs.map(input => input.acceptableEvents).flat()
+        };
     }
 
     processEvent(event: TransitionEvent) {
