@@ -20,3 +20,5 @@ export type Decklist = {
   basic: ElementalStarterCard;
   items: ItemCard[];
 }
+
+export type TransitionEvent = 'all-sages-selected' | 'all-teams-joined' | 'all-players-ready' | 'all-players-setup-complete' | 'next-phase' | 'day-break-card' | 'draw-card' | 'swap-cards' | 'summon-card' | 'attack' | 'utility' | 'sage-skill' | 'buy-card' | 'sell-card' | 'refresh-shop' | 'done-discarding-cards' | 'done-drawing-new-hand' | 'win-game';

@@ -35,7 +35,7 @@ class GameStateManager {
         if (this.currentGames[gameId] !== undefined) throw new ConflictError(`There is already an existing game with the given ID`)
         this.currentGames[gameId] = {
             game: new ConGame(gameId, numPlayers),
-            state: new GameState()
+            state: new GameState(gameId)
         };
 
         return this.currentGames[gameId].game;

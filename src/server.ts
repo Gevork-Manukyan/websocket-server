@@ -150,7 +150,7 @@ gameNamespace.on("connection", (socket) => {
       Buy Card
         Item Shop
         Creature Shop
-      Sell Card
+      Utility Card
       Summon Bought Card
       Refresh Shop
 
