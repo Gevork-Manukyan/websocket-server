@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { ConGame } from "../models/ConGame";
 import { ElementalChampion, ElementalSage, ElementalStarterCard, ElementalWarriorCard, ItemCard } from "./card-types";
 
 export type gameId = string;

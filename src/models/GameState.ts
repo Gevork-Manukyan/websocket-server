@@ -1,14 +1,16 @@
 import { gameId } from "../types";
 import { TransitionEvent } from "../types/types";
 
+type State = "join-game" | "joining-teams" | "ready-up" | "starting-setup" | "begin-turn" | "phase1" | "phase2" | "phase3" | "discarding-cards" | "drawing-new-hand" | "end-game" | "game-finished";
+
 type Transition = {
-    currentStateValue: string;
+    currentStateValue: State;
     possibleInputs: Input[];
 }
 
 type Input = {
     acceptableEvents: TransitionEvent[];
-    nextState: string;
+    nextState: State;
 }
 
 export class GameState {
@@ -62,11 +64,21 @@ export class GameState {
         ])
     }
 
-    private addTransition(currentStateValue: string, possibleInputs: Input[]) {
+    private addTransition(currentStateValue: State, possibleInputs: Input[]) {
         this.stateTransitionTable.push({ currentStateValue, possibleInputs });
     }
 
     getCurrentTransition() {
         return this.currentTransition;
+    }
+
+    processEvent(event: TransitionEvent) {
+        const input = this.currentTransition.possibleInputs.find(input => input.acceptableEvents.includes(event));
+
+        if (!input) throw new Error(`Invalid event: ${event} for current state: ${this.currentTransition.currentStateValue}`);
+        const nextState = this.stateTransitionTable.find(transition => transition.currentStateValue === input.nextState);
+        
+        if (!nextState) throw new Error(`Invalid next state: ${input.nextState}`);
+        this.currentTransition = nextState;
     }
 }
