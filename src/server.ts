@@ -1,7 +1,6 @@
 import express from "express"; 
 import http from "http"; 
 import { Server } from "socket.io";
-import { ConGame } from "./models/ConGame";
 import { Player } from "./models/Player";
 import { gameEventEmitter } from "./services/GameEventEmitter";
 import { gameStateManager } from "./services/GameStateManager";

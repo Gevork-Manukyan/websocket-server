@@ -1,3 +1,4 @@
+import { GameStateError } from "../services/CustomError/GameError";
 import { gameId } from "../types";
 import { TransitionEvent } from "../types/types";
 
@@ -75,10 +76,10 @@ export class GameState {
     processEvent(event: TransitionEvent) {
         const input = this.currentTransition.possibleInputs.find(input => input.acceptableEvents.includes(event));
 
-        if (!input) throw new Error(`Invalid event: ${event} for current state: ${this.currentTransition.currentStateValue}`);
+        if (!input) throw new GameStateError(`Invalid event: ${event} for current state: ${this.currentTransition.currentStateValue}`);
         const nextState = this.stateTransitionTable.find(transition => transition.currentStateValue === input.nextState);
         
-        if (!nextState) throw new Error(`Invalid next state: ${input.nextState}`);
+        if (!nextState) throw new GameStateError(`Invalid next state: ${input.nextState}`);
         this.currentTransition = nextState;
     }
 }

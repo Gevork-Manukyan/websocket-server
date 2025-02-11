@@ -44,11 +44,16 @@ export class PlayersNotReadyError extends ConflictError {
 }
 
 export class NullSpaceError extends CustomError {
-    spaceNumber; 
+  spaceNumber; 
 
-    constructor(spaceNumber: number, message = `Cannot interact with null space: ${spaceNumber}`) {
-      super(message, "NULL_SPACE");
-      this.spaceNumber = spaceNumber;
-    }
+  constructor(spaceNumber: number, message = `Cannot interact with null space: ${spaceNumber}`) {
+    super(message, "NULL_SPACE");
+    this.spaceNumber = spaceNumber;
   }
+}
   
+export class GameStateError extends CustomError {
+    constructor(message = "Invalid game state") {
+        super(message, "GAME_STATE_ERROR");
+    }
+}
