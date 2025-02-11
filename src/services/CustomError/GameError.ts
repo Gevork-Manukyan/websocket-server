@@ -1,5 +1,14 @@
-import { Sage } from "../../types";
+import { gameId, Sage } from "../../types";
 import { ConflictError, CustomError } from "./BaseError";
+
+/**
+ * When the game with the given ID does not exist
+ */
+export class GameConflictError extends ConflictError {
+    constructor(gameId: gameId) {
+        super(`Game with ID ${gameId} does not exist`);
+    }
+}
 
 /**
  * When the selected sage is already selected by another player
