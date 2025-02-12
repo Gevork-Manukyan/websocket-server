@@ -67,6 +67,10 @@ const leaveGameSchema = z.object({
   gameId: z.string(),
 });
 
+const currentGameStateSchema = z.object({
+  gameId: z.string(),
+});
+
 export const CreateGameEvent = "create-game" as const;
 export const JoinGameEvent = "join-game" as const;
 export const SelectSageEvent = "select-sage" as const;
@@ -82,6 +86,7 @@ export const CancelSetupEvent = "cancel-setup" as const;
 export const AllPlayersSetupEvent = "all-players-setup" as const;
 export const PlayerOrderChosenEvent = "player-order-chosen" as const;
 export const LeaveGameEvent = "leave-game" as const;
+export const CurrentGameStateEvent = "current-game-state" as const;
 
 // Define EventSchemas record
 export const EventSchemas = {
@@ -100,6 +105,7 @@ export const EventSchemas = {
   [AllPlayersSetupEvent]: allPlayersSetupSchema,
   [PlayerOrderChosenEvent]: playerOrderChosenSchema,
   [LeaveGameEvent]: leaveGameSchema,
+  [CurrentGameStateEvent]: currentGameStateSchema,
 } as const;
 
 // Infer the types from the schemas directly
@@ -118,6 +124,7 @@ export type CancelSetupData = z.infer<typeof cancelSetupSchema>;
 export type AllPlayersSetupData = z.infer<typeof allPlayersSetupSchema>;
 export type PlayerOrderChosenData = z.infer<typeof playerOrderChosenSchema>;
 export type LeaveGameData = z.infer<typeof leaveGameSchema>;
+export type CurrentGameStateData = z.infer<typeof currentGameStateSchema>;
 
 // Create a mapped type for socket events
 export type SocketEventMap = {
@@ -136,4 +143,5 @@ export type SocketEventMap = {
   [AllPlayersSetupEvent]: AllPlayersSetupData;
   [PlayerOrderChosenEvent]: PlayerOrderChosenData;
   [LeaveGameEvent]: LeaveGameData;
+  [CurrentGameStateEvent]: CurrentGameStateData;
 }

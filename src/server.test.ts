@@ -304,7 +304,7 @@ describe("Server.ts", () => {
             gameStateManager.getGame = jest.fn().mockReturnValue(mockGame);
             const player1 = new Player(testPlayerId, true);
             mockGame.getPlayer = jest.fn().mockReturnValue(player1);
-            mockGame.startGame = jest.fn();
+            mockGame.initGame = jest.fn();
             mockGame.setStarted = jest.fn();
     
             gameEventEmitter.emitToPlayer = jest.fn();
@@ -314,7 +314,7 @@ describe("Server.ts", () => {
             clientSocket.emit(StartGameEvent, { gameId: testGameId });
     
             setTimeout(() => {
-                expect(mockGame.startGame).toHaveBeenCalled();
+                expect(mockGame.initGame).toHaveBeenCalled();
                 expect(gameEventEmitter.emitToPlayer).toHaveBeenCalledTimes(mockGame.players.length);
                 expect(mockGame.setStarted).toHaveBeenCalledWith(true);
                 done();

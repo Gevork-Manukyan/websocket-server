@@ -66,3 +66,15 @@ export class GameStateError extends CustomError {
         super(message, "GAME_STATE_ERROR");
     }
 }
+
+export class ShopFullError extends ConflictError {
+    constructor(shop: "creature" | "item") {
+        super(`Cannot add more cards to the ${shop} shop`);
+    }
+}
+
+export class NotEnoughGoldError extends ConflictError {
+    constructor() {
+        super("Not enough gold to purchase this card");
+    }
+}

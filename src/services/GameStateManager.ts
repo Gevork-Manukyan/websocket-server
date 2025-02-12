@@ -1,5 +1,6 @@
 import { ConGame } from "../models";
 import { GameState } from "../models/GameState";
+import { ActiveConGame } from "../models/ConGame";
 import { gameId } from "../types";
 import { ConflictError } from "./CustomError/BaseError";
 import { GameConflictError } from "./CustomError/GameError";
@@ -30,10 +31,26 @@ class GameStateManager {
         return gameState.game;
     }
 
+    private setGame(gameId: gameId, game: ConGame) {
+        this.currentGames[gameId].game = game;
+    }
+
     private getGameState(gameId: gameId) {
         const gameState = this.currentGames[gameId];
         if (!gameState) throw new GameConflictError(gameId);
         return gameState.state;
+    }
+
+    getActiveGame(gameId: gameId): ActiveConGame {
+        const game = this.getGame(gameId);
+        if (!this.isActiveGame(game)) {
+          throw new Error("Game has not finished setup yet.");
+        }
+        return game;
+    }
+
+    private isActiveGame(game: ConGame): game is ActiveConGame {
+        return game.getHasFinishedSetup()
     }
 
     createGame(gameId: gameId, numPlayers: ConGame['numPlayersTotal']) {
@@ -49,6 +66,11 @@ class GameStateManager {
     deleteGame(gameId: gameId) {
         if (this.currentGames.hasOwnProperty(gameId))
             delete this.currentGames[gameId] 
+    }
+
+    beginBattle(game: ConGame) {
+        const activeGame = game.finishedSetup();
+        this.setGame(game.id, activeGame);
     }
 
     resetGameStateManager() {

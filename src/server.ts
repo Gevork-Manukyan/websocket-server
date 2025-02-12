@@ -6,7 +6,7 @@ import { gameEventEmitter } from "./services/GameEventEmitter";
 import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
-import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, PlayerOrderChosenEvent, AllPlayersSetupData, PlayerOrderChosenData, AllSagesSelectedEvent, AllSagesSelectedData } from "./types/server-types";
+import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, PlayerOrderChosenEvent, AllPlayersSetupData, PlayerOrderChosenData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent } from "./types/server-types";
 import { processEvent, socketErrorHandler } from "./utils/utilities";
 import { ValidationError } from "./services/CustomError/BaseError";
 import { PlayersNotReadyError } from "./services/CustomError/GameError";
@@ -35,7 +35,7 @@ gameNamespace.on("connection", (socket) => {
     processEvent(socket, event as keyof SocketEventMap, rawData, next)
   });
 
-  socket.on("error", (error) => {
+  socket.on("error", (error: Error) => {
     console.error("Socket error:", error);
   });
 
@@ -110,7 +110,7 @@ gameNamespace.on("connection", (socket) => {
     if (game.numPlayersReady !== game.numPlayersTotal) throw new PlayersNotReadyError(game.numPlayersReady, game.numPlayersTotal)
     gameStateManager.verifyAllPlayersReadyEvent(gameId);
 
-    game.startGame();
+    game.initGame();
     gameStateManager.processAllPlayersReadyEvent(gameId);
     gameEventEmitter.emitPickWarriors(game.players);
   }));
@@ -142,8 +142,8 @@ gameNamespace.on("connection", (socket) => {
   socket.on(AllPlayersSetupEvent, socketErrorHandler(socket, AllPlayersSetupEvent, async ({ gameId }: AllPlayersSetupData) => {
     const game = gameStateManager.getGame(gameId);
     if (game.numPlayersFinishedSetup !== game.players.length) throw new ValidationError("All players have not finished setup", "players");
-    gameEventEmitter.emitTeamOrder(gameId, game.getTeamGoingFirst().getTeamNumber());
-    game.hasFinishedSetup = true;
+    gameStateManager.beginBattle(game);
+    socket.emit(`${AllPlayersSetupEvent}--success`)
   }));
 
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {
@@ -154,6 +154,13 @@ gameNamespace.on("connection", (socket) => {
 
 
   /* -------- GAME BATTLING -------- */
+
+  socket.on(CurrentGameStateEvent, socketErrorHandler(socket, CurrentGameStateEvent, async ({ gameId }) => {
+    const game = gameStateManager.getActiveGame(gameId);
+    const gameState = game.getGameState(socket.id);
+    socket.emit(CurrentGameStateEvent, gameState);
+  }));
+
   /*
     PHASE 1
       Daybreak Effects
@@ -167,10 +174,10 @@ gameNamespace.on("connection", (socket) => {
       Sage Ability
     
     PHASE 3
-      Buy Card
-        Item Shop
-        Creature Shop
-      Utility Card
+      Buy Card ✅
+        Item Shop ✅
+        Creature Shop ✅
+      Sell Card
       Summon Bought Card
       Refresh Shop
 

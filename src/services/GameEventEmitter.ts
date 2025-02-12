@@ -45,6 +45,11 @@ class GameEventEmitter {
   emitTeamOrder(roomId: gameId, firstTeam: Team['teamNumber']) {
     this.emitToRoom(roomId, "team-order", firstTeam);
   }
+  
+  emitCurrentTurnTeam(roomId: gameId, firstTeam: Team) {
+    // TODO: Emit to all players on team going first. Emit to other team they are waiting.
+    // this.emitToRoom(roomId, "team-order", firstTeam);
+  }
 
   emitBeginBattle(roomId: gameId, firstTurnPlayer: Player) {
     const { id, ...cleanPlayer } = firstTurnPlayer

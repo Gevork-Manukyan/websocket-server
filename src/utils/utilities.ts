@@ -1,10 +1,12 @@
-import { gameId, Sage } from "../types";
+import { Card, gameId, Sage } from "../types";
 import { DropletDeck, LeafDeck, PebbleDeck, TwigDeck } from "./constants";
-import { CustomError, ValidationError } from "../services/CustomError/BaseError";
+import { CustomError, NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { HostOnlyActionError, InvalidSageError } from "../services/CustomError/GameError";
 import { AllPlayersSetupEvent, ClearTeamsEvent, EventSchemas, SocketEventMap, StartGameEvent } from "../types/server-types";
 import { Socket } from "socket.io";
 import { gameStateManager } from "../services/GameStateManager";
+
+/* -------- PRE-GAME -------- */
 
 export function getSageDecklist(sage: Sage | null) {
   if (!sage) throw new ValidationError(`No chosen sage`, "sage")
@@ -51,7 +53,6 @@ export function handleSocketError(
   });
 }
 
-
 export function processEvent<T extends keyof SocketEventMap>(socket: Socket, eventName: T, rawData: any, next: (err?: Error) => void) {
   try {
     // Ensure the event is recognized
@@ -90,4 +91,17 @@ export function processEvent<T extends keyof SocketEventMap>(socket: Socket, eve
     handleSocketError(socket, eventName, customError)
     next(customError)
   }
+}
+
+
+/* -------- GAME -------- */
+
+export function drawCardFromDeck<T extends Card>(deck: T[]) {
+  if (deck.length === 0) throw new NotFoundError("No cards left in deck", "deck");
+
+  const randomIndex = Math.floor(Math.random() * deck.length);
+  const card = deck[randomIndex];
+  deck.splice(randomIndex, 1);
+
+  return card;
 }
