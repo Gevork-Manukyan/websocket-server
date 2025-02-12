@@ -142,6 +142,51 @@ class GameStateManager {
     processAllPlayersReadyEvent(gameId: gameId) {
         this.getGameState(gameId).processEvent('all-players-ready');
     }
+
+    // Choose Warriors
+    verifyChooseWarriorsEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('choose-warriors');
+    }
+
+    processChooseWarriorsEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('choose-warriors');
+    }
+
+    // Swap Warriors
+    verifySwapWarriorsEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('swap-warriors');
+    }
+
+    processSwapWarriorsEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('swap-warriors');
+    }
+
+    // Finished Setup
+    verifyFinishedSetupEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('player-finished-setup');
+    }
+
+    processFinishedSetupEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('player-finished-setup');
+    }
+
+    // Cancel Setup
+    verifyCancelSetupEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('cancel-setup');
+    }
+
+    processCancelSetupEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('cancel-setup');
+    }
+
+    // All Players Setup
+    verifyAllPlayersSetupEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('all-players-setup-complete');
+    }
+
+    processAllPlayersSetupEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('all-players-setup-complete');
+    }
 }
 
 export const gameStateManager = GameStateManager.getInstance();

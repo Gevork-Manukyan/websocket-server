@@ -116,33 +116,43 @@ gameNamespace.on("connection", (socket) => {
   }));
 
   socket.on(ChoseWarriorsEvent, socketErrorHandler(socket, ChoseWarriorsEvent, async ({ gameId, choices }: ChoseWarriorsData) => {
+    gameStateManager.verifyChooseWarriorsEvent(gameId);
     gameStateManager.getGame(gameId).getPlayer(socket.id).chooseWarriors(choices);
+    gameStateManager.processChooseWarriorsEvent(gameId);
     socket.emit(`${ChoseWarriorsEvent}--success`)
   }));
 
   socket.on(SwapWarriorsEvent, socketErrorHandler(socket, SwapWarriorsEvent, async ({ gameId }: SwapWarriorsData) => {
+    gameStateManager.verifySwapWarriorsEvent(gameId);
     gameStateManager.getGame(gameId).getPlayer(socket.id).swapWarriors()
+    gameStateManager.processSwapWarriorsEvent(gameId);
     socket.emit(`${SwapWarriorsEvent}--success`)
   }));
 
   socket.on(PlayerFinishedSetupEvent, socketErrorHandler(socket, PlayerFinishedSetupEvent, async ({ gameId }: PlayerFinishedSetupData) => {
+    gameStateManager.verifyFinishedSetupEvent(gameId);
     const game = gameStateManager.getGame(gameId);
     game.getPlayer(socket.id).finishPlayerSetup();
     game.incrementPlayersFinishedSetup();
+    gameStateManager.processFinishedSetupEvent(gameId);
     socket.emit(`${PlayerFinishedSetupEvent}--success`)
   }));
 
   socket.on(CancelSetupEvent, socketErrorHandler(socket, CancelSetupEvent, async ({ gameId }: CancelSetupData) => {
+    gameStateManager.verifyCancelSetupEvent(gameId);
     const game = gameStateManager.getGame(gameId)
     game.getPlayer(socket.id).cancelPlayerSetup();
     game.decrementPlayersFinishedSetup();
+    gameStateManager.processCancelSetupEvent(gameId);
     socket.emit(`${CancelSetupEvent}--success`)
   }))
 
   socket.on(AllPlayersSetupEvent, socketErrorHandler(socket, AllPlayersSetupEvent, async ({ gameId }: AllPlayersSetupData) => {
+    gameStateManager.verifyAllPlayersSetupEvent(gameId);
     const game = gameStateManager.getGame(gameId);
     if (game.numPlayersFinishedSetup !== game.players.length) throw new ValidationError("All players have not finished setup", "players");
     gameStateManager.beginBattle(game);
+    gameStateManager.processAllPlayersSetupEvent(gameId);
     socket.emit(`${AllPlayersSetupEvent}--success`)
   }));
 
