@@ -108,10 +108,11 @@ gameNamespace.on("connection", (socket) => {
 
     // All players must be ready
     if (game.numPlayersReady !== game.numPlayersTotal) throw new PlayersNotReadyError(game.numPlayersReady, game.numPlayersTotal)
+    gameStateManager.verifyAllPlayersReadyEvent(gameId);
 
     game.startGame();
+    gameStateManager.processAllPlayersReadyEvent(gameId);
     gameEventEmitter.emitPickWarriors(game.players);
-    game.setStarted(true);
   }));
 
   socket.on(ChoseWarriorsEvent, socketErrorHandler(socket, ChoseWarriorsEvent, async ({ gameId, choices }: ChoseWarriorsData) => {

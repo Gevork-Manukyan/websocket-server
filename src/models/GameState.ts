@@ -39,6 +39,7 @@ export class GameState {
             { acceptableEvents: ['all-players-ready'], nextState: "starting-setup" }
         ])
         this.addTransition("starting-setup", [
+            { acceptableEvents: [], nextState: "starting-setup" },
             { acceptableEvents: ['all-players-setup-complete'], nextState: "begin-turn" }
         ])
         this.addTransition("begin-turn", [
