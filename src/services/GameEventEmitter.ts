@@ -34,6 +34,14 @@ class GameEventEmitter {
     socket.to(roomId).emit("sage-selected", sage);
   }
 
+  emitAllSagesSelected(roomId: gameId) {
+    this.emitToRoom(roomId, "all-sages-selected");
+  }
+
+  emitTeamJoined(roomId: gameId, team: Team['teamNumber']) {
+    this.emitToRoom(roomId, "team-joined", team);
+  }
+
   emitTeamOrder(roomId: gameId, firstTeam: Team['teamNumber']) {
     this.emitToRoom(roomId, "team-order", firstTeam);
   }

@@ -6,9 +6,10 @@ import { gameEventEmitter } from "./services/GameEventEmitter";
 import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
-import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, PlayerOrderChosenEvent, AllPlayersSetupData, PlayerOrderChosenData } from "./types/server-types";
+import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, PlayerOrderChosenEvent, AllPlayersSetupData, PlayerOrderChosenData, AllSagesSelectedEvent, AllSagesSelectedData } from "./types/server-types";
 import { processEvent, socketErrorHandler } from "./utils/utilities";
 import { ValidationError } from "./services/CustomError/BaseError";
+import { PlayersNotReadyError } from "./services/CustomError/GameError";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -40,7 +41,7 @@ gameNamespace.on("connection", (socket) => {
 
 
   /* -------- GAME SETUP -------- */
-  // TODO: create a system to enforce an order of calling events. Shouldn't be able to call events out of order
+  // TODO: some events should emit to all players that something happened
 
   socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ gameId, numPlayers }: CreateGameData) => {
     const newGame = gameStateManager.createGame(gameId, numPlayers);
@@ -50,33 +51,48 @@ gameNamespace.on("connection", (socket) => {
   }));
 
   socket.on(JoinGameEvent, socketErrorHandler(socket, JoinGameEvent, async ({ gameId }: JoinGameData) => {
+    gameStateManager.verifyJoinGameEvent(gameId);
     gameStateManager.getGame(gameId).addPlayer(new Player(socket.id));
     socket.join(gameId);
+    gameStateManager.processJoinGameEvent(gameId);
     socket.emit(`${JoinGameEvent}--success`);
   }));
 
   socket.on(SelectSageEvent, socketErrorHandler(socket, SelectSageEvent, async ({ gameId, sage }: SelectSageData) => {
+    gameStateManager.verifySelectSageEvent(gameId);
     gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage);
     gameEventEmitter.emitSageSelected(socket, gameId, sage);
+    gameStateManager.processSelectSageEvent(gameId);
     socket.emit(`${SelectSageEvent}--success`);
   }));
 
+  socket.on(AllSagesSelectedEvent, socketErrorHandler(socket, AllSagesSelectedEvent, async ({ gameId }: AllSagesSelectedData) => {
+    gameStateManager.processAllSagesSelectedEvent(gameId);
+    gameEventEmitter.emitAllSagesSelected(gameId);
+  }));
+
   socket.on(JoinTeamEvent, socketErrorHandler(socket, JoinTeamEvent, async ({ gameId, team }: JoinTeamData) => {
+    gameStateManager.verifyJoinTeamEvent(gameId);
     gameStateManager.getGame(gameId).joinTeam(socket.id, team);
+    gameEventEmitter.emitTeamJoined(gameId, team);
+    gameStateManager.processJoinTeamEvent(gameId);
     socket.emit(`${JoinTeamEvent}--success`);
   }));
 
   socket.on(ClearTeamsEvent, socketErrorHandler(socket, ClearTeamsEvent, async ({ gameId }: ClearTeamsData) => {
+    gameStateManager.verifyClearTeamsEvent(gameId);
     gameStateManager.getGame(gameId).clearTeams();
+    gameStateManager.processClearTeamsEvent(gameId);
     socket.emit(`${ClearTeamsEvent}--success`);
   }));
 
   socket.on(ToggleReadyStatusEvent, socketErrorHandler(socket, ToggleReadyStatusEvent, async ({ gameId }: ToggleReadyStatusData) => {
+    gameStateManager.verifyToggleReadyStatusEvent(gameId);
     const game = gameStateManager.getGame(gameId);
     const currPlayer = game.getPlayer(socket.id);
     if (!currPlayer.getSage()) throw new ValidationError("Cannot toggle ready. The sage has not been set.", "sage");
     currPlayer.toggleReady();
-
+    
     if (currPlayer.getIsReady()) {
       game.incrementPlayersReady();
       socket.emit("ready-status--ready");
@@ -84,10 +100,14 @@ gameNamespace.on("connection", (socket) => {
       game.decrementPlayersReady();
       socket.emit("ready-status--not-ready");
     }
+    gameStateManager.processToggleReadyStatusEvent(gameId);
   }));
 
   socket.on(StartGameEvent, socketErrorHandler(socket, StartGameEvent, async ({ gameId }: StartGameData) => {
     const game = gameStateManager.getGame(gameId);
+
+    // All players must be ready
+    if (game.numPlayersReady !== game.numPlayersTotal) throw new PlayersNotReadyError(game.numPlayersReady, game.numPlayersTotal)
 
     game.startGame();
     gameEventEmitter.emitPickWarriors(game.players);

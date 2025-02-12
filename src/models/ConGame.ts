@@ -136,9 +136,6 @@ export class ConGame {
   }
 
   startGame() {
-    // All players must be ready
-    if (this.numPlayersReady !== this.numPlayersTotal) throw new PlayersNotReadyError(this.numPlayersReady, this.numPlayersTotal)
-
     this.initPlayerDecks();
     this.initPlayerFields();
     

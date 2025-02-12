@@ -2,6 +2,7 @@ import { ConGame } from "../models";
 import { GameState } from "../models/GameState";
 import { gameId } from "../types";
 import { ConflictError } from "./CustomError/BaseError";
+import { GameConflictError } from "./CustomError/GameError";
 
 type CurrentGames = {
     [key: gameId]: {
@@ -24,11 +25,15 @@ class GameStateManager {
     }
 
     getGame(gameId: gameId) {
-        return this.currentGames[gameId]?.game;
+        const gameState = this.currentGames[gameId];
+        if (!gameState) throw new GameConflictError(gameId);
+        return gameState.game;
     }
 
-    getGameState(gameId: gameId) {
-        return this.currentGames[gameId]?.state;
+    private getGameState(gameId: gameId) {
+        const gameState = this.currentGames[gameId];
+        if (!gameState) throw new GameConflictError(gameId);
+        return gameState.state;
     }
 
     createGame(gameId: gameId, numPlayers: ConGame['numPlayersTotal']) {
@@ -48,6 +53,72 @@ class GameStateManager {
 
     resetGameStateManager() {
         this.currentGames = {};
+    }
+
+
+    /* -------- PROCESSING GAME STATE -------- */
+
+    // Player Joined
+    verifyJoinGameEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('player-joined');
+    }
+
+    processJoinGameEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('player-joined');
+    }
+
+    // Player Selected Sage
+    verifySelectSageEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('player-selected-sage');
+    }
+
+    processSelectSageEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('player-selected-sage');
+    }
+
+    // All Sages Selected
+    verifyAllSagesSelectedEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('all-sages-selected');
+    }
+
+    processAllSagesSelectedEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('all-sages-selected');
+    }
+
+    // Player Joined Team
+    verifyJoinTeamEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('player-joined-team');
+    }
+
+    processJoinTeamEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('player-joined-team');
+    }
+
+    // Clear Teams
+    verifyClearTeamsEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('clear-teams');
+    }
+
+    processClearTeamsEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('clear-teams');
+    }
+
+    // Toggle Ready Status
+    verifyToggleReadyStatusEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('toggle-ready-status');
+    }
+
+    processToggleReadyStatusEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('toggle-ready-status');
+    }
+
+    // All Players Ready
+    verifyAllPlayersReadyEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('all-players-ready');
+    }
+
+    processAllPlayersReadyEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('all-players-ready');
     }
 }
 

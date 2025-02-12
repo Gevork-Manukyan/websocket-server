@@ -1,8 +1,8 @@
 import { GameStateError } from "../services/CustomError/GameError";
 import { gameId } from "../types";
-import { TransitionEvent } from "../types/types";
 
-type State = "join-game" | "joining-teams" | "ready-up" | "starting-setup" | "begin-turn" | "phase1" | "phase2" | "phase3" | "discarding-cards" | "drawing-new-hand" | "end-game" | "game-finished";
+type State = "joining-game" | "joining-teams" | "ready-up" | "starting-setup" | "begin-turn" | "phase1" | "phase2" | "phase3" | "discarding-cards" | "drawing-new-hand" | "end-game" | "game-finished";
+type TransitionEvent = 'player-joined' | 'player-selected-sage' | 'all-sages-selected' | 'player-joined-team' | 'clear-teams' | 'all-teams-joined' | 'toggle-ready-status' | 'all-players-ready' | 'all-players-setup-complete' | 'next-phase' | 'day-break-card' | 'draw-card' | 'swap-cards' | 'summon-card' | 'attack' | 'utility' | 'sage-skill' | 'buy-card' | 'sell-card' | 'refresh-shop' | 'done-discarding-cards' | 'done-drawing-new-hand' | 'win-game';
 
 type Transition = {
     currentStateValue: State;
@@ -26,13 +26,16 @@ export class GameState {
     }
 
     private initTransitionTable() {
-        this.addTransition("join-game", [
+        this.addTransition("joining-game", [
+            { acceptableEvents: ['player-joined', 'player-selected-sage'], nextState: "joining-game" },
             { acceptableEvents: ['all-sages-selected'], nextState: "joining-teams" }
         ])
         this.addTransition("joining-teams", [
+            { acceptableEvents: ['player-joined-team', 'clear-teams'], nextState: "joining-teams" },
             { acceptableEvents: ['all-teams-joined'], nextState: "ready-up" }
         ])
         this.addTransition("ready-up", [
+            { acceptableEvents: ['toggle-ready-status'], nextState: "ready-up" },
             { acceptableEvents: ['all-players-ready'], nextState: "starting-setup" }
         ])
         this.addTransition("starting-setup", [
@@ -76,13 +79,26 @@ export class GameState {
         };
     }
 
+    private checkTransitionForEvent(event: TransitionEvent, transition: Transition) {
+        return transition.possibleInputs.find(input => input.acceptableEvents.includes(event));
+    }
+
+    private findNextTransition(nextState: State) {
+        return this.stateTransitionTable.find(transition => transition.currentStateValue === nextState);
+    }
+
+    verifyEvent(event: TransitionEvent) {
+        const input = this.checkTransitionForEvent(event, this.currentTransition);
+        if (!input) throw new GameStateError(`Invalid event: ${event} for current state: ${this.currentTransition.currentStateValue}`);
+    }
+
     processEvent(event: TransitionEvent) {
-        const input = this.currentTransition.possibleInputs.find(input => input.acceptableEvents.includes(event));
+        const input = this.checkTransitionForEvent(event, this.currentTransition);
 
         if (!input) throw new GameStateError(`Invalid event: ${event} for current state: ${this.currentTransition.currentStateValue}`);
-        const nextState = this.stateTransitionTable.find(transition => transition.currentStateValue === input.nextState);
+        const nextTransition = this.findNextTransition(input.nextState);
         
-        if (!nextState) throw new GameStateError(`Invalid next state: ${input.nextState}`);
-        this.currentTransition = nextState;
+        if (!nextTransition) throw new GameStateError(`Invalid next state: ${input.nextState}`);
+        this.currentTransition = nextTransition;
     }
 }
