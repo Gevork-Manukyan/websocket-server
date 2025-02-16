@@ -188,6 +188,15 @@ class GameStateManager {
     processAllPlayersSetupEvent(gameId: gameId) {
         this.getGameState(gameId).processEvent('all-players-setup-complete');
     }
+
+    // Activate Day Break
+    verifyActivateDayBreakEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('day-break-card');
+    }
+
+    processActivateDayBreakEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('day-break-card');
+    }
 }
 
 export const gameStateManager = GameStateManager.getInstance();
