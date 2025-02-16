@@ -1,5 +1,5 @@
 import { gameId, Sage } from "../../types";
-import { ConflictError, CustomError } from "./BaseError";
+import { ConflictError, CustomError, ValidationError } from "./BaseError";
 
 /**
  * When the game with the given ID does not exist
@@ -52,12 +52,18 @@ export class PlayersNotReadyError extends ConflictError {
     }
 }
 
+export class InvalidSpaceError extends ValidationError {
+    constructor(spaceOption: number) {
+        super(`Invalid space number: ${spaceOption}`, "INVALID_SPACE");
+    }
+}
+
 export class NullSpaceError extends CustomError {
   spaceNumber; 
 
-  constructor(spaceNumber: number, message = `Cannot interact with null space: ${spaceNumber}`) {
+  constructor(spaceOption: number, message = `Cannot interact with null space: ${spaceOption}`) {
     super(message, "NULL_SPACE");
-    this.spaceNumber = spaceNumber;
+    this.spaceNumber = spaceOption;
   }
 }
   
