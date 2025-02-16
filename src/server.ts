@@ -6,11 +6,12 @@ import { gameEventEmitter } from "./services/GameEventEmitter";
 import { gameStateManager } from "./services/GameStateManager";
 import { IS_PRODUCTION } from "./utils/constants";
 import { PORT } from "./utils/config";
-import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, PlayerOrderChosenEvent, AllPlayersSetupData, PlayerOrderChosenData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent } from "./types/server-types";
+import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData } from "./types/server-types";
 import { processEvent, socketErrorHandler } from "./utils/utilities";
 import { ValidationError } from "./services/CustomError/BaseError";
-import { PlayersNotReadyError } from "./services/CustomError/GameError";
+import { InvalidSpaceError, PlayersNotReadyError } from "./services/CustomError/GameError";
 import { ActiveConGame } from "./models/ConGame";
+import { OnePlayerSpaceOptionsSchema } from "./types/types";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -166,10 +167,23 @@ gameNamespace.on("connection", (socket) => {
 
   /* -------- GAME BATTLING -------- */
 
-  socket.on(CurrentGameStateEvent, socketErrorHandler(socket, CurrentGameStateEvent, async ({ gameId }) => {
+  socket.on(CurrentGameStateEvent, socketErrorHandler(socket, CurrentGameStateEvent, async ({ gameId }: CurrentGameStateData) => {
     const game = gameStateManager.getActiveGame(gameId);
     const gameState = game.getGameState(socket.id);
     socket.emit(CurrentGameStateEvent, gameState);
+  }));
+
+  socket.on(ActivateDayBreakEvent, socketErrorHandler(socket, ActivateDayBreakEvent, async ({ gameId, spaceOption }: ActivateDayBreakData) => {
+    gameStateManager.verifyActivateDayBreakEvent(gameId);
+    const game = gameStateManager.getActiveGame(gameId);
+
+    // if there is only 2 players in the game then the space option must be a 2 player space option
+    if (game.players.length === 2 && !(OnePlayerSpaceOptionsSchema.safeParse(spaceOption).success)) {
+      throw new InvalidSpaceError(spaceOption);
+    }
+
+    game.activateDayBreak(socket.id, spaceOption);
+    gameStateManager.processActivateDayBreakEvent(gameId);
   }));
 
   /*

@@ -3,7 +3,7 @@
 import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { NotEnoughGoldError, PlayersNotReadyError, SageUnavailableError, ShopFullError } from "../services/CustomError/GameError";
 import { Sage, ElementalCard, gameId, ItemCard } from "../types";
-import { Decklist } from "../types/types";
+import { Decklist, SpaceOption } from "../types/types";
 import { BambooBerserker, Bruce, CackleRipclaw, CamouChameleon, CurrentConjurer, Dewy, DistantDoubleStrike, ElementalIncantation, ElementalSwap, ExchangeOfNature, FarsightFrenzy, Flint, FocusedFury, ForageThumper, Herbert, HummingHerald, IguanaGuard, LumberClaw, MagicEtherStrike, MeleeShield, MossViper, Mush, NaturalDefense, NaturesWrath, OakLumbertron, Obliterate, PineSnapper, PrimitiveStrike, ProjectileBlast, RangedBarrier, Redstone, ReinforcedImpact, RoamingRazor, Rocco, RubyGuardian, RunePuma, ShrubBeetle, SplashBasilisk, SplinterStinger, StoneDefender, SurgesphereMonk, TerrainTumbler, TwineFeline, TyphoonFist, Wade, WhirlWhipper, Willow } from "../utils/cards";
 import { drawCardFromDeck } from "../utils/utilities";
 import { Player } from "./Player";
@@ -395,6 +395,10 @@ export class ActiveConGame extends ConGame {
   decrementActionPoints() {
     if (this.actionPoints === 0) throw new ValidationError("Team has no action points left", "actionPoints");
     this.actionPoints -= 1;
+  }
+
+  activateDayBreak(playerId: Player['id'], spaceOption: SpaceOption) {
+    const team = this.getPlayer(playerId).getTeam()!.activateDayBreak(spaceOption);
   }
 
   buyCreature(playerId: Player['id'], creatureShopIndex: ShopIndex) {
