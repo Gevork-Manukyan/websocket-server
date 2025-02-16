@@ -1,12 +1,10 @@
 import { ValidationError } from "../services/CustomError/BaseError";
 import { NullSpaceError } from "../services/CustomError/GameError";
 import { ElementalCard } from "../types";
+import { SpaceOption, OnePlayerSpaceOptions, TwoPlayerSpaceOptions } from "../types/types";
 
-type OnePlayerSpaceOptions = 1 | 2 | 3 | 4 | 5 | 6;
 const ONE_PLAYER_SPACE_MAX = 6;
-type TwoPlayerSpaceOptions = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 const TWO_PLAYER_SPACE_MAX = 12;
-type SpaceOptions = OnePlayerSpaceOptions | TwoPlayerSpaceOptions
 
 export class Battlefield {
     private fieldArray: BattlefieldSpace[] = [];
@@ -143,12 +141,12 @@ export class Battlefield {
         this.fieldArray = [row_1_1, row_1_2, row_2_1, row_2_2, row_2_3, row_2_4, row_3_1, row_3_2, row_3_3, row_3_4, row_3_5, row_3_6];
     }
 
-    private getBattlefieldSpace<T extends SpaceOptions>(spaceNumber: T) {
+    private getBattlefieldSpace<T extends SpaceOption>(spaceNumber: T) {
         this.validateSpaceNumber(spaceNumber)
         return this.fieldArray[spaceNumber - 1];
     }
 
-    private validateSpaceNumber(spaceNumber: SpaceOptions): asserts spaceNumber is OnePlayerSpaceOptions | TwoPlayerSpaceOptions {
+    private validateSpaceNumber(spaceNumber: SpaceOption): asserts spaceNumber is OnePlayerSpaceOptions | TwoPlayerSpaceOptions {
         const maxSpaceNumber = this.numPlayersOnTeam === 1 ? ONE_PLAYER_SPACE_MAX : TWO_PLAYER_SPACE_MAX;
     
         if (spaceNumber < 1 || spaceNumber > maxSpaceNumber) {
@@ -156,17 +154,17 @@ export class Battlefield {
         }
     }
 
-    getCard(spaceNumber: SpaceOptions) {
+    getCard(spaceNumber: SpaceOption) {
         return this.getBattlefieldSpace(spaceNumber).value;
     }
 
-    addCard(card: ElementalCard, spaceNumber: SpaceOptions) {
+    addCard(card: ElementalCard, spaceNumber: SpaceOption) {
         const targetSpace = this.getBattlefieldSpace(spaceNumber)
         if (targetSpace.value !== null) throw new ValidationError("Cannot add a card to a space with an existing card", "INVALID_INPUT")
         targetSpace.value = card;
     }
 
-    removeCard(spaceNumber: SpaceOptions): ElementalCard {
+    removeCard(spaceNumber: SpaceOption): ElementalCard {
         const targetSpace = this.getBattlefieldSpace(spaceNumber)
         if (targetSpace.value === null) throw new NullSpaceError(spaceNumber, `Cannot remove an empty space: ${spaceNumber}`)
         const targetCard = targetSpace.value
@@ -174,7 +172,7 @@ export class Battlefield {
         return targetCard;
     }
 
-    swapCards(space1Number: SpaceOptions, space2Number: SpaceOptions) {
+    swapCards(space1Number: SpaceOption, space2Number: SpaceOption) {
         if (space1Number === space2Number) throw new ValidationError("Cannot swap a card with itself", "spaceNumber");
 
         const space1 = this.getBattlefieldSpace(space1Number)
@@ -201,7 +199,7 @@ export class Battlefield {
 
 type Direction = "TL" | "T" | "TR" | "L" | "R" | "BL" | "B" | "BR"
 export class BattlefieldSpace {
-    spaceNumber: SpaceOptions;
+    spaceNumber: SpaceOption;
     value: ElementalCard | null;
     connections: {
         TL?: BattlefieldSpace | null; 
@@ -214,7 +212,7 @@ export class BattlefieldSpace {
         BR?: BattlefieldSpace | null;
     }
 
-    constructor(spaceNumber: SpaceOptions, value: BattlefieldSpace['value'], connections?: BattlefieldSpace['connections']) {
+    constructor(spaceNumber: SpaceOption, value: BattlefieldSpace['value'], connections?: BattlefieldSpace['connections']) {
         this.spaceNumber = spaceNumber;
         this.value = value;
         this.connections =  {

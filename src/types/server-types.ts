@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SageSchema } from "./types";
+import { AllSpaceOptionsSchema, SageSchema } from "./types";
 import { ElementalWarriorStarterCardSchema } from "./card-types";
 
 const createGameSchema = z.object({
@@ -58,17 +58,17 @@ const allPlayersSetupSchema = z.object({
   gameId: z.string(),
 })
 
-const playerOrderChosenSchema = z.object({
-  gameId: z.string(),
-  playerOrder: z.union([z.literal(1), z.literal(2)])
-})
-
 const leaveGameSchema = z.object({
   gameId: z.string(),
 });
 
 const currentGameStateSchema = z.object({
   gameId: z.string(),
+});
+
+const activateDayBreakSchema = z.object({
+  gameId: z.string(),
+  spaceOption: AllSpaceOptionsSchema,
 });
 
 export const CreateGameEvent = "create-game" as const;
@@ -84,9 +84,9 @@ export const SwapWarriorsEvent = "swap-warriors" as const;
 export const PlayerFinishedSetupEvent = "player-finished-setup" as const;
 export const CancelSetupEvent = "cancel-setup" as const;
 export const AllPlayersSetupEvent = "all-players-setup" as const;
-export const PlayerOrderChosenEvent = "player-order-chosen" as const;
 export const LeaveGameEvent = "leave-game" as const;
 export const CurrentGameStateEvent = "current-game-state" as const;
+export const ActivateDayBreakEvent = "activate-day-break" as const;
 
 // Define EventSchemas record
 export const EventSchemas = {
@@ -103,9 +103,9 @@ export const EventSchemas = {
   [PlayerFinishedSetupEvent]: playerFinishedSetupSchema,
   [CancelSetupEvent]: cancelSetupSchema,
   [AllPlayersSetupEvent]: allPlayersSetupSchema,
-  [PlayerOrderChosenEvent]: playerOrderChosenSchema,
   [LeaveGameEvent]: leaveGameSchema,
   [CurrentGameStateEvent]: currentGameStateSchema,
+  [ActivateDayBreakEvent]: activateDayBreakSchema,
 } as const;
 
 // Infer the types from the schemas directly
@@ -122,9 +122,9 @@ export type SwapWarriorsData = z.infer<typeof swapWarriorsSchema>;
 export type PlayerFinishedSetupData = z.infer<typeof playerFinishedSetupSchema>;
 export type CancelSetupData = z.infer<typeof cancelSetupSchema>;
 export type AllPlayersSetupData = z.infer<typeof allPlayersSetupSchema>;
-export type PlayerOrderChosenData = z.infer<typeof playerOrderChosenSchema>;
 export type LeaveGameData = z.infer<typeof leaveGameSchema>;
 export type CurrentGameStateData = z.infer<typeof currentGameStateSchema>;
+export type ActivateDayBreakData = z.infer<typeof activateDayBreakSchema>;
 
 // Create a mapped type for socket events
 export type SocketEventMap = {
@@ -141,7 +141,7 @@ export type SocketEventMap = {
   [PlayerFinishedSetupEvent]: PlayerFinishedSetupData;
   [CancelSetupEvent]: CancelSetupData;
   [AllPlayersSetupEvent]: AllPlayersSetupData;
-  [PlayerOrderChosenEvent]: PlayerOrderChosenData;
   [LeaveGameEvent]: LeaveGameData;
   [CurrentGameStateEvent]: CurrentGameStateData;
+  [ActivateDayBreakEvent]: ActivateDayBreakData;
 }
