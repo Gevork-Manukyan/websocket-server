@@ -24,6 +24,12 @@ class GameEventEmitter {
     this.io.in(roomId).emit(eventName, data);
   }
 
+  emitToTeam(team: Team, eventName: string, data: any = null) {
+    team.players.forEach(player => {
+      this.emitToPlayer(player.id, eventName, data);
+    });
+  }
+
   emitPickWarriors(players: Player[]) {
     players.forEach(player => {
       this.emitToPlayer(player.id, "pick-warriors", player.getDecklist());
@@ -41,19 +47,10 @@ class GameEventEmitter {
   emitTeamJoined(roomId: gameId, team: Team['teamNumber']) {
     this.emitToRoom(roomId, "team-joined", team);
   }
-
-  emitTeamOrder(roomId: gameId, firstTeam: Team['teamNumber']) {
-    this.emitToRoom(roomId, "team-order", firstTeam);
-  }
   
-  emitCurrentTurnTeam(roomId: gameId, firstTeam: Team) {
-    // TODO: Emit to all players on team going first. Emit to other team they are waiting.
-    // this.emitToRoom(roomId, "team-order", firstTeam);
-  }
-
-  emitBeginBattle(roomId: gameId, firstTurnPlayer: Player) {
-    const { id, ...cleanPlayer } = firstTurnPlayer
-    this.emitToRoom(roomId, "begin-battle", cleanPlayer);
+  emitStartTurn(activeTeam: Team, waitingTeam: Team) {
+    this.emitToTeam(activeTeam, "start-turn");
+    this.emitToTeam(waitingTeam, "waiting-turn");
   }
 }
  

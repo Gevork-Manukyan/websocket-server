@@ -353,6 +353,10 @@ export class ActiveConGame extends ConGame {
     return this.teamOrder[this.currentTurnTeam];
   }
 
+  getWaitingTeam() {
+    return this.teamOrder[this.currentTurnTeam === "first" ? "second" : "first"];
+  }
+
   toggleCurrentTurnTeam() {
     this.currentTurnTeam = this.currentTurnTeam === "first" ? "second" : "first";
   }

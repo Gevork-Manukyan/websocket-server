@@ -10,6 +10,7 @@ import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEven
 import { processEvent, socketErrorHandler } from "./utils/utilities";
 import { ValidationError } from "./services/CustomError/BaseError";
 import { PlayersNotReadyError } from "./services/CustomError/GameError";
+import { ActiveConGame } from "./models/ConGame";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -151,9 +152,9 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.verifyAllPlayersSetupEvent(gameId);
     const game = gameStateManager.getGame(gameId);
     if (game.numPlayersFinishedSetup !== game.players.length) throw new ValidationError("All players have not finished setup", "players");
-    gameStateManager.beginBattle(game);
+    const activeGame = gameStateManager.beginBattle(game);
     gameStateManager.processAllPlayersSetupEvent(gameId);
-    socket.emit(`${AllPlayersSetupEvent}--success`)
+    gameEventEmitter.emitStartTurn(activeGame.getCurrentTurnTeam(), activeGame.getWaitingTeam());
   }));
 
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {

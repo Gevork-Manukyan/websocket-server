@@ -68,9 +68,10 @@ class GameStateManager {
             delete this.currentGames[gameId] 
     }
 
-    beginBattle(game: ConGame) {
+    beginBattle(game: ConGame): ActiveConGame {
         const activeGame = game.finishedSetup();
         this.setGame(game.id, activeGame);
+        return activeGame;
     }
 
     resetGameStateManager() {
