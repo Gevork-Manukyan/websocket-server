@@ -189,6 +189,15 @@ class GameStateManager {
         this.getGameState(gameId).processEvent('all-players-setup-complete');
     }
 
+    // Get Day Break Cards
+    verifyGetDayBreakCardsEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent('get-day-break-cards');
+    }
+
+    processGetDayBreakCardsEvent(gameId: gameId) {
+        this.getGameState(gameId).processEvent('get-day-break-cards');
+    }
+
     // Activate Day Break
     verifyActivateDayBreakEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent('day-break-card');

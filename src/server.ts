@@ -174,8 +174,10 @@ gameNamespace.on("connection", (socket) => {
   }));
 
   socket.on(GetDayBreakCardsEvent, socketErrorHandler(socket, GetDayBreakCardsEvent, async ({ gameId }: GetDayBreakCardsData) => {
+    gameStateManager.verifyGetDayBreakCardsEvent(gameId);
     const game = gameStateManager.getActiveGame(gameId);
     const dayBreakCards = game.getDayBreakCards(socket.id);
+    gameStateManager.processGetDayBreakCardsEvent(gameId);
     gameEventEmitter.emitDayBreakCards(game.getActiveTeam(), dayBreakCards);
   }));
 
