@@ -66,6 +66,10 @@ const currentGameStateSchema = z.object({
   gameId: z.string(),
 });
 
+const getDayBreakCardsSchema = z.object({
+  gameId: z.string(),
+});
+
 const activateDayBreakSchema = z.object({
   gameId: z.string(),
   spaceOption: AllSpaceOptionsSchema,
@@ -86,6 +90,7 @@ export const CancelSetupEvent = "cancel-setup" as const;
 export const AllPlayersSetupEvent = "all-players-setup" as const;
 export const LeaveGameEvent = "leave-game" as const;
 export const CurrentGameStateEvent = "current-game-state" as const;
+export const GetDayBreakCardsEvent = "get-day-break-cards" as const;
 export const ActivateDayBreakEvent = "activate-day-break" as const;
 
 // Define EventSchemas record
@@ -105,6 +110,7 @@ export const EventSchemas = {
   [AllPlayersSetupEvent]: allPlayersSetupSchema,
   [LeaveGameEvent]: leaveGameSchema,
   [CurrentGameStateEvent]: currentGameStateSchema,
+  [GetDayBreakCardsEvent]: getDayBreakCardsSchema,
   [ActivateDayBreakEvent]: activateDayBreakSchema,
 } as const;
 
@@ -124,6 +130,7 @@ export type CancelSetupData = z.infer<typeof cancelSetupSchema>;
 export type AllPlayersSetupData = z.infer<typeof allPlayersSetupSchema>;
 export type LeaveGameData = z.infer<typeof leaveGameSchema>;
 export type CurrentGameStateData = z.infer<typeof currentGameStateSchema>;
+export type GetDayBreakCardsData = z.infer<typeof getDayBreakCardsSchema>;
 export type ActivateDayBreakData = z.infer<typeof activateDayBreakSchema>;
 
 // Create a mapped type for socket events
@@ -143,5 +150,6 @@ export type SocketEventMap = {
   [AllPlayersSetupEvent]: AllPlayersSetupData;
   [LeaveGameEvent]: LeaveGameData;
   [CurrentGameStateEvent]: CurrentGameStateData;
+  [GetDayBreakCardsEvent]: GetDayBreakCardsData;
   [ActivateDayBreakEvent]: ActivateDayBreakData;
 }

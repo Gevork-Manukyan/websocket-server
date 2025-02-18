@@ -303,7 +303,7 @@ export class ConGame {
 }
 
 export class ActiveConGame extends ConGame {
-  private currentTurnTeam: keyof TeamOrder = "first";
+  private activeTeam: keyof TeamOrder = "first";
   private currentPhase: "phase1" | "phase2" | "phase3" | "phase4" = "phase1";
   private actionPoints: number;
   private maxActionPoints: 3 | 6;
@@ -328,7 +328,7 @@ export class ActiveConGame extends ConGame {
 
     const gameState = {
       game: {
-        isTurn: this.getCurrentTurnTeam() === team,
+        isTurn: this.getActiveTeam() === team,
         currentPhase: this.currentPhase,
         actionPoints: this.actionPoints,
         creatureShop: this.currentCreatureShopCards,
@@ -349,16 +349,16 @@ export class ActiveConGame extends ConGame {
     return gameState;
   }
 
-  getCurrentTurnTeam() {
-    return this.teamOrder[this.currentTurnTeam];
+  getActiveTeam() {
+    return this.teamOrder[this.activeTeam];
   }
 
   getWaitingTeam() {
-    return this.teamOrder[this.currentTurnTeam === "first" ? "second" : "first"];
+    return this.teamOrder[this.activeTeam === "first" ? "second" : "first"];
   }
 
-  toggleCurrentTurnTeam() {
-    this.currentTurnTeam = this.currentTurnTeam === "first" ? "second" : "first";
+  toggleActiveTeam() {
+    this.activeTeam = this.activeTeam === "first" ? "second" : "first";
   }
 
   getCurrentPhase() {
@@ -380,7 +380,7 @@ export class ActiveConGame extends ConGame {
   endPhase4() {
     // TODO: end turn and reset all variables
     this.currentPhase = "phase1";
-    this.toggleCurrentTurnTeam();
+    this.toggleActiveTeam();
     this.resetActionPoints();
   }
 
@@ -395,6 +395,10 @@ export class ActiveConGame extends ConGame {
   decrementActionPoints() {
     if (this.actionPoints === 0) throw new ValidationError("Team has no action points left", "actionPoints");
     this.actionPoints -= 1;
+  }
+
+  getDayBreakCards(playerId: Player['id']): SpaceOption[] {
+    return this.getPlayer(playerId).getTeam()!.getDayBreakCards();
   }
 
   activateDayBreak(playerId: Player['id'], spaceOption: SpaceOption) {

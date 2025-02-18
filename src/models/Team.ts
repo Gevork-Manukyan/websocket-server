@@ -1,6 +1,6 @@
 import { ConflictError, NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { ElementalWarriorStarterCard } from "../types/card-types";
-import { Decklist } from "../types/types";
+import { Decklist, SpaceOption } from "../types/types";
 import { Battlefield } from "./Battlefield";
 import { Player } from "./Player";
 
@@ -149,5 +149,9 @@ export class Team {
             gold: this.gold,
             battlefield: this.battlefield.getBattlefieldState()
         }
+    }
+
+    getDayBreakCards(): SpaceOption[] {
+        return this.battlefield.getDayBreakCards();
     }
 }

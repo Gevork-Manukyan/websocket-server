@@ -2,6 +2,7 @@ import { Server, Socket } from "socket.io";
 import { Player } from "../models";
 import { Team } from "../models/Team";
 import { gameId, Sage } from "../types";
+import { SpaceOption } from "../types/types";
 
 class GameEventEmitter {
   private static instance: GameEventEmitter;
@@ -51,6 +52,10 @@ class GameEventEmitter {
   emitStartTurn(activeTeam: Team, waitingTeam: Team) {
     this.emitToTeam(activeTeam, "start-turn");
     this.emitToTeam(waitingTeam, "waiting-turn");
+  }
+
+  emitDayBreakCards(activeTeam: Team, dayBreakCards: SpaceOption[]) {
+    this.emitToTeam(activeTeam, "day-break-cards", dayBreakCards);
   }
 }
  

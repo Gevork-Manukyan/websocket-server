@@ -195,6 +195,15 @@ export class Battlefield {
     getBattlefieldState() {
         return this.fieldArray.map(space => space.getBattlefieldSpaceState())
     }
+
+    getDayBreakCards(): SpaceOption[] {
+        return this.fieldArray.filter(space => {
+            if (space.value === null) return false;
+            
+            // If space has an ability card with Day Break which is true, return true
+            return "isDayBreak" in space.value && space.value.isDayBreak
+        }).map(space => space.spaceNumber)
+    }
 }
 
 type Direction = "TL" | "T" | "TR" | "L" | "R" | "BL" | "B" | "BR"

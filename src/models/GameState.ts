@@ -3,7 +3,7 @@ import { gameId } from "../types";
 
 type State = "joining-game" | "joining-teams" | "ready-up" | "starting-setup" | "phase1" | "phase2" | "phase3" | "discarding-cards" | "drawing-new-hand" | "end-game" | "game-finished";
 
-type TransitionEvent = 'player-joined' | 'player-selected-sage' | 'all-sages-selected' | 'player-joined-team' | 'clear-teams' | 'all-teams-joined' | 'toggle-ready-status' | 'all-players-ready' | 'choose-warriors' | 'swap-warriors' | 'player-finished-setup' | 'cancel-setup' |'all-players-setup-complete' | 'next-phase' | 'day-break-card' | 'draw-card' | 'swap-cards' | 'summon-card' | 'attack' | 'utility' | 'sage-skill' | 'buy-card' | 'sell-card' | 'refresh-shop' | 'done-discarding-cards' | 'done-drawing-new-hand' | 'win-game';
+type TransitionEvent = 'player-joined' | 'player-selected-sage' | 'all-sages-selected' | 'player-joined-team' | 'clear-teams' | 'all-teams-joined' | 'toggle-ready-status' | 'all-players-ready' | 'choose-warriors' | 'swap-warriors' | 'player-finished-setup' | 'cancel-setup' |'all-players-setup-complete' | 'next-phase' | 'get-day-break-cards' | 'day-break-card' | 'draw-card' | 'swap-cards' | 'summon-card' | 'attack' | 'utility' | 'sage-skill' | 'buy-card' | 'sell-card' | 'refresh-shop' | 'done-discarding-cards' | 'done-drawing-new-hand' | 'win-game';
 
 type Transition = {
     currentStateValue: State;
@@ -47,7 +47,7 @@ export class GameState {
         //     { acceptableEvents: ['next-phase'], nextState: "phase1" }
         // ])
         this.addTransition("phase1", [
-            { acceptableEvents: ['day-break-card'], nextState: "phase1" },
+            { acceptableEvents: ['get-day-break-cards', 'day-break-card'], nextState: "phase1" },
             { acceptableEvents: ['next-phase'], nextState: "phase2" }
         ])
         this.addTransition("phase2", [
