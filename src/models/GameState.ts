@@ -1,9 +1,52 @@
 import { GameStateError } from "../services/CustomError/GameError";
 import { gameId } from "../types";
 
-type State = "joining-game" | "joining-teams" | "ready-up" | "starting-setup" | "phase1" | "resolve-day-break-cards" | "phase2" | "phase3" | "discarding-cards" | "drawing-new-hand" | "end-game" | "game-finished";
+export enum State {
+    JOINING_GAME = "joining-game",
+    JOINING_TEAMS = "joining-teams",
+    READY_UP = "ready-up",
+    STARTING_SETUP = "starting-setup",
+    PHASE1 = "phase1",
+    RESOLVE_DAY_BREAK_CARDS = "resolve-day-break-cards",
+    PHASE2 = "phase2",
+    PHASE3 = "phase3",
+    DISCARDING_CARDS = "discarding-cards",
+    DRAWING_NEW_HAND = "drawing-new-hand",
+    END_GAME = "end-game",
+    GAME_FINISHED = "game-finished",
+}
 
-type TransitionEvent = 'player-joined' | 'player-selected-sage' | 'all-sages-selected' | 'player-joined-team' | 'clear-teams' | 'all-teams-joined' | 'toggle-ready-status' | 'all-players-ready' | 'choose-warriors' | 'swap-warriors' | 'player-finished-setup' | 'cancel-setup' |'all-players-setup-complete' | 'next-phase' | 'get-day-break-cards' | 'day-break-card' | 'draw-card' | 'swap-cards' | 'summon-card' | 'attack' | 'utility' | 'sage-skill' | 'buy-card' | 'sell-card' | 'refresh-shop' | 'done-discarding-cards' | 'done-drawing-new-hand' | 'win-game';
+export enum TransitionEvent {
+    PLAYER_JOINED = "player-joined",
+    PLAYER_SELECTED_SAGE = "player-selected-sage",
+    ALL_SAGES_SELECTED = "all-sages-selected",
+    PLAYER_JOINED_TEAM = "player-joined-team",
+    CLEAR_TEAMS = "clear-teams",
+    ALL_TEAMS_JOINED = "all-teams-joined",
+    TOGGLE_READY_STATUS = "toggle-ready-status",
+    ALL_PLAYERS_READY = "all-players-ready",
+    CHOOSE_WARRIORS = "choose-warriors",
+    SWAP_WARRIORS = "swap-warriors",
+    PLAYER_FINISHED_SETUP = "player-finished-setup",
+    CANCEL_SETUP = "cancel-setup",
+    ALL_PLAYERS_SETUP_COMPLETE = "all-players-setup-complete",
+    NEXT_PHASE = "next-phase",
+    GET_DAY_BREAK_CARDS = "get-day-break-cards",
+    DAY_BREAK_CARD = "day-break-card",
+    DRAW_CARD = "draw-card",
+    SWAP_CARDS = "swap-cards",
+    SUMMON_CARD = "summon-card",
+    ATTACK = "attack",
+    UTILITY = "utility",
+    SAGE_SKILL = "sage-skill",
+    BUY_CARD = "buy-card",
+    SELL_CARD = "sell-card",
+    REFRESH_SHOP = "refresh-shop",
+    DONE_DISCARDING_CARDS = "done-discarding-cards",
+    DONE_DRAWING_NEW_HAND = "done-drawing-new-hand",
+    WIN_GAME = "win-game",
+}
+
 
 type Transition = {
     currentStateValue: State;
@@ -27,48 +70,49 @@ export class GameState {
     }
 
     private initTransitionTable() {
-        this.addTransition("joining-game", [
-            { acceptableEvents: ['player-joined', 'player-selected-sage'], nextState: "joining-game" },
-            { acceptableEvents: ['all-sages-selected'], nextState: "joining-teams" }
-        ])
-        this.addTransition("joining-teams", [
-            { acceptableEvents: ['player-joined-team', 'clear-teams'], nextState: "joining-teams" },
-            { acceptableEvents: ['all-teams-joined'], nextState: "ready-up" }
-        ])
-        this.addTransition("ready-up", [
-            { acceptableEvents: ['toggle-ready-status'], nextState: "ready-up" },
-            { acceptableEvents: ['all-players-ready'], nextState: "starting-setup" }
-        ])
-        this.addTransition("starting-setup", [
-            { acceptableEvents: ['choose-warriors', 'swap-warriors', 'player-finished-setup', 'cancel-setup'], nextState: "starting-setup" },
-            { acceptableEvents: ['all-players-setup-complete'], nextState: "phase1" }
-        ])
-        this.addTransition("phase1", [
-            { acceptableEvents: ['get-day-break-cards'], nextState: "resolve-day-break-cards" }
-        ])
-        this.addTransition("resolve-day-break-cards", [
-            { acceptableEvents: ['day-break-card'], nextState: "resolve-day-break-cards" },
-            { acceptableEvents: ['next-phase'], nextState: "phase2" }
-        ])
-        this.addTransition("phase2", [
-            { acceptableEvents: ['draw-card', 'swap-cards', 'summon-card', 'attack', 'utility', 'sage-skill'], nextState: "phase2" },
-            { acceptableEvents: ['next-phase'], nextState: "phase3" },
-            { acceptableEvents: ['win-game'], nextState: "end-game" }
-        ])
-        this.addTransition("phase3", [
-            { acceptableEvents: ['buy-card', 'summon-card', 'sell-card', 'refresh-shop'], nextState: "phase3" },
-            { acceptableEvents: ['next-phase'], nextState: "discarding-cards" }
-        ])
-        this.addTransition("discarding-cards", [
-            { acceptableEvents: ['done-discarding-cards'], nextState: "drawing-new-hand" },
-        ])
-        this.addTransition("drawing-new-hand", [
-            { acceptableEvents: ['done-drawing-new-hand'], nextState: "phase1" }
-        ])
-        this.addTransition("end-game", [
-            { acceptableEvents: ['win-game'], nextState: "game-finished" }
-        ])
+        this.addTransition(State.JOINING_GAME, [
+            { acceptableEvents: [TransitionEvent.PLAYER_JOINED, TransitionEvent.PLAYER_SELECTED_SAGE], nextState: State.JOINING_GAME },
+            { acceptableEvents: [TransitionEvent.ALL_SAGES_SELECTED], nextState: State.JOINING_TEAMS }
+        ]);
+        this.addTransition(State.JOINING_TEAMS, [
+            { acceptableEvents: [TransitionEvent.PLAYER_JOINED_TEAM, TransitionEvent.CLEAR_TEAMS], nextState: State.JOINING_TEAMS },
+            { acceptableEvents: [TransitionEvent.ALL_TEAMS_JOINED], nextState: State.READY_UP }
+        ]);
+        this.addTransition(State.READY_UP, [
+            { acceptableEvents: [TransitionEvent.TOGGLE_READY_STATUS], nextState: State.READY_UP },
+            { acceptableEvents: [TransitionEvent.ALL_PLAYERS_READY], nextState: State.STARTING_SETUP }
+        ]);
+        this.addTransition(State.STARTING_SETUP, [
+            { acceptableEvents: [TransitionEvent.CHOOSE_WARRIORS, TransitionEvent.SWAP_WARRIORS, TransitionEvent.PLAYER_FINISHED_SETUP, TransitionEvent.CANCEL_SETUP], nextState: State.STARTING_SETUP },
+            { acceptableEvents: [TransitionEvent.ALL_PLAYERS_SETUP_COMPLETE], nextState: State.PHASE1 }
+        ]);
+        this.addTransition(State.PHASE1, [
+            { acceptableEvents: [TransitionEvent.GET_DAY_BREAK_CARDS], nextState: State.RESOLVE_DAY_BREAK_CARDS }
+        ]);
+        this.addTransition(State.RESOLVE_DAY_BREAK_CARDS, [
+            { acceptableEvents: [TransitionEvent.DAY_BREAK_CARD], nextState: State.RESOLVE_DAY_BREAK_CARDS },
+            { acceptableEvents: [TransitionEvent.NEXT_PHASE], nextState: State.PHASE2 }
+        ]);
+        this.addTransition(State.PHASE2, [
+            { acceptableEvents: [TransitionEvent.DRAW_CARD, TransitionEvent.SWAP_CARDS, TransitionEvent.SUMMON_CARD, TransitionEvent.ATTACK, TransitionEvent.UTILITY, TransitionEvent.SAGE_SKILL], nextState: State.PHASE2 },
+            { acceptableEvents: [TransitionEvent.NEXT_PHASE], nextState: State.PHASE3 },
+            { acceptableEvents: [TransitionEvent.WIN_GAME], nextState: State.END_GAME }
+        ]);
+        this.addTransition(State.PHASE3, [
+            { acceptableEvents: [TransitionEvent.BUY_CARD, TransitionEvent.SUMMON_CARD, TransitionEvent.SELL_CARD, TransitionEvent.REFRESH_SHOP], nextState: State.PHASE3 },
+            { acceptableEvents: [TransitionEvent.NEXT_PHASE], nextState: State.DISCARDING_CARDS }
+        ]);
+        this.addTransition(State.DISCARDING_CARDS, [
+            { acceptableEvents: [TransitionEvent.DONE_DISCARDING_CARDS], nextState: State.DRAWING_NEW_HAND }
+        ]);
+        this.addTransition(State.DRAWING_NEW_HAND, [
+            { acceptableEvents: [TransitionEvent.DONE_DRAWING_NEW_HAND], nextState: State.PHASE1 }
+        ]);
+        this.addTransition(State.END_GAME, [
+            { acceptableEvents: [TransitionEvent.WIN_GAME], nextState: State.GAME_FINISHED }
+        ]);
     }
+    
 
     private addTransition(currentStateValue: State, possibleInputs: Input[]) {
         this.stateTransitionTable.push({ currentStateValue, possibleInputs });
