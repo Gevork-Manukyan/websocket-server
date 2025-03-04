@@ -425,7 +425,7 @@ describe("Server.ts", () => {
             setTimeout(() => {
                 expect(gameEventEmitter.emitToRoom).toHaveBeenCalled();
                 expect(gameEventEmitter.emitToRoom).toHaveBeenCalled();
-                expect(mockGame.hasFinishedSetup).toBe(true);
+                expect(mockGame.getHasFinishedSetup()).toBe(true);
                 done();
             }, 50);
         });
@@ -439,7 +439,7 @@ describe("Server.ts", () => {
 
             setTimeout(() => {
                 expect(gameEventEmitter.emitToRoom).toHaveBeenCalled();
-                expect(mockGame.hasFinishedSetup).toBe(true);
+                expect(mockGame.getHasFinishedSetup()).toBe(true);
                 done();
             }, 50);
         })
