@@ -44,7 +44,8 @@ describe("team getter and setters", () => {
 describe("level getter and setters", () => {
     test("should correctly set the player's level", () => {
         const player = new Player(testPlayerId);
-        player.setLevel(2);
+        player.levelUp();
+        player.levelUp();
         expect(player.getLevel()).toBe(2);
     });
 });
@@ -52,7 +53,7 @@ describe("level getter and setters", () => {
 describe("hand getter and setters", () => {
     test("should correctly set the player's hand", () => {
         const player = new Player(testPlayerId);
-        player.setHand([Cedar]);
+        player.addCardToHand(Cedar);
         expect(player.getHand()).toContainEqual(Cedar);
     });
 });
@@ -60,7 +61,7 @@ describe("hand getter and setters", () => {
 describe("deck getter and setters", () => {
     test("should correctly set the player's deck", () => {
         const player = new Player(testPlayerId);
-        player.setDeck([Cedar]);
+        player.addCardToDeck(Cedar);
         expect(player.getDeck()).toContainEqual(Cedar);
     });
 });
