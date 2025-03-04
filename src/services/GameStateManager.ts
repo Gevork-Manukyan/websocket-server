@@ -1,5 +1,5 @@
 import { ConGame } from "../models";
-import { GameState } from "../models/GameState";
+import { GameState, TransitionEvent } from "../models/GameState";
 import { ActiveConGame } from "../models/ConGame";
 import { gameId } from "../types";
 import { ConflictError } from "./CustomError/BaseError";
@@ -83,129 +83,130 @@ class GameStateManager {
 
     // Player Joined
     verifyJoinGameEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('player-joined');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.PLAYER_JOINED);
     }
 
     processJoinGameEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('player-joined');
+        this.getGameState(gameId).processEvent(TransitionEvent.PLAYER_JOINED);
     }
 
     // Player Selected Sage
     verifySelectSageEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('player-selected-sage');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.PLAYER_SELECTED_SAGE);
     }
 
     processSelectSageEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('player-selected-sage');
+        this.getGameState(gameId).processEvent(TransitionEvent.PLAYER_SELECTED_SAGE);
     }
 
     // All Sages Selected
     verifyAllSagesSelectedEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('all-sages-selected');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.ALL_SAGES_SELECTED);
     }
 
     processAllSagesSelectedEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('all-sages-selected');
+        this.getGameState(gameId).processEvent(TransitionEvent.ALL_SAGES_SELECTED);
     }
 
     // Player Joined Team
     verifyJoinTeamEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('player-joined-team');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.PLAYER_JOINED_TEAM);
     }
 
     processJoinTeamEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('player-joined-team');
+        this.getGameState(gameId).processEvent(TransitionEvent.PLAYER_JOINED_TEAM);
     }
 
     // Clear Teams
     verifyClearTeamsEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('clear-teams');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.CLEAR_TEAMS);
     }
 
     processClearTeamsEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('clear-teams');
+        this.getGameState(gameId).processEvent(TransitionEvent.CLEAR_TEAMS);
     }
 
     // Toggle Ready Status
     verifyToggleReadyStatusEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('toggle-ready-status');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.TOGGLE_READY_STATUS);
     }
 
     processToggleReadyStatusEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('toggle-ready-status');
+        this.getGameState(gameId).processEvent(TransitionEvent.TOGGLE_READY_STATUS);
     }
 
     // All Players Ready
     verifyAllPlayersReadyEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('all-players-ready');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.ALL_PLAYERS_READY);
     }
 
     processAllPlayersReadyEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('all-players-ready');
+        this.getGameState(gameId).processEvent(TransitionEvent.ALL_PLAYERS_READY);
     }
 
     // Choose Warriors
     verifyChooseWarriorsEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('choose-warriors');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.CHOOSE_WARRIORS);
     }
 
     processChooseWarriorsEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('choose-warriors');
+        this.getGameState(gameId).processEvent(TransitionEvent.CHOOSE_WARRIORS);
     }
 
     // Swap Warriors
     verifySwapWarriorsEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('swap-warriors');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.SWAP_WARRIORS);
     }
 
     processSwapWarriorsEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('swap-warriors');
+        this.getGameState(gameId).processEvent(TransitionEvent.SWAP_WARRIORS);
     }
 
     // Finished Setup
     verifyFinishedSetupEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('player-finished-setup');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.PLAYER_FINISHED_SETUP);
     }
 
     processFinishedSetupEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('player-finished-setup');
+        this.getGameState(gameId).processEvent(TransitionEvent.PLAYER_FINISHED_SETUP);
     }
 
     // Cancel Setup
     verifyCancelSetupEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('cancel-setup');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.CANCEL_SETUP);
     }
 
     processCancelSetupEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('cancel-setup');
+        this.getGameState(gameId).processEvent(TransitionEvent.CANCEL_SETUP);
     }
 
     // All Players Setup
     verifyAllPlayersSetupEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('all-players-setup-complete');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.ALL_PLAYERS_SETUP_COMPLETE);
     }
 
     processAllPlayersSetupEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('all-players-setup-complete');
+        this.getGameState(gameId).processEvent(TransitionEvent.ALL_PLAYERS_SETUP_COMPLETE);
     }
 
     // Get Day Break Cards
     verifyGetDayBreakCardsEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('get-day-break-cards');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.GET_DAY_BREAK_CARDS);
     }
 
     processGetDayBreakCardsEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('get-day-break-cards');
+        this.getGameState(gameId).processEvent(TransitionEvent.GET_DAY_BREAK_CARDS);
     }
 
     // Activate Day Break
     verifyActivateDayBreakEvent(gameId: gameId) {
-        this.getGameState(gameId).verifyEvent('day-break-card');
+        this.getGameState(gameId).verifyEvent(TransitionEvent.DAY_BREAK_CARD);
     }
 
     processActivateDayBreakEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent('day-break-card');
+        this.getGameState(gameId).processEvent(TransitionEvent.DAY_BREAK_CARD);
     }
+
 }
 
 export const gameStateManager = GameStateManager.getInstance();
