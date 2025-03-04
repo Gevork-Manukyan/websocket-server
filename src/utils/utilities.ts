@@ -1,4 +1,4 @@
-import { Card, gameId, Sage } from "../types";
+import { Card, ElementalCard, gameId, Sage } from "../types";
 import { DropletDeck, LeafDeck, PebbleDeck, TwigDeck } from "./constants";
 import { CustomError, NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { HostOnlyActionError, InvalidSageError } from "../services/CustomError/GameError";

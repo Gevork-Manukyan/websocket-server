@@ -154,4 +154,8 @@ export class Team {
     getDayBreakCards(): SpaceOption[] {
         return this.battlefield.getDayBreakCards();
     }
+
+    activateDayBreak(spaceOption: SpaceOption) {
+        this.battlefield.activateDayBreak(spaceOption)
+    }
 }

@@ -80,7 +80,7 @@ export const ElementalStarterCardSchema = ElementalCardSchema.extend({
 export const ElementalWarriorCardSchema = ElementalCardSchema.merge(AbilityCardSchema)
   .extend({
     isDayBreak: z.boolean(),
-  });
+});
 
 export const ElementalWarriorStarterCardSchema = ElementalWarriorCardSchema.extend({
   price: z.literal(1),
@@ -129,3 +129,4 @@ export type AttackStarterCard = z.infer<typeof AttackStarterCardSchema>;
 export type UtilityCard = z.infer<typeof UtilityCardSchema>;
 export type InstantCard = z.infer<typeof InstantCardSchema>;
 export type InstantStarterCard = z.infer<typeof InstantStarterCardSchema>;
+

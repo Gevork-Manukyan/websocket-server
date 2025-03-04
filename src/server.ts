@@ -11,7 +11,7 @@ import { processEvent, socketErrorHandler } from "./utils/utilities";
 import { ValidationError } from "./services/CustomError/BaseError";
 import { InvalidSpaceError, PlayersNotReadyError } from "./services/CustomError/GameError";
 import { ActiveConGame } from "./models/ConGame";
-import { OnePlayerSpaceOptionsSchema } from "./types/types";
+import { AllSpaceOptionsSchema, OnePlayerSpaceOptionsSchema } from "./types/types";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -185,8 +185,7 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.verifyActivateDayBreakEvent(gameId);
     const game = gameStateManager.getActiveGame(gameId);
 
-    // if there is only 2 players in the game then the space option must be a 2 player space option
-    if (game.players.length === 2 && !(OnePlayerSpaceOptionsSchema.safeParse(spaceOption).success)) {
+    if (game.players.length === 2 && AllSpaceOptionsSchema.safeParse(spaceOption).error) {
       throw new InvalidSpaceError(spaceOption);
     }
 

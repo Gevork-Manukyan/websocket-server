@@ -1,6 +1,7 @@
 import { ValidationError } from "../services/CustomError/BaseError";
 import { NullSpaceError } from "../services/CustomError/GameError";
 import { ElementalCard } from "../types";
+import { ElementalWarriorCard, ElementalWarriorCardSchema } from "../types/card-types";
 import { SpaceOption, OnePlayerSpaceOptions, TwoPlayerSpaceOptions } from "../types/types";
 
 const ONE_PLAYER_SPACE_MAX = 6;
@@ -188,10 +189,6 @@ export class Battlefield {
         space2.setValue(space1Value)
     }
 
-    private updateBattlefield() {
-        //TODO: implement
-    }
-
     getBattlefieldState() {
         return this.fieldArray.map(space => space.getBattlefieldSpaceState())
     }
@@ -203,6 +200,12 @@ export class Battlefield {
             // If space has an ability card with Day Break which is true, return true
             return "isDayBreak" in space.value && space.value.isDayBreak
         }).map(space => space.spaceNumber)
+    }
+
+    activateDayBreak(spaceOption: SpaceOption) {
+        const targetSpace: BattlefieldSpace = this.getBattlefieldSpace(spaceOption);
+        targetSpace.validateDayBreakActivation();
+        targetSpace.value.ability();
     }
 }
 
@@ -251,4 +254,18 @@ export class BattlefieldSpace {
             value: this.value,
         }
     }
+
+    validateDayBreakActivation(): asserts this is BattlefieldSpace & { value: ElementalWarriorCard } {
+        if (this.value === null) {
+            throw new NullSpaceError(this.spaceNumber, `Cannot activate Day Break on an empty space: ${this.spaceNumber}`);
+        }
+        
+        if (!isElementalWarriorCard(this.value) || !this.value.isDayBreak) {
+            throw new ValidationError("Cannot activate Day Break on a card that does not have the ability", "INVALID_INPUT");
+        }
+    }
+}
+
+function isElementalWarriorCard(card: ElementalCard): card is ElementalWarriorCard {
+    return ElementalWarriorCardSchema.safeParse(card).success;
 }
