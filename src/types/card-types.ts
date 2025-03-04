@@ -64,7 +64,6 @@ export const StarterCardSchema = z.object({
 
 export const AbilityCardSchema = z.object({
   ability: z.undefined(),
-  isDayBreak: z.boolean(),
   rowRequirement: z.array(z.union([z.literal(1), z.literal(2), z.literal(3)])),
 });
 
@@ -78,7 +77,10 @@ export const ElementalStarterCardSchema = ElementalCardSchema.extend({
   price: z.literal(1),
 });
 
-export const ElementalWarriorCardSchema = ElementalCardSchema.merge(AbilityCardSchema);
+export const ElementalWarriorCardSchema = ElementalCardSchema.merge(AbilityCardSchema)
+  .extend({
+    isDayBreak: z.boolean(),
+  });
 
 export const ElementalWarriorStarterCardSchema = ElementalWarriorCardSchema.extend({
   price: z.literal(1),
