@@ -16,7 +16,7 @@ describe("ConGame", () => {
       test("initializes the game with the correct properties", () => {
         expect(mockGame.id).toBe("game-1");
         expect(mockGame.isStarted).toBe(false);
-        expect(mockGame.hasFinishedSetup).toBe(false);
+        expect(mockGame.getHasFinishedSetup()).toBe(false);
         expect(mockGame.numPlayersTotal).toBe(4);
         expect(mockGame.numPlayersReady).toBe(0);
         expect(mockGame.numPlayersFinishedSetup).toBe(0);
@@ -27,8 +27,8 @@ describe("ConGame", () => {
           first: expect.any(Team),
           second: expect.any(Team),
         });
-        expect(mockGame.creatureShop).toEqual([]);
-        expect(mockGame.itemShop).toEqual([]);
+        expect(mockGame.getCreatureShop()).toEqual([]);
+        expect(mockGame.getItemShop()).toEqual([]);
       });
     });
   
