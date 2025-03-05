@@ -1,6 +1,6 @@
 import { ValidationError } from "../services/CustomError/BaseError";
 import { NullSpaceError } from "../services/CustomError/GameError";
-import { AcornSquire, Timber } from "../utils";
+import { AcornSquire, Timber } from "../constants";
 import { Battlefield, BattlefieldSpace } from "./Battlefield";
 
 describe("Battlefield class", () => {

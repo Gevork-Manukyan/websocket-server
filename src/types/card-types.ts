@@ -63,7 +63,7 @@ export const StarterCardSchema = z.object({
 });
 
 export const AbilityCardSchema = z.object({
-  ability: z.undefined(),
+  ability: z.function().args().returns(z.unknown()),
   rowRequirement: z.array(z.union([z.literal(1), z.literal(2), z.literal(3)])),
 });
 

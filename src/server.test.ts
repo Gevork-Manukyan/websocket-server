@@ -1,11 +1,11 @@
 import Client, { Socket } from "socket.io-client";
 import { server } from "./server";
-import { PORT } from "./utils/config";
+import { PORT } from "./lib/config";
 import { gameStateManager } from "./services/GameStateManager";
 import { ConGame, Player } from "./models";
 import { AllPlayersSetupEvent, CancelSetupEvent, ChoseWarriorsEvent, ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, PlayerFinishedSetupEvent, SelectSageData, StartGameEvent, SwapWarriorsEvent, ToggleReadyStatusData } from "./types/server-types";
 import { gameEventEmitter } from "./services/GameEventEmitter";
-import { AcornSquire, QuillThornback } from "./utils";
+import { AcornSquire, QuillThornback } from "./constants";
 import { Team } from "./models/Team";
 
 

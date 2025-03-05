@@ -8,7 +8,7 @@ import {
   SlumberJack,
   Timber,
   VixVanguard,
-} from "./";
+} from ".";
 import {
   AgileAssailant,
   BogBlight,
@@ -42,12 +42,8 @@ import {
   Torrent,
   TwigCharm,
 } from "./cards";
-import { NODE_ENV } from "./config";
 
-/* ------- ENV ------- */
-export const IS_PRODUCTION = NODE_ENV === "production";
 
-/* ------- DECKLISTS ------- */
 export const TwigDeck: Decklist = {
   sage: Cedar,
   champions: {

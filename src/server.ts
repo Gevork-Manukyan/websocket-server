@@ -4,14 +4,13 @@ import { Server } from "socket.io";
 import { Player } from "./models/Player";
 import { gameEventEmitter } from "./services/GameEventEmitter";
 import { gameStateManager } from "./services/GameStateManager";
-import { IS_PRODUCTION } from "./utils/constants";
-import { PORT } from "./utils/config";
+import { PORT } from "./lib/config";
 import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData } from "./types/server-types";
-import { processEvent, socketErrorHandler } from "./utils/utilities";
+import { processEvent, socketErrorHandler } from "./lib/utilities";
 import { ValidationError } from "./services/CustomError/BaseError";
 import { InvalidSpaceError, PlayersNotReadyError } from "./services/CustomError/GameError";
-import { ActiveConGame } from "./models/ConGame";
-import { AllSpaceOptionsSchema, OnePlayerSpaceOptionsSchema } from "./types/types";
+import { AllSpaceOptionsSchema } from "./types/types";
+import { IS_PRODUCTION } from "./constants/env";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server

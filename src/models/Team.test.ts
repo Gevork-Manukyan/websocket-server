@@ -1,6 +1,6 @@
 import { ConflictError, NotFoundError, ValidationError } from "../services/CustomError/BaseError"
-import { AcornSquire, Cedar, Porella, QuillThornback, Sprout, Timber } from "../utils"
-import { LeafDeck, TwigDeck } from "../utils/constants"
+import { AcornSquire, Cedar, Porella, QuillThornback, Sprout, Timber } from "../constants"
+import { LeafDeck, TwigDeck } from "../constants/decklists"
 import { Battlefield } from "./Battlefield"
 import { Player } from "./Player"
 import { Team } from "./Team"

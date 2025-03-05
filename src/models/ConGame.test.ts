@@ -1,6 +1,6 @@
-import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
+import { NotFoundError } from "../services/CustomError/BaseError";
 import { PlayersNotReadyError, SageUnavailableError } from "../services/CustomError/GameError";
-import { LeafDeck, TwigDeck } from "../utils/constants";
+import { LeafDeck, TwigDeck } from "../constants/decklists";
 import { ConGame } from "./ConGame";
 import { Player } from "./Player";
 import { Team } from "./Team";
