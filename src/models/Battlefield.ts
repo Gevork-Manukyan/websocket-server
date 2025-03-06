@@ -1,4 +1,4 @@
-import { ValidationError } from "../services/CustomError/BaseError";
+import { InternalServerError, ValidationError } from "../services/CustomError/BaseError";
 import { NullSpaceError } from "../services/CustomError/GameError";
 import { ElementalCard } from "../types";
 import { ElementalWarriorCard, ElementalWarriorCardSchema } from "../types/card-types";
@@ -206,6 +206,18 @@ export class Battlefield {
         const targetSpace: BattlefieldSpace = this.getBattlefieldSpace(spaceOption);
         targetSpace.validateDayBreakActivation();
         targetSpace.value.ability();
+    }
+
+    damageCardAtPosition(position: SpaceOption, amount: number): boolean {
+        const space = this.getBattlefieldSpace(position);
+        const card = space.value;
+        if (!card) throw new InternalServerError("Card does not exist")
+
+        const newHealth = card.health - amount;
+        if (newHealth <= 0) return true;
+        
+        space.setValue({ ...card, health: newHealth })
+        return false;
     }
 }
 

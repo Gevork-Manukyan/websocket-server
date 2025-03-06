@@ -93,7 +93,7 @@ export class ConGame {
     return this.teamOrder.second;
   }
 
-  getOppostingTeam(team: Team) {
+  getOpposingTeam(team: Team) {
     return team === this.team1 ? this.team2 : this.team1;
   }
 

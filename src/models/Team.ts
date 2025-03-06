@@ -37,7 +37,7 @@ export class Team {
         return this.gold;
     }
     
-    setGold(amount: number) {
+    private setGold(amount: number) {
         if (amount > this.maxGold) throw new ValidationError(`Team cannot have more than ${this.maxGold} gold`, "gold");
         this.gold = amount;
     }
@@ -151,11 +151,18 @@ export class Team {
         }
     }
 
+
+    /* ----- GAMEPLAY ----- */
+
     getDayBreakCards(): SpaceOption[] {
         return this.battlefield.getDayBreakCards();
     }
 
     activateDayBreak(spaceOption: SpaceOption) {
         this.battlefield.activateDayBreak(spaceOption)
+    }
+
+    damageCardAtPosition(position: SpaceOption, amount: number) {
+        this.battlefield.damageCardAtPosition(position, amount)
     }
 }

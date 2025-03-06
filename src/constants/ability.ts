@@ -43,6 +43,7 @@ export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult
             collectGold(team, amount);
             break;
         case AbilityAction.DEAL_DAMAGE:
+            dealDamage(game, team, fieldTarget, amount);
             break;
         case AbilityAction.REDUCE_DAMAGE:
             break;
@@ -80,8 +81,12 @@ function collectGold(team: AbilityResult['team'], amount: AbilityResult['amount'
     team.addGold(amount);
 }
 
-function dealDamage() {
+function dealDamage(game: ActiveConGame, team: AbilityResult['team'], fieldTarget: AbilityResult['fieldTarget'], amount: AbilityResult['amount']) {
+    if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
+    if (amount === undefined) throw new InternalServerError("Amount of damage to deal is not defined");
 
+    const targetTeam = fieldTarget.team === 'self' ? team : game.getOpposingTeam(team);
+    
 }
 
 function reduceDamage() {
