@@ -1,0 +1,176 @@
+import { Player } from "../models";
+import { ActiveConGame } from "../models/ConGame";
+import { Team } from "../models/Team";
+import { InternalServerError } from "../services/CustomError/BaseError";
+import { SpaceOption } from "../types/types";
+
+export type AbilityResult = {
+    type: AbilityAction;
+    team: Team;
+    player: Player;
+    amount?: number;
+    fieldTarget?: {
+        team: 'self' | 'enemy';
+        position: SpaceOption;
+    };
+    handTarget?: number;
+    discardTarget?: number;
+}
+
+export enum AbilityAction {
+    COLLECT_GOLD = 'collect_gold',
+    DEAL_DAMAGE = 'deal_damage',
+    REDUCE_DAMAGE = 'reduce_damage',
+    MOVE_TO_DISCARD_FROM_FIELD = 'move_to_discard_from_field',
+    MOVE_TO_FIELD_FROM_DISCARD = 'move_to_field_from_discard',
+    SWAP_FIELD_POSITION = 'swap_field_position',
+    DRAW = 'draw',
+    MOVE_TO_HAND_FROM_DISCARD = 'move_to_hand_from_discard',
+    MOVE_TO_DISCARD_FROM_HAND = 'move_to_discard_from_hand',
+    MOVE_TO_HAND_FROM_FIELD = 'move_to_hand_from_field',
+    MOVE_TO_FIELD_FROM_HAND = 'move_to_field_from_hand',
+    ADD_SHIELD = 'add_shield',
+    ADD_BOOST = 'add_boost',
+    DONT_REMOVE_SHIELD = 'dont_remove_shield',
+    DONT_REMOVE_BOOST = 'dont_remove_boost',
+    REMOVE_ALL_DAMAGE = 'remove_all_damage',
+}
+
+export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult) {
+    const { type, team, player, amount, fieldTarget, handTarget, discardTarget } = AbilityResult;
+    switch (type) {
+        case AbilityAction.COLLECT_GOLD:
+            collectGold(team, amount);
+            break;
+        case AbilityAction.DEAL_DAMAGE:
+            break;
+        case AbilityAction.REDUCE_DAMAGE:
+            break;
+        case AbilityAction.MOVE_TO_DISCARD_FROM_FIELD:
+            break;
+        case AbilityAction.MOVE_TO_FIELD_FROM_DISCARD:
+            break;
+        case AbilityAction.SWAP_FIELD_POSITION:
+            break;
+        case AbilityAction.DRAW:
+            break;
+        case AbilityAction.MOVE_TO_HAND_FROM_DISCARD:
+            break;
+        case AbilityAction.MOVE_TO_DISCARD_FROM_HAND:
+            break;
+        case AbilityAction.MOVE_TO_HAND_FROM_FIELD:
+            break;
+        case AbilityAction.MOVE_TO_FIELD_FROM_HAND:
+            break;
+        case AbilityAction.ADD_SHIELD:
+            break;
+        case AbilityAction.ADD_BOOST:
+            break;
+        case AbilityAction.DONT_REMOVE_SHIELD:
+            break;
+        case AbilityAction.DONT_REMOVE_BOOST:
+            break;
+        case AbilityAction.REMOVE_ALL_DAMAGE:
+            break;
+    }
+}
+
+function collectGold(team: AbilityResult['team'], amount: AbilityResult['amount']) {
+    if (amount === undefined) throw new InternalServerError("Amount of gold to collect is not defined");
+    team.addGold(amount);
+}
+
+function dealDamage() {
+
+}
+
+function reduceDamage() {
+
+}
+
+function moveToDiscardFromField() {
+
+}
+
+function moveToFieldFromDiscard() {
+
+}
+
+function swapFieldPosition() {
+
+}
+
+function draw() {
+
+}
+
+function moveToHandFromDiscard() {
+
+}
+
+function moveToDiscardFromHand() {
+
+}
+
+function moveToHandFromField() {
+
+}
+
+function moveToFieldFromHand() {
+
+}
+
+function addShield() {
+
+}
+
+function addBoost() {
+
+}
+
+function dontRemoveShield() {
+
+}
+
+function dontRemoveBoost() {
+
+}
+
+function removeAllDamage() {
+
+}
+
+enum PlayerActionType {
+    CARD_ENTERS_FIELD = 'card_enters_field',
+    CARD_LEAVES_FIELD = 'card_leaves_field',
+    ATTACK = 'attack',
+    MELEE_ATTACK = 'melee_attack',
+    RANGE_ATTACK = 'range_attack',
+    IS_ATTACKED = 'is_attacked',
+    IS_MELEE_ATTACKED = 'is_melee_attacked',
+    IS_RANGE_ATTACKED = 'is_range_attacked',
+    DEAL_DAMAGE_WITH_ATTACK = 'deal_damage_with_attack',
+    TAKE_DAMAGE = 'take_damage',
+    ENTER_ROW = 'enter_row',
+    DEFEAT_ENEMY = 'defeat_enemy',
+    IS_DEFEATED = 'is_defeated',
+    ADD_SHIELD = 'add_shield',
+    ADD_BOOST = 'add_boost',
+    REMOVE_SHIELD = 'remove_shield',
+    REMOVE_BOOST = 'remove_boost',
+}
+
+/*
+// TODO: New idea: this enum will live somewhere else. Card abilities will return an object 
+with keys and values that determine what kind of action needs to be done
+e.g. { type: ActionType.COLLECT_GOLD, amount: 10 }
+
+Then a processAbility function will take in the action object and perform the action
+
+For instants, there will be a flag on each player that indicates if they have an instant in their hand
+If they do, then before processing action, prompt player if they wanna use instant card
+
+For triggers, each action a player does will have a value in an enum
+When a card enters the field, get all of it's triggers and add them to a list. Triggers are values from the same actions enum
+When an action is done, check if any triggers are activated 
+*/
