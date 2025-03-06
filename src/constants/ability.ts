@@ -48,6 +48,7 @@ export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult
         case AbilityAction.REDUCE_DAMAGE:
             break;
         case AbilityAction.MOVE_TO_DISCARD_FROM_FIELD:
+            moveToDiscardFromField(team, player, fieldTarget);
             break;
         case AbilityAction.MOVE_TO_FIELD_FROM_DISCARD:
             break;
@@ -105,8 +106,12 @@ function reduceDamage() {
 
 }
 
-function moveToDiscardFromField() {
+function moveToDiscardFromField(team: AbilityResult['team'], player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget']) {
+    if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
+    if (fieldTarget.team === 'enemy') throw new InternalServerError("Cannot move enemy card to discard");
 
+    const removedCard = team.battlefield.removeCard(fieldTarget.position);
+    player.addCardToDiscardPile(removedCard);
 }
 
 function moveToFieldFromDiscard() {

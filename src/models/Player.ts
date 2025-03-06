@@ -118,8 +118,8 @@ export class Player {
     return this.discardPile;
   }
 
-  setDiscardPile(discardPile: Card[]) {
-    this.discardPile = discardPile;
+  addCardToDiscardPile(card: Card) {
+    this.discardPile.push(card);
   }
 
   getElement() {
