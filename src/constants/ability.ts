@@ -11,10 +11,10 @@ export type AbilityResult = {
     amount?: number;
     fieldTarget?: {
         team: 'self' | 'enemy';
-        position: SpaceOption;
+        position: SpaceOption[];
     };
-    handTarget?: number;
-    discardTarget?: number;
+    handTarget?: number[];
+    discardTarget?: number[];
 }
 
 export enum AbilityAction {
@@ -97,11 +97,12 @@ function collectGold(player: AbilityResult['player'], amount: AbilityResult['amo
  */
 function dealDamage(game: ActiveConGame, player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget'], amount: AbilityResult['amount']) {
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
+    if (fieldTarget.position.length !== 1) throw new InternalServerError("Field target position is not a single position");
     if (amount === undefined) throw new InternalServerError("Amount of damage to deal is not defined");
 
     const playerTeam = player.getTeam()!;
     const targetTeam = fieldTarget.team === 'self' ? playerTeam : game.getOpposingTeam(playerTeam);
-    targetTeam.damageCardAtPosition(fieldTarget.position, amount);
+    targetTeam.damageCardAtPosition(fieldTarget.position[0], amount);
 }
 
 function reduceDamage() {
@@ -115,21 +116,24 @@ function reduceDamage() {
  */
 function moveToDiscardFromField(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget']) {
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
+    if (fieldTarget.position.length !== 1) throw new InternalServerError("Field target position is not a single position");
     if (fieldTarget.team === 'enemy') throw new InternalServerError("Cannot move enemy card to discard");
 
-    const removedCard = player.getTeam()!.getBattlefield().removeCard(fieldTarget.position);
+    const removedCard = player.getTeam()!.getBattlefield().removeCard(fieldTarget.position[0]);
     player.addCardToDiscardPile(removedCard);
 }
 
 function moveToFieldFromDiscard(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget'], discardTarget: AbilityResult['discardTarget']) {
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
+    if (fieldTarget.position.length !== 1) throw new InternalServerError("Field target position is not a single position");
     if (discardTarget === undefined) throw new InternalServerError("Discard target is not defined");
+    if (discardTarget.length !== 1) throw new InternalServerError("Discard target position is not a single position");
     if (fieldTarget.team === 'enemy') throw new InternalServerError("Cannot move enemy card to field");
 
-    const removedCard = player.removeCardFromDiscardPile(discardTarget);
+    const removedCard = player.removeCardFromDiscardPile(discardTarget[0]);
     if (!isElementalCard(removedCard)) throw new InvalidCardTypeError("Card is not an ElementalCard");
 
-    player.getTeam()!.getBattlefield().addCard(removedCard, fieldTarget.position);
+    player.getTeam()!.getBattlefield().addCard(removedCard, fieldTarget.position[0]);
 }
 
 function swapFieldPosition() {
