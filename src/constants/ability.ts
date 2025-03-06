@@ -66,6 +66,7 @@ export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult
             moveToDiscardFromHand(player, handTarget);
             break;
         case AbilityAction.MOVE_TO_HAND_FROM_FIELD:
+            moveToHandFromField(player, fieldTarget);
             break;
         case AbilityAction.MOVE_TO_FIELD_FROM_HAND:
             break;
@@ -199,8 +200,13 @@ function moveToDiscardFromHand(player: AbilityResult['player'], handTarget: Abil
     });
 }
 
-function moveToHandFromField() {
+function moveToHandFromField(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget']) {
+    if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
 
+    fieldTarget.position.forEach(position => {
+        const removedCard = player.getTeam()!.getBattlefield().removeCard(position);
+        player.addCardToHand(removedCard);
+    });
 }
 
 function moveToFieldFromHand() {
