@@ -54,6 +54,7 @@ export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult
             moveToFieldFromDiscard(player, fieldTarget, discardTarget);
             break;
         case AbilityAction.SWAP_FIELD_POSITION:
+            swapFieldPosition(player, fieldTarget);
             break;
         case AbilityAction.DRAW:
             break;
@@ -97,12 +98,13 @@ function collectGold(player: AbilityResult['player'], amount: AbilityResult['amo
  */
 function dealDamage(game: ActiveConGame, player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget'], amount: AbilityResult['amount']) {
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
-    if (fieldTarget.position.length !== 1) throw new InternalServerError("Field target position is not a single position");
     if (amount === undefined) throw new InternalServerError("Amount of damage to deal is not defined");
 
     const playerTeam = player.getTeam()!;
     const targetTeam = fieldTarget.team === 'self' ? playerTeam : game.getOpposingTeam(playerTeam);
-    targetTeam.damageCardAtPosition(fieldTarget.position[0], amount);
+    fieldTarget.position.forEach(position => {
+        targetTeam.damageCardAtPosition(position, amount);
+    });
 }
 
 function reduceDamage() {
@@ -123,6 +125,12 @@ function moveToDiscardFromField(player: AbilityResult['player'], fieldTarget: Ab
     player.addCardToDiscardPile(removedCard);
 }
 
+/**
+ * Moves a card from the discard pile to the battlefield
+ * @param player The player that is moving the card
+ * @param fieldTarget The target on the battlefield to move to
+ * @param discardTarget The target in the discard pile to move from
+ */
 function moveToFieldFromDiscard(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget'], discardTarget: AbilityResult['discardTarget']) {
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
     if (fieldTarget.position.length !== 1) throw new InternalServerError("Field target position is not a single position");
@@ -136,8 +144,16 @@ function moveToFieldFromDiscard(player: AbilityResult['player'], fieldTarget: Ab
     player.getTeam()!.getBattlefield().addCard(removedCard, fieldTarget.position[0]);
 }
 
-function swapFieldPosition() {
+/**
+ * Swaps the positions of two cards on the battlefield
+ * @param player The player that is swapping the cards
+ * @param fieldTarget The two positions on the battlefield to swap
+ */
+function swapFieldPosition(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget']) {
+    if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
+    if (fieldTarget.position.length !== 2) throw new InternalServerError("Field target position is not two positions");
 
+    player.getTeam()!.getBattlefield().swapCards(fieldTarget.position[0], fieldTarget.position[1]);
 }
 
 function draw() {
