@@ -122,6 +122,10 @@ export class Player {
     this.discardPile.push(card);
   }
 
+  removeCardFromDiscardPile(index: number) {
+    return this.discardPile.splice(index, 1)[0];
+  }
+
   getElement() {
     if (!this.sage) throw new NotFoundError("Sage", "Player does not have an element")
     if (!this.decklist) throw new NotFoundError("Decklist", "Player does not have an element")

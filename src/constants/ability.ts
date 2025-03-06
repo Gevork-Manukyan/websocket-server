@@ -1,6 +1,8 @@
+import { isElementalCard } from "../lib/card-validators";
 import { Player } from "../models";
 import { ActiveConGame } from "../models/ConGame";
 import { InternalServerError } from "../services/CustomError/BaseError";
+import { InvalidCardTypeError } from "../services/CustomError/GameError";
 import { SpaceOption } from "../types/types";
 
 export type AbilityResult = {
@@ -119,8 +121,15 @@ function moveToDiscardFromField(player: AbilityResult['player'], fieldTarget: Ab
     player.addCardToDiscardPile(removedCard);
 }
 
-function moveToFieldFromDiscard() {
+function moveToFieldFromDiscard(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget'], discardTarget: AbilityResult['discardTarget']) {
+    if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
+    if (discardTarget === undefined) throw new InternalServerError("Discard target is not defined");
+    if (fieldTarget.team === 'enemy') throw new InternalServerError("Cannot move enemy card to field");
 
+    const removedCard = player.removeCardFromDiscardPile(discardTarget);
+    if (!isElementalCard(removedCard)) throw new InvalidCardTypeError("Card is not an ElementalCard");
+    
+    player.getTeam()!.battlefield.addCard(removedCard, fieldTarget.position);
 }
 
 function swapFieldPosition() {

@@ -1,3 +1,4 @@
+import { isElementalWarriorCard } from "../lib/card-validators";
 import { InternalServerError, ValidationError } from "../services/CustomError/BaseError";
 import { NullSpaceError } from "../services/CustomError/GameError";
 import { ElementalCard } from "../types";
@@ -159,6 +160,11 @@ export class Battlefield {
         return this.getBattlefieldSpace(spaceNumber).value;
     }
 
+    /**
+     * Adds a card to the battlefield space
+     * @param card The card to add
+     * @param spaceNumber The space number to add the card to
+     */
     addCard(card: ElementalCard, spaceNumber: SpaceOption) {
         const targetSpace = this.getBattlefieldSpace(spaceNumber)
         if (targetSpace.value !== null) throw new ValidationError("Cannot add a card to a space with an existing card", "INVALID_INPUT")
@@ -281,8 +287,4 @@ export class BattlefieldSpace {
             throw new ValidationError("Cannot activate Day Break on a card that does not have the ability", "INVALID_INPUT");
         }
     }
-}
-
-function isElementalWarriorCard(card: ElementalCard): card is ElementalWarriorCard {
-    return ElementalWarriorCardSchema.safeParse(card).success;
 }

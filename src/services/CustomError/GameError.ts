@@ -84,3 +84,9 @@ export class NotEnoughGoldError extends ConflictError {
         super("Not enough gold to purchase this card");
     }
 }
+
+export class InvalidCardTypeError extends ValidationError {
+    constructor(message = "Invalid card type selected") {
+        super(message, "INVALID_CARD_TYPE");
+    }
+}
