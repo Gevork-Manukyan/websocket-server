@@ -122,18 +122,19 @@ function reduceDamage() {
  */
 function moveToDiscardFromField(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget']) {
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
-    if (fieldTarget.position.length !== 1) throw new InternalServerError("Field target position is not a single position");
     if (fieldTarget.team === 'enemy') throw new InternalServerError("Cannot move enemy card to discard");
 
-    const removedCard = player.getTeam()!.getBattlefield().removeCard(fieldTarget.position[0]);
-    player.addCardToDiscardPile(removedCard);
+    fieldTarget.position.forEach(position => {
+        const removedCard = player.getTeam()!.getBattlefield().removeCard(position);
+        player.addCardToDiscardPile(removedCard);
+    });
 }
 
 /**
  * Moves a card from the discard pile to the battlefield
  * @param player The player that is moving the card
- * @param fieldTarget The target on the battlefield to move to
- * @param discardTarget The target in the discard pile to move from
+ * @param fieldTarget The target on the battlefield to move to; must be a single position
+ * @param discardTarget The target in the discard pile to move from; must be a single position
  */
 function moveToFieldFromDiscard(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget'], discardTarget: AbilityResult['discardTarget']) {
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
@@ -200,6 +201,11 @@ function moveToDiscardFromHand(player: AbilityResult['player'], handTarget: Abil
     });
 }
 
+/**
+ * Moves a card from the battlefield to the hand
+ * @param player The player that is moving the card
+ * @param fieldTarget The target on the battlefield to move to the hand
+ */
 function moveToHandFromField(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget']) {
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
 
