@@ -1,12 +1,10 @@
 import { Player } from "../models";
 import { ActiveConGame } from "../models/ConGame";
-import { Team } from "../models/Team";
 import { InternalServerError } from "../services/CustomError/BaseError";
 import { SpaceOption } from "../types/types";
 
 export type AbilityResult = {
     type: AbilityAction;
-    team: Team;
     player: Player;
     amount?: number;
     fieldTarget?: {
@@ -37,20 +35,21 @@ export enum AbilityAction {
 }
 
 export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult) {
-    const { type, team, player, amount, fieldTarget, handTarget, discardTarget } = AbilityResult;
+    const { type, player, amount, fieldTarget, handTarget, discardTarget } = AbilityResult;
     switch (type) {
         case AbilityAction.COLLECT_GOLD:
-            collectGold(team, amount);
+            collectGold(player, amount);
             break;
         case AbilityAction.DEAL_DAMAGE:
-            dealDamage(game, team, fieldTarget, amount);
+            dealDamage(game, player, fieldTarget, amount);
             break;
         case AbilityAction.REDUCE_DAMAGE:
             break;
         case AbilityAction.MOVE_TO_DISCARD_FROM_FIELD:
-            moveToDiscardFromField(team, player, fieldTarget);
+            moveToDiscardFromField(player, fieldTarget);
             break;
         case AbilityAction.MOVE_TO_FIELD_FROM_DISCARD:
+            moveToFieldFromDiscard(player, fieldTarget, discardTarget);
             break;
         case AbilityAction.SWAP_FIELD_POSITION:
             break;
@@ -79,26 +78,27 @@ export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult
 
 /**
  * Collects gold for a team
- * @param team The team to collect gold for
+ * @param player The team to collect gold for
  * @param amount The amount of gold to collect 
  */
-function collectGold(team: AbilityResult['team'], amount: AbilityResult['amount']) {
+function collectGold(player: AbilityResult['player'], amount: AbilityResult['amount']) {
     if (amount === undefined) throw new InternalServerError("Amount of gold to collect is not defined");
-    team.addGold(amount);
+    player.getTeam()!.addGold(amount);
 }
 
 /**
  * Deals damage to a card on the battlefield
  * @param game The current game
- * @param team The team that is dealing damage
+ * @param player The team that is dealing damage
  * @param fieldTarget The target on the battlefield to deal damage to
  * @param amount The amount of damage to deal 
  */
-function dealDamage(game: ActiveConGame, team: AbilityResult['team'], fieldTarget: AbilityResult['fieldTarget'], amount: AbilityResult['amount']) {
+function dealDamage(game: ActiveConGame, player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget'], amount: AbilityResult['amount']) {
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
     if (amount === undefined) throw new InternalServerError("Amount of damage to deal is not defined");
 
-    const targetTeam = fieldTarget.team === 'self' ? team : game.getOpposingTeam(team);
+    const playerTeam = player.getTeam()!;
+    const targetTeam = fieldTarget.team === 'self' ? playerTeam : game.getOpposingTeam(playerTeam);
     targetTeam.damageCardAtPosition(fieldTarget.position, amount);
 }
 
@@ -106,11 +106,16 @@ function reduceDamage() {
 
 }
 
-function moveToDiscardFromField(team: AbilityResult['team'], player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget']) {
+/**
+ * Moves a card from the battlefield to the discard pile
+ * @param player The player that is moving the card
+ * @param fieldTarget The target on the battlefield to move to the discard pile
+ */
+function moveToDiscardFromField(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget']) {
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
     if (fieldTarget.team === 'enemy') throw new InternalServerError("Cannot move enemy card to discard");
 
-    const removedCard = team.battlefield.removeCard(fieldTarget.position);
+    const removedCard = player.getTeam()!.battlefield.removeCard(fieldTarget.position);
     player.addCardToDiscardPile(removedCard);
 }
 
