@@ -76,17 +76,29 @@ export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult
     }
 }
 
+/**
+ * Collects gold for a team
+ * @param team The team to collect gold for
+ * @param amount The amount of gold to collect 
+ */
 function collectGold(team: AbilityResult['team'], amount: AbilityResult['amount']) {
     if (amount === undefined) throw new InternalServerError("Amount of gold to collect is not defined");
     team.addGold(amount);
 }
 
+/**
+ * Deals damage to a card on the battlefield
+ * @param game The current game
+ * @param team The team that is dealing damage
+ * @param fieldTarget The target on the battlefield to deal damage to
+ * @param amount The amount of damage to deal 
+ */
 function dealDamage(game: ActiveConGame, team: AbilityResult['team'], fieldTarget: AbilityResult['fieldTarget'], amount: AbilityResult['amount']) {
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
     if (amount === undefined) throw new InternalServerError("Amount of damage to deal is not defined");
 
     const targetTeam = fieldTarget.team === 'self' ? team : game.getOpposingTeam(team);
-    
+    targetTeam.damageCardAtPosition(fieldTarget.position, amount);
 }
 
 function reduceDamage() {

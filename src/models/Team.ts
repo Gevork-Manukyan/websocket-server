@@ -73,10 +73,18 @@ export class Team {
         });
     }
 
+    /**
+     * Returns the cards that have been removed from the battlefield
+     * @returns The cards that have been removed from the battlefield
+     */
     getRemovedCards() {
         return this.removedCards;
     }
 
+    /**
+     * Adds a card to the removedCards array
+     * @param card The card to add to the removedCards array
+     */
     addRemovedCard(card: Card) {
         this.removedCards.push(card);
     }
@@ -164,15 +172,33 @@ export class Team {
 
     /* ----- GAMEPLAY ----- */
 
+    /**
+     * @returns The cards on the battlefield that have a daybreak ability
+     */
     getDayBreakCards(): SpaceOption[] {
         return this.battlefield.getDayBreakCards();
     }
 
+    /**
+     * Activates the daybreak ability of a card at a given position on the battlefield
+     * @param spaceOption The position of the card to activate the daybreak ability of
+     */
     activateDayBreak(spaceOption: SpaceOption) {
         this.battlefield.activateDayBreak(spaceOption)
     }
 
+    /**
+     * Deals damage to a card at a given position on the battlefield and removes the card if it is dead
+     * @param position The position of the card to deal damage to
+     * @param amount The amount of damage to deal
+     * @returns Whether the card is dead
+     */
     damageCardAtPosition(position: SpaceOption, amount: number) {
-        this.battlefield.damageCardAtPosition(position, amount)
+        const isDead = this.battlefield.damageCardAtPosition(position, amount)
+        if (isDead) {
+            const removedCard = this.battlefield.removeCard(position);
+            this.addRemovedCard(removedCard);
+        }
+        return isDead;
     }
 }

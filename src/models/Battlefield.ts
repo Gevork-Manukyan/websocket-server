@@ -165,6 +165,11 @@ export class Battlefield {
         targetSpace.value = card;
     }
 
+    /**
+     * Removes a card from the battlefield space and returns the card
+     * @param spaceNumber The space number to remove the card from
+     * @returns The card that was removed
+     */
     removeCard(spaceNumber: SpaceOption): ElementalCard {
         const targetSpace = this.getBattlefieldSpace(spaceNumber)
         if (targetSpace.value === null) throw new NullSpaceError(spaceNumber, `Cannot remove an empty space: ${spaceNumber}`)
