@@ -1,5 +1,5 @@
 import { ConflictError, NotFoundError, ValidationError } from "../services/CustomError/BaseError";
-import { ElementalWarriorStarterCard } from "../types/card-types";
+import { Card, ElementalWarriorStarterCard } from "../types/card-types";
 import { Decklist, SpaceOption } from "../types/types";
 import { Battlefield } from "./Battlefield";
 import { Player } from "./Player";
@@ -11,6 +11,8 @@ export class Team {
     private teamSize: 1 | 2;
     private gold: number = 0;
     private maxGold: 12 | 20;
+    private removedCards: Card[] = [];
+
   
     constructor(teamSize: Team['teamSize'], teamNumber: Team['teamNumber']) {
         this.players = [];
@@ -69,6 +71,14 @@ export class Team {
             if (decklist === null) throw new NotFoundError("Decklist", `Player ${player.id}'s decklist is not set`);
             return decklist;    
         });
+    }
+
+    getRemovedCards() {
+        return this.removedCards;
+    }
+
+    addRemovedCard(card: Card) {
+        this.removedCards.push(card);
     }
   
     initBattlefield(decklists: Decklist[]) {

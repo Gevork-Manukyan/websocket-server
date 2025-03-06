@@ -18,7 +18,6 @@ export class Player {
   private hand: Card[] = [];
   private deck: Card[] = [];
   private discardPile: Card[] = [];
-  private removedCards: Card[] = [];
 
   constructor(socketId: string, isGameHost = false) {
     this.id = socketId;
@@ -121,14 +120,6 @@ export class Player {
 
   setDiscardPile(discardPile: Card[]) {
     this.discardPile = discardPile;
-  }
-
-  getRemovedCards() {
-    return this.removedCards;
-  }
-
-  addRemovedCard(card: Card) {
-    this.removedCards.push(card);
   }
 
   getElement() {
