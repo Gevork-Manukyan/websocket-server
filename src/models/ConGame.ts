@@ -93,6 +93,10 @@ export class ConGame {
     return this.teamOrder.second;
   }
 
+  getOppostingTeam(team: Team) {
+    return team === this.team1 ? this.team2 : this.team1;
+  }
+
   getCreatureShop() {
     return this.creatureShop;
   }
