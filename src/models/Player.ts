@@ -102,6 +102,12 @@ export class Player {
     this.hand.push(card);
   }
 
+  removeCardFromHand(index: number) {
+    if (index < 0 || index >= this.hand.length) throw new ValidationError("Invalid index for hand", "INVALID_INDEX")
+
+    return this.hand.splice(index, 1)[0];
+  }
+
   getDeck() {
     return this.deck;
   }
@@ -123,6 +129,8 @@ export class Player {
   }
 
   removeCardFromDiscardPile(index: number) {
+    if (index < 0 || index >= this.discardPile.length) throw new ValidationError("Invalid index for discard pile", "INVALID_INDEX")
+
     return this.discardPile.splice(index, 1)[0];
   }
 

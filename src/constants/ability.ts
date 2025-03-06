@@ -63,6 +63,7 @@ export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult
             moveToHandFromDiscard(player, discardTarget);
             break;
         case AbilityAction.MOVE_TO_DISCARD_FROM_HAND:
+            moveToDiscardFromHand(player, handTarget);
             break;
         case AbilityAction.MOVE_TO_HAND_FROM_FIELD:
             break;
@@ -184,8 +185,18 @@ function moveToHandFromDiscard(player: AbilityResult['player'], discardTarget: A
     });
 }
 
-function moveToDiscardFromHand() {
+/**
+ * Moves a card from the hand to the discard pile
+ * @param player The player that is moving the card
+ * @param handTarget The target in the hand to move from
+ */
+function moveToDiscardFromHand(player: AbilityResult['player'], handTarget: AbilityResult['handTarget']) {
+    if (handTarget === undefined) throw new InternalServerError("Hand target is not defined");
 
+    handTarget.forEach(targetIndex => {
+        const removedCard = player.removeCardFromHand(targetIndex);
+        player.addCardToDiscardPile(removedCard);
+    });
 }
 
 function moveToHandFromField() {
