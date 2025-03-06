@@ -57,6 +57,7 @@ export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult
             swapFieldPosition(player, fieldTarget);
             break;
         case AbilityAction.DRAW:
+            draw(player, amount);
             break;
         case AbilityAction.MOVE_TO_HAND_FROM_DISCARD:
             break;
@@ -156,8 +157,16 @@ function swapFieldPosition(player: AbilityResult['player'], fieldTarget: Ability
     player.getTeam()!.getBattlefield().swapCards(fieldTarget.position[0], fieldTarget.position[1]);
 }
 
-function draw() {
-
+/**
+ * Draws a card from the deck
+ * @param player The player that is drawing the card
+ * @param amount The amount of cards to draw
+ */
+function draw(player: AbilityResult['player'], amount: AbilityResult['amount']) {
+    if (amount === undefined) throw new InternalServerError("Amount of cards to draw is not defined");
+    for (let i = 0; i < amount; i++) {
+        player.drawCard();
+    }
 }
 
 function moveToHandFromDiscard() {
