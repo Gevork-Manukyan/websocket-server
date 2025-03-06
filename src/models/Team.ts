@@ -6,7 +6,7 @@ import { Player } from "./Player";
 
 export class Team {
     players: Player[];
-    battlefield: Battlefield;
+    private battlefield: Battlefield;
     private teamNumber: 1 | 2;
     private teamSize: 1 | 2;
     private gold: number = 0;
@@ -25,6 +25,10 @@ export class Team {
     resetTeam() {
         this.players = []
         this.battlefield = new Battlefield(this.teamSize)
+    }
+
+    getBattlefield() {
+        return this.battlefield;
     }
 
     getTeamNumber() {

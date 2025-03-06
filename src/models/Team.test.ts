@@ -24,10 +24,10 @@ describe("Team", () => {
     })
 
     test("should create a default Team object", (done) => {
-        const { players, battlefield } = mockTeam
+        const { players } = mockTeam
 
         expect(players).toEqual([])
-        expect(battlefield).toBeDefined();
+        expect(mockTeam.getBattlefield()).toBeDefined();
         expect(mockTeam.getTeamNumber()).toBe(1)
         expect(mockTeam.getTeamSize()).toBe(1)
         done()
@@ -35,12 +35,12 @@ describe("Team", () => {
 
     describe("gold manipulation methods", () => {
         test("should correctly set the team's gold amount", () => {
-            mockTeam.setGold(10);
+            mockTeam.addGold(10);
             expect(mockTeam.getGold()).toBe(10);
         });
 
         test("should throw an error if the amount of gold exceeds the maximum", () => {
-            expect(() => mockTeam.setGold(1000)).toThrow(ValidationError);
+            expect(() => mockTeam.addGold(1000)).toThrow(ValidationError);
         });
 
         test("should correctly add gold to the team", () => {
@@ -54,7 +54,7 @@ describe("Team", () => {
         });
 
         test("should correctly remove gold from the team", () => {
-            mockTeam.setGold(10);
+            mockTeam.addGold(10);
             mockTeam.removeGold(5);
             expect(mockTeam.getGold()).toBe(5);
         });
@@ -67,10 +67,10 @@ describe("Team", () => {
 
     describe("resetTeam method", () => {
         test("should remove all players and create new battlefield", () => {
-            const initialBattlefield = mockTeam.battlefield;
+            const initialBattlefield = mockTeam.getBattlefield();
             mockTeam.resetTeam()
             expect(mockTeam.players).toEqual([])
-            expect(mockTeam.battlefield).not.toBe(initialBattlefield); 
+            expect(mockTeam.getBattlefield()).not.toBe(initialBattlefield); 
             expect(Battlefield).toHaveBeenCalledWith(mockTeam.getTeamSize()); 
         })
     })
@@ -131,10 +131,10 @@ describe("Team", () => {
             const sage = Cedar;
             mockTeam.initBattlefield([decklist]);
     
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard, 1);
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard, 2);
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard, 3);
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(sage, 5);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(basicCard, 1);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(basicCard, 2);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(basicCard, 3);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(sage, 5);
         });
 
         test("should initialize battlefield for a two-player team", () => {
@@ -150,16 +150,16 @@ describe("Team", () => {
 
             mockTeam.initBattlefield([decklist_1, decklist_2]);
 
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard_1, 1);
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard_2, 2);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(basicCard_1, 1);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(basicCard_2, 2);
 
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard_1, 3);
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard_1, 4);
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard_2, 5);
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(basicCard_2, 6);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(basicCard_1, 3);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(basicCard_1, 4);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(basicCard_2, 5);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(basicCard_2, 6);
 
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(sage_1, 8);
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(sage_2, 11);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(sage_1, 8);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(sage_2, 11);
         })
     })
 
@@ -167,32 +167,32 @@ describe("Team", () => {
         test("should initialize warriors for one-player team", () => {
             mockTeam.initWarriors([AcornSquire, QuillThornback])
 
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(AcornSquire, 4)
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(QuillThornback, 6)
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(AcornSquire, 4)
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(QuillThornback, 6)
         })
 
         test("should initialize warriors for two-player team (left side)", () => {
             mockTeam = new Team(2, 1);
 
-            mockTeam.battlefield.getCard = jest
+            mockTeam.getBattlefield().getCard = jest
             .fn()
             .mockImplementation((position) => (position === 8 ? Cedar : null));
 
             mockTeam.initWarriors([AcornSquire, QuillThornback])
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(AcornSquire, 7)
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(QuillThornback, 9)
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(AcornSquire, 7)
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(QuillThornback, 9)
         })
 
         test("should initialize warriors for two-player team (right side)", () => {
             mockTeam = new Team(2, 1);
 
-            mockTeam.battlefield.getCard = jest
+            mockTeam.getBattlefield().getCard = jest
             .fn()
             .mockImplementation((position) => (position === 11 ? Cedar : null));
 
             mockTeam.initWarriors([AcornSquire, QuillThornback])
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(AcornSquire, 10)
-            expect(mockTeam.battlefield.addCard).toHaveBeenCalledWith(QuillThornback, 12)
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(AcornSquire, 10)
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(QuillThornback, 12)
         })
     })
 
@@ -201,7 +201,7 @@ describe("Team", () => {
 
         beforeEach(() => {
             mockPlayer = new Player("testPlayerId_1")
-            mockTeam.battlefield.swapCards = jest.fn()
+            mockTeam.getBattlefield().swapCards = jest.fn()
         })
 
         test("should swap warriors in a single-player team", () => {
@@ -210,18 +210,18 @@ describe("Team", () => {
             mockTeam.swapWarriors(mockPlayer)
 
             expect(mockTeam.getTeamSize).toHaveBeenCalled()
-            expect(mockTeam.battlefield.swapCards).toHaveBeenCalledWith(4, 6)
+            expect(mockTeam.getBattlefield().swapCards).toHaveBeenCalledWith(4, 6)
         });
     
         test("should swap warriors for the left-side player in a two-player team", () => {
             mockTeam.getTeamSize = jest.fn().mockReturnValue(2)
             mockPlayer.getElement = jest.fn().mockReturnValue(Cedar.element)
-            mockTeam.battlefield.getCard = jest.fn().mockReturnValue(Cedar)
+            mockTeam.getBattlefield().getCard = jest.fn().mockReturnValue(Cedar)
             
             mockTeam.swapWarriors(mockPlayer)
             
             expect(mockTeam.getTeamSize).toHaveBeenCalled()
-            expect(mockTeam.battlefield.swapCards).toHaveBeenCalledWith(7, 9)
+            expect(mockTeam.getBattlefield().swapCards).toHaveBeenCalledWith(7, 9)
         });
     
         test("should swap warriors for the right-side player in a two-player team", () => {
@@ -229,18 +229,18 @@ describe("Team", () => {
             mockPlayer.getElement = jest.fn()
                 .mockReturnValueOnce("leaf")
                 .mockReturnValueOnce(Cedar.element)
-            mockTeam.battlefield.getCard = jest.fn().mockReturnValue(Cedar)
+            mockTeam.getBattlefield().getCard = jest.fn().mockReturnValue(Cedar)
             
             mockTeam.swapWarriors(mockPlayer)
             
             expect(mockTeam.getTeamSize).toHaveBeenCalled()
-            expect(mockTeam.battlefield.swapCards).toHaveBeenCalledWith(10, 12)
+            expect(mockTeam.getBattlefield().swapCards).toHaveBeenCalledWith(10, 12)
         });
     
         test("should throw an error if the element does not match any sage", () => {
             mockTeam.getTeamSize = jest.fn().mockReturnValue(2)
             mockPlayer.getElement = jest.fn().mockReturnValueOnce("leaf")
-            mockTeam.battlefield.getCard = jest.fn().mockReturnValue(Cedar)
+            mockTeam.getBattlefield().getCard = jest.fn().mockReturnValue(Cedar)
 
             expect(() => (mockTeam.swapWarriors(mockPlayer))).toThrow(ValidationError)
         });

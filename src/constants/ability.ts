@@ -117,7 +117,7 @@ function moveToDiscardFromField(player: AbilityResult['player'], fieldTarget: Ab
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
     if (fieldTarget.team === 'enemy') throw new InternalServerError("Cannot move enemy card to discard");
 
-    const removedCard = player.getTeam()!.battlefield.removeCard(fieldTarget.position);
+    const removedCard = player.getTeam()!.getBattlefield().removeCard(fieldTarget.position);
     player.addCardToDiscardPile(removedCard);
 }
 
@@ -128,8 +128,8 @@ function moveToFieldFromDiscard(player: AbilityResult['player'], fieldTarget: Ab
 
     const removedCard = player.removeCardFromDiscardPile(discardTarget);
     if (!isElementalCard(removedCard)) throw new InvalidCardTypeError("Card is not an ElementalCard");
-    
-    player.getTeam()!.battlefield.addCard(removedCard, fieldTarget.position);
+
+    player.getTeam()!.getBattlefield().addCard(removedCard, fieldTarget.position);
 }
 
 function swapFieldPosition() {
