@@ -3,6 +3,7 @@ import { Player } from "../models";
 import { ActiveConGame } from "../models/ConGame";
 import { InternalServerError } from "../services/CustomError/BaseError";
 import { InvalidCardTypeError } from "../services/CustomError/GameError";
+import { ElementalCard } from "../types";
 import { SpaceOption } from "../types/types";
 
 export type AbilityResult = {
@@ -69,6 +70,7 @@ export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult
             moveToHandFromField(player, fieldTarget);
             break;
         case AbilityAction.MOVE_TO_FIELD_FROM_HAND:
+            moveToFieldFromHand(player, fieldTarget, handTarget);
             break;
         case AbilityAction.ADD_SHIELD:
             break;
@@ -143,9 +145,11 @@ function moveToFieldFromDiscard(player: AbilityResult['player'], fieldTarget: Ab
     if (discardTarget.length !== 1) throw new InternalServerError("Discard target position is not a single position");
     if (fieldTarget.team === 'enemy') throw new InternalServerError("Cannot move enemy card to field");
 
-    const removedCard = player.removeCardFromDiscardPile(discardTarget[0]);
-    if (!isElementalCard(removedCard)) throw new InvalidCardTypeError("Card is not an ElementalCard");
-
+    const targetIndex = discardTarget[0];
+    const targetCard = player.getDiscardPile()[targetIndex];
+    if (!isElementalCard(targetCard)) throw new InvalidCardTypeError("Card is not an ElementalCard");
+    
+    const removedCard = player.removeCardFromDiscardPile(targetIndex) as ElementalCard;
     player.getTeam()!.getBattlefield().addCard(removedCard, fieldTarget.position[0]);
 }
 
@@ -215,8 +219,26 @@ function moveToHandFromField(player: AbilityResult['player'], fieldTarget: Abili
     });
 }
 
-function moveToFieldFromHand() {
+/**
+ * Moves a card from the hand to the battlefield
+ * @param player The player that is moving the card
+ * @param fieldTarget The target on the battlefield to move to; must be a single position
+ * @param handTarget The target in the hand to move from; must be a single position
+ */
+function moveToFieldFromHand(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget'], handTarget: AbilityResult['handTarget']) {
+    if (handTarget === undefined) throw new InternalServerError("Hand target is not defined");
+    if (handTarget.length !== 1) throw new InternalServerError("Hand target position is not a single position");
+    if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
+    if (fieldTarget.position.length !== 1) throw new InternalServerError("Field target position is not a single position");
+    if (fieldTarget.team === 'enemy') throw new InternalServerError("Cannot move enemy card to field");
 
+
+    const targetIndex = handTarget[0];
+    const targetCard = player.getHand()[targetIndex];
+    if (!isElementalCard(targetCard)) throw new InvalidCardTypeError("Card is not an ElementalCard");
+    
+    const removedCard = player.removeCardFromHand(targetIndex) as ElementalCard;
+    player.getTeam()!.getBattlefield().addCard(removedCard, fieldTarget.position[0]);
 }
 
 function addShield() {
