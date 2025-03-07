@@ -22,7 +22,9 @@ export const Cedar: ElementalSage = {
   element: "twig",
   attack: 3,
   health: 12,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2, 3],
   isDayBreak: true,
 };
@@ -35,7 +37,9 @@ export const Gravel: ElementalSage = {
   element: "pebble",
   attack: 3,
   health: 12,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2, 3],
   isDayBreak: true,
 };
@@ -48,7 +52,9 @@ export const Porella: ElementalSage = {
   element: "leaf",
   attack: 3,
   health: 12,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2, 3],
   isDayBreak: true,
 };
@@ -61,7 +67,9 @@ export const Torrent: ElementalSage = {
   element: "droplet",
   attack: 3,
   health: 12,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2, 3],
   isDayBreak: true,
 };
@@ -75,7 +83,9 @@ export const VixVanguard: ElementalChampion = {
   element: "twig",
   attack: 3,
   health: 6,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   levelRequirement: 4,
   isDayBreak: true,
@@ -88,7 +98,9 @@ export const HornedHollow: ElementalChampion = {
   element: "twig",
   attack: 6,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   levelRequirement: 6,
   isDayBreak: false,
@@ -101,7 +113,9 @@ export const CalamityLeopard: ElementalChampion = {
   element: "twig",
   attack: 3,
   health: 8,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   levelRequirement: 8,
   isDayBreak: false,
@@ -115,7 +129,9 @@ export const JadeTitan: ElementalChampion = {
   element: "pebble",
   attack: 3,
   health: 5,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   levelRequirement: 4,
   isDayBreak: false,
@@ -128,7 +144,9 @@ export const BoulderhideBrute: ElementalChampion = {
   element: "pebble",
   attack: 6,
   health: 6,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   levelRequirement: 6,
   isDayBreak: false,
@@ -141,7 +159,9 @@ export const OxenAvenger: ElementalChampion = {
   element: "pebble",
   attack: 8,
   health: 7,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   levelRequirement: 8,
   isDayBreak: false,
@@ -155,7 +175,9 @@ export const AgileAssailant: ElementalChampion = {
   element: "leaf",
   attack: 3,
   health: 5,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [2],
   levelRequirement: 4,
   isDayBreak: false,
@@ -168,7 +190,9 @@ export const BogBlight: ElementalChampion = {
   element: "leaf",
   attack: 4,
   health: 5,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   levelRequirement: 6,
   isDayBreak: true,
@@ -181,7 +205,9 @@ export const KomodoKin: ElementalChampion = {
   element: "leaf",
   attack: 8,
   health: 6,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   levelRequirement: 8,
   isDayBreak: false,
@@ -195,7 +221,9 @@ export const TideTurner: ElementalChampion = {
   element: "droplet",
   attack: 4,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   levelRequirement: 4,
   isDayBreak: false,
@@ -208,7 +236,9 @@ export const KingCrustacean: ElementalChampion = {
   element: "droplet",
   attack: 3,
   health: 7,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   levelRequirement: 6,
   isDayBreak: false,
@@ -221,7 +251,9 @@ export const FrostfallEmperor: ElementalChampion = {
   element: "droplet",
   attack: 2,
   health: 12,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   levelRequirement: 8,
   isDayBreak: false,
@@ -236,6 +268,8 @@ export const Timber: ElementalStarterCard = {
   img: "",
   attack: 2,
   health: 2,
+  shieldCount: 0,
+  boostCount: 0,
 };
 
 export const Bruce: ElementalCard = {
@@ -245,6 +279,8 @@ export const Bruce: ElementalCard = {
   img: "",
   attack: 3,
   health: 3,
+  shieldCount: 0,
+  boostCount: 0,
 };
 
 export const Willow: ElementalCard = {
@@ -254,6 +290,8 @@ export const Willow: ElementalCard = {
   img: "",
   attack: 1,
   health: 3,
+  shieldCount: 0,
+  boostCount: 0,
 };
 
 // *** Pebbles ***
@@ -264,6 +302,8 @@ export const Cobble: ElementalStarterCard = {
   img: "",
   attack: 2,
   health: 2,
+  shieldCount: 0,
+  boostCount: 0,
 };
 
 export const Flint: ElementalCard = {
@@ -273,6 +313,8 @@ export const Flint: ElementalCard = {
   img: "",
   attack: 1,
   health: 3,
+  shieldCount: 0,
+  boostCount: 0,
 };
 
 export const Rocco: ElementalCard = {
@@ -282,6 +324,8 @@ export const Rocco: ElementalCard = {
   img: "",
   attack: 3,
   health: 3,
+  shieldCount: 0,
+  boostCount: 0,
 };
 
 // *** Leafs ***
@@ -292,6 +336,8 @@ export const Sprout: ElementalStarterCard = {
   img: "",
   attack: 2,
   health: 2,
+  shieldCount: 0,
+  boostCount: 0,
 };
 
 export const Herbert: ElementalCard = {
@@ -301,6 +347,8 @@ export const Herbert: ElementalCard = {
   img: "",
   attack: 3,
   health: 3,
+  shieldCount: 0,
+  boostCount: 0,
 };
 
 export const Mush: ElementalCard = {
@@ -310,6 +358,8 @@ export const Mush: ElementalCard = {
   img: "",
   attack: 1,
   health: 3,
+  shieldCount: 0,
+  boostCount: 0,
 };
 
 // *** Droplets ***
@@ -320,6 +370,8 @@ export const Dribble: ElementalStarterCard = {
   img: "",
   attack: 2,
   health: 2,
+  shieldCount: 0,
+  boostCount: 0,
 };
 
 export const Dewy: ElementalCard = {
@@ -329,6 +381,8 @@ export const Dewy: ElementalCard = {
   img: "",
   attack: 3,
   health: 3,
+  shieldCount: 0,
+  boostCount: 0,
 };
 
 export const Wade: ElementalCard = {
@@ -338,6 +392,8 @@ export const Wade: ElementalCard = {
   element: "droplet",
   attack: 1,
   health: 3,
+  shieldCount: 0,
+  boostCount: 0,
 };
 
 // ------------ WARRIORS ------------
@@ -349,7 +405,9 @@ export const AcornSquire: ElementalWarriorStarterCard = {
   element: "twig",
   attack: 2,
   health: 3,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   isDayBreak: false,
 };
@@ -361,7 +419,9 @@ export const QuillThornback: ElementalWarriorStarterCard = {
   element: "twig",
   attack: 3,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   isDayBreak: false,
 };
@@ -373,7 +433,9 @@ export const SlumberJack: ElementalWarriorStarterCard = {
   element: "twig",
   attack: 1,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [2],
   isDayBreak: true,
 };
@@ -385,7 +447,9 @@ export const CamouChameleon: ElementalWarriorCard = {
   element: "twig",
   attack: 4,
   health: 5,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   isDayBreak: true,
 };
@@ -397,7 +461,9 @@ export const LumberClaw: ElementalWarriorCard = {
   element: "twig",
   attack: 2,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   isDayBreak: false,
 };
@@ -409,7 +475,9 @@ export const PineSnapper: ElementalWarriorCard = {
   element: "twig",
   attack: 1,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [2],
   isDayBreak: false,
 };
@@ -421,7 +489,9 @@ export const SplinterStinger: ElementalWarriorCard = {
   element: "twig",
   attack: 3,
   health: 5,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   isDayBreak: false,
 };
@@ -433,7 +503,9 @@ export const TwineFeline: ElementalWarriorCard = {
   element: "twig",
   attack: 3,
   health: 5,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [2],
   isDayBreak: true,
 };
@@ -445,7 +517,9 @@ export const OakLumbertron: ElementalWarriorCard = {
   element: "twig",
   attack: 6,
   health: 6,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   isDayBreak: true,
 };
@@ -458,7 +532,9 @@ export const GeoWeasel: ElementalWarriorStarterCard = {
   element: "pebble",
   attack: 1,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   isDayBreak: false,
 };
@@ -470,7 +546,9 @@ export const GraniteRampart: ElementalWarriorStarterCard = {
   element: "pebble",
   attack: 2,
   health: 3,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   isDayBreak: true,
 };
@@ -482,7 +560,9 @@ export const OnyxBearer: ElementalWarriorStarterCard = {
   element: "pebble",
   attack: 3,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [2],
   isDayBreak: true,
 };
@@ -494,7 +574,9 @@ export const CackleRipclaw: ElementalWarriorCard = {
   element: "pebble",
   attack: 2,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   isDayBreak: false,
 };
@@ -506,7 +588,9 @@ export const Redstone: ElementalWarriorCard = {
   element: "pebble",
   attack: 3,
   health: 3,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   isDayBreak: true,
 };
@@ -518,7 +602,9 @@ export const RubyGuardian: ElementalWarriorCard = {
   element: "pebble",
   attack: 2,
   health: 3,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   isDayBreak: true,
 };
@@ -530,7 +616,9 @@ export const RunePuma: ElementalWarriorCard = {
   element: "pebble",
   attack: 3,
   health: 3,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [2],
   isDayBreak: false,
 };
@@ -542,7 +630,9 @@ export const StoneDefender: ElementalWarriorCard = {
   element: "pebble",
   attack: 7,
   health: 5,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   isDayBreak: true,
 };
@@ -554,7 +644,9 @@ export const TerrainTumbler: ElementalWarriorCard = {
   element: "pebble",
   attack: 2,
   health: 6,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [2],
   isDayBreak: false,
 };
@@ -567,7 +659,9 @@ export const BotanicFangs: ElementalWarriorStarterCard = {
   element: "leaf",
   attack: 3,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   isDayBreak: false,
 };
@@ -579,7 +673,9 @@ export const PetalMage: ElementalWarriorStarterCard = {
   element: "leaf",
   attack: 2,
   health: 3,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [2],
   isDayBreak: false,
 };
@@ -591,7 +687,9 @@ export const ThornFencer: ElementalWarriorStarterCard = {
   element: "leaf",
   attack: 2,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   isDayBreak: true,
 };
@@ -603,7 +701,9 @@ export const BambooBerserker: ElementalWarriorCard = {
   element: "leaf",
   attack: 6,
   health: 6,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   isDayBreak: true,
 };
@@ -615,7 +715,9 @@ export const ForageThumper: ElementalWarriorCard = {
   element: "leaf",
   attack: 2,
   health: 5,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   isDayBreak: true,
 };
@@ -627,7 +729,9 @@ export const HummingHerald: ElementalWarriorCard = {
   element: "leaf",
   attack: 4,
   health: 3,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [2],
   isDayBreak: false,
 };
@@ -639,7 +743,9 @@ export const IguanaGuard: ElementalWarriorCard = {
   element: "leaf",
   attack: 3,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [2],
   isDayBreak: false,
 };
@@ -651,7 +757,9 @@ export const MossViper: ElementalWarriorCard = {
   element: "leaf",
   attack: 4,
   health: 2,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   isDayBreak: false,
 };
@@ -663,7 +771,9 @@ export const ShrubBeetle: ElementalWarriorCard = {
   element: "leaf",
   attack: 1,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   isDayBreak: false,
 };
@@ -676,7 +786,9 @@ export const CoastalCoyote: ElementalWarriorStarterCard = {
   element: "droplet",
   attack: 3,
   health: 3,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   isDayBreak: false,
 };
@@ -688,7 +800,9 @@ export const RiptideTiger: ElementalWarriorStarterCard = {
   element: "droplet",
   attack: 2,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   isDayBreak: false,
 };
@@ -700,7 +814,9 @@ export const RiverRogue: ElementalWarriorStarterCard = {
   element: "droplet",
   attack: 2,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [2],
   isDayBreak: true,
 };
@@ -712,7 +828,9 @@ export const CurrentConjurer: ElementalWarriorCard = {
   element: "droplet",
   attack: 1,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [2],
   isDayBreak: false,
 };
@@ -724,7 +842,9 @@ export const RoamingRazor: ElementalWarriorCard = {
   element: "droplet",
   attack: 5,
   health: 8,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   isDayBreak: false,
 };
@@ -736,7 +856,9 @@ export const SplashBasilisk: ElementalWarriorCard = {
   element: "droplet",
   attack: 3,
   health: 5,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   isDayBreak: false,
 };
@@ -748,7 +870,9 @@ export const SurgesphereMonk: ElementalWarriorCard = {
   element: "droplet",
   attack: 1,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [2],
   isDayBreak: false,
 };
@@ -760,7 +884,9 @@ export const TyphoonFist: ElementalWarriorCard = {
   element: "droplet",
   attack: 2,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1],
   isDayBreak: false,
 };
@@ -772,7 +898,9 @@ export const WhirlWhipper: ElementalWarriorCard = {
   element: "droplet",
   attack: 3,
   health: 4,
-  ability: undefined,
+  ability: () => {},
+  shieldCount: 0,
+  boostCount: 0,
   rowRequirement: [1, 2],
   isDayBreak: true,
 };
@@ -782,7 +910,7 @@ export const CloseStrike: AttackStarterCard = {
   name: "Close Strike",
   img: "",
   price: 1,
-  ability: undefined,
+  ability: () => {},
   rowRequirement: [1],
 };
 
@@ -790,7 +918,7 @@ export const FarStrike: AttackStarterCard = {
   name: "Far Strike",
   img: "",
   price: 1,
-  ability: undefined,
+  ability: () => {},
   rowRequirement: [1, 2],
 };
 
@@ -798,7 +926,7 @@ export const DistantDoubleStrike: AttackCard = {
   name: "Distant Double Strike",
   img: "",
   price: 3,
-  ability: undefined,
+  ability: () => {},
   rowRequirement: [1, 2],
 };
 
@@ -806,7 +934,7 @@ export const FarsightFrenzy: AttackCard = {
   name: "Farsight Frenzy",
   img: "",
   price: 3,
-  ability: undefined,
+  ability: () => {},
   rowRequirement: [1, 2, 3],
 };
 
@@ -814,7 +942,7 @@ export const FocusedFury: AttackCard = {
   name: "Focused Fury",
   img: "",
   price: 2,
-  ability: undefined,
+  ability: () => {},
   rowRequirement: [1],
 };
 
@@ -822,7 +950,7 @@ export const MagicEtherStrike: AttackCard = {
   name: "Magic Ether Strike",
   img: "",
   price: 5,
-  ability: undefined,
+  ability: () => {},
   rowRequirement: [1],
 };
 
@@ -830,7 +958,7 @@ export const NaturesWrath: AttackCard = {
   name: "Nature's Wrath",
   img: "",
   price: 2,
-  ability: undefined,
+  ability: () => {},
   rowRequirement: [1],
 };
 
@@ -838,7 +966,7 @@ export const PrimitiveStrike: AttackCard = {
   name: "Primitive Strike",
   img: "",
   price: 3,
-  ability: undefined,
+  ability: () => {},
   rowRequirement: [1, 2],
 };
 
@@ -846,7 +974,7 @@ export const ProjectileBlast: AttackCard = {
   name: "Projectile Blast",
   img: "",
   price: 2,
-  ability: undefined,
+  ability: () => {},
   rowRequirement: [1, 2],
 };
 
@@ -854,7 +982,7 @@ export const ReinforcedImpact: AttackCard = {
   name: "Reinforced Impact",
   img: "",
   price: 2,
-  ability: undefined,
+  ability: () => {},
   rowRequirement: [1],
 };
 
@@ -863,56 +991,56 @@ export const DropletCharm: InstantStarterCard = {
   name: "Droplet Charm",
   img: "",
   price: 1,
-  ability: undefined,
+  ability: () => {},
 };
 
 export const LeafCharm: InstantStarterCard = {
   name: "Leaf Charm",
   img: "",
   price: 1,
-  ability: undefined,
+  ability: () => {},
 };
 
 export const PebbleCharm: InstantStarterCard = {
   name: "Pebble Charm",
   img: "",
   price: 1,
-  ability: undefined,
+  ability: () => {},
 };
 
 export const TwigCharm: InstantStarterCard = {
   name: "Twig Charm",
   img: "",
   price: 1,
-  ability: undefined,
+  ability: () => {},
 };
 
 export const NaturalRestoration: InstantStarterCard = {
   name: "Natural Restoration",
   img: "",
   price: 1,
-  ability: undefined,
+  ability: () => {},
 };
 
 export const MeleeShield: InstantCard = {
   name: "Melee Shield",
   img: "",
   price: 3,
-  ability: undefined,
+  ability: () => {},
 };
 
 export const NaturalDefense: InstantCard = {
   name: "Natural Defense",
   img: "",
   price: 3,
-  ability: undefined,
+  ability: () => {},
 };
 
 export const RangedBarrier: InstantCard = {
   name: "Ranged Barrier",
   img: "",
   price: 3,
-  ability: undefined,
+  ability: () => {},
 };
 
 // ------------ UTILITIES ------------
@@ -920,26 +1048,26 @@ export const ElementalIncantation: UtilityCard = {
   name: "Elemental Incantation",
   img: "",
   price: 5,
-  ability: undefined,
+  ability: () => {},
 };
 
 export const ElementalSwap: UtilityCard = {
   name: "Elemental Swap",
   img: "",
   price: 2,
-  ability: undefined,
+  ability: () => {},
 };
 
 export const ExchangeOfNature: UtilityCard = {
   name: "Exchange of Nature",
   img: "",
   price: 2,
-  ability: undefined,
+  ability: () => {},
 };
 
 export const Obliterate: UtilityCard = {
   name: "Obliterate",
   img: "",
   price: 5,
-  ability: undefined,
+  ability: () => {},
 };

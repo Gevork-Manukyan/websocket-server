@@ -71,6 +71,8 @@ export const ElementalCardSchema = CardSchema.extend({
   element: ElementSchema,
   attack: z.number(),
   health: z.number(),
+  shieldCount: z.number().default(0),
+  boostCount: z.number().default(0),
 });
 
 export const ElementalStarterCardSchema = ElementalCardSchema.extend({
