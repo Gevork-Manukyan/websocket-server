@@ -76,6 +76,7 @@ export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult
             addShield(player, fieldTarget, amount);
             break;
         case AbilityAction.ADD_BOOST:
+            addBoost(player, fieldTarget, amount)
             break;
         case AbilityAction.DONT_REMOVE_SHIELD:
             break;
@@ -242,6 +243,12 @@ function moveToFieldFromHand(player: AbilityResult['player'], fieldTarget: Abili
     player.getTeam()!.getBattlefield().addCard(removedCard, fieldTarget.position[0]);
 }
 
+/**
+ * Adds shield to a card on the battlefield
+ * @param player The player that is adding shield
+ * @param fieldTarget The target on the battlefield to add shield to
+ * @param amount The amount of shield to add
+ */
 function addShield(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget'], amount: AbilityResult['amount']) {
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
     if (amount === undefined) throw new InternalServerError("Amount of shield to add is not defined");
@@ -252,8 +259,20 @@ function addShield(player: AbilityResult['player'], fieldTarget: AbilityResult['
     });
 }
 
-function addBoost() {
+/**
+ * Adds boost to a card on the battlefield
+ * @param player The player that is adding boost
+ * @param fieldTarget The target on the battlefield to add boost to
+ * @param amount The amount of boost to add
+ */
+function addBoost(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget'], amount: AbilityResult['amount']) {
+    if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
+    if (amount === undefined) throw new InternalServerError("Amount of boost to add is not defined");
+    if (fieldTarget.team === 'enemy') throw new InternalServerError("Cannot add boost to enemy card");
 
+    fieldTarget.position.forEach(position => {
+        player.getTeam()!.getBattlefield().addBoostToCardAtPosition(position, amount);
+    });
 }
 
 function dontRemoveShield() {

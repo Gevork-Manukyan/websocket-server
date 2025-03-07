@@ -240,6 +240,12 @@ export class Battlefield {
         const newShield = card.shieldCount + amount;
         card.shieldCount = newShield;
     }
+
+    addBoostToCardAtPosition(position: SpaceOption, amount: number) {
+        const card = this.getCardAtSpace(position);
+        const newBoost = card.boostCount + amount;
+        card.boostCount = newBoost;
+    }
 }
 
 type Direction = "TL" | "T" | "TR" | "L" | "R" | "BL" | "B" | "BR"
