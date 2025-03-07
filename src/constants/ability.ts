@@ -73,6 +73,7 @@ export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult
             moveToFieldFromHand(player, fieldTarget, handTarget);
             break;
         case AbilityAction.ADD_SHIELD:
+            addShield(player, fieldTarget, amount);
             break;
         case AbilityAction.ADD_BOOST:
             break;
@@ -241,8 +242,14 @@ function moveToFieldFromHand(player: AbilityResult['player'], fieldTarget: Abili
     player.getTeam()!.getBattlefield().addCard(removedCard, fieldTarget.position[0]);
 }
 
-function addShield() {
+function addShield(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget'], amount: AbilityResult['amount']) {
+    if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
+    if (amount === undefined) throw new InternalServerError("Amount of shield to add is not defined");
+    if (fieldTarget.team === 'enemy') throw new InternalServerError("Cannot add shield to enemy card");
 
+    fieldTarget.position.forEach(position => {
+        player.getTeam()!.getBattlefield().addShieldToCardAtPosition(position, amount);
+    });
 }
 
 function addBoost() {

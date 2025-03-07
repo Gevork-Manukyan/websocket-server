@@ -148,6 +148,12 @@ export class Battlefield {
         return this.fieldArray[spaceNumber - 1];
     }
 
+    private getCardAtSpace<T extends SpaceOption>(spaceNumber: T) {
+        const card = this.getBattlefieldSpace(spaceNumber).value;
+        if (!card) throw new NullSpaceError(spaceNumber, `Cannot get card from empty space: ${spaceNumber}`);
+        return card;
+    }
+
     private validateSpaceNumber(spaceNumber: SpaceOption): asserts spaceNumber is OnePlayerSpaceOptions | TwoPlayerSpaceOptions {
         const maxSpaceNumber = this.numPlayersOnTeam === 1 ? ONE_PLAYER_SPACE_MAX : TWO_PLAYER_SPACE_MAX;
     
@@ -220,15 +226,19 @@ export class Battlefield {
     }
 
     damageCardAtPosition(position: SpaceOption, amount: number): boolean {
-        const space = this.getBattlefieldSpace(position);
-        const card = space.value;
-        if (!card) throw new InternalServerError("Card does not exist")
+        const card = this.getCardAtSpace(position);
 
         const newHealth = card.health - amount;
         if (newHealth <= 0) return true;
         
-        space.setValue({ ...card, health: newHealth })
+        card.health = newHealth;
         return false;
+    }
+
+    addShieldToCardAtPosition(position: SpaceOption, amount: number) {
+        const card = this.getCardAtSpace(position);
+        const newShield = card.shieldCount + amount;
+        card.shieldCount = newShield;
     }
 }
 
