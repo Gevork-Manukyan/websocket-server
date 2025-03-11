@@ -1,7 +1,8 @@
 import { ValidationError } from "../services/CustomError/BaseError";
 import { NullSpaceError } from "../services/CustomError/GameError";
-import { AcornSquire, Timber } from "../constants";
 import { Battlefield, BattlefieldSpace } from "./Battlefield";
+import { ALL_CARDS } from "../constants/cards";
+const { AcornSquire, Timber } = ALL_CARDS;
 
 describe("Battlefield class", () => {
     let mockBattlefield: Battlefield;

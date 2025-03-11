@@ -1,5 +1,6 @@
 import { Decklist } from "../types/types";
-import {
+import { ALL_CARDS } from "./cards";
+const {
   AcornSquire,
   CalamityLeopard,
   Cedar,
@@ -8,8 +9,6 @@ import {
   SlumberJack,
   Timber,
   VixVanguard,
-} from ".";
-import {
   AgileAssailant,
   BogBlight,
   BotanicFangs,
@@ -41,7 +40,7 @@ import {
   TideTurner,
   Torrent,
   TwigCharm,
-} from "./cards";
+} = ALL_CARDS;
 
 
 export const TwigDeck: Decklist = {

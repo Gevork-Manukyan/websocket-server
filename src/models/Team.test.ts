@@ -1,9 +1,10 @@
 import { ConflictError, NotFoundError, ValidationError } from "../services/CustomError/BaseError"
-import { AcornSquire, Cedar, Porella, QuillThornback, Sprout, Timber } from "../constants"
 import { LeafDeck, TwigDeck } from "../constants/decklists"
 import { Battlefield } from "./Battlefield"
 import { Player } from "./Player"
 import { Team } from "./Team"
+import { ALL_CARDS } from "../constants/cards"
+const { AcornSquire, Cedar, Porella, QuillThornback, Sprout, Timber } = ALL_CARDS;
 
 jest.mock("./Battlefield", () => {
     return {

@@ -73,6 +73,7 @@ export const ElementalCardSchema = CardSchema.extend({
   health: z.number(),
   shieldCount: z.number().default(0),
   boostCount: z.number().default(0),
+  damageCount: z.number().default(0),
 });
 
 export const ElementalStarterCardSchema = ElementalCardSchema.extend({
@@ -81,7 +82,7 @@ export const ElementalStarterCardSchema = ElementalCardSchema.extend({
 
 export const ElementalWarriorCardSchema = ElementalCardSchema.merge(AbilityCardSchema)
   .extend({
-    isDayBreak: z.boolean(),
+    isDayBreak: z.boolean().default(false),
 });
 
 export const ElementalWarriorStarterCardSchema = ElementalWarriorCardSchema.extend({
@@ -131,4 +132,3 @@ export type AttackStarterCard = z.infer<typeof AttackStarterCardSchema>;
 export type UtilityCard = z.infer<typeof UtilityCardSchema>;
 export type InstantCard = z.infer<typeof InstantCardSchema>;
 export type InstantStarterCard = z.infer<typeof InstantStarterCardSchema>;
-

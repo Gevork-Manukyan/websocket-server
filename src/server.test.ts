@@ -5,8 +5,9 @@ import { gameStateManager } from "./services/GameStateManager";
 import { ConGame, Player } from "./models";
 import { AllPlayersSetupEvent, CancelSetupEvent, ChoseWarriorsEvent, ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, PlayerFinishedSetupEvent, SelectSageData, StartGameEvent, SwapWarriorsEvent, ToggleReadyStatusData } from "./types/server-types";
 import { gameEventEmitter } from "./services/GameEventEmitter";
-import { AcornSquire, QuillThornback } from "./constants";
 import { Team } from "./models/Team";
+import { ALL_CARDS } from "./constants/cards";
+const { AcornSquire, QuillThornback } = ALL_CARDS;
 
 
 let clientSocket: Socket;

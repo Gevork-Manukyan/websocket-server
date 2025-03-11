@@ -1,9 +1,9 @@
 import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
-import { Cedar, Gravel, Timber } from "../constants";
-import { AcornSquire, CloseStrike, FarStrike, GeoWeasel, GraniteRampart, NaturalRestoration, QuillThornback, SlumberJack, TwigCharm } from "../constants/cards";
 import { TwigDeck } from "../constants/decklists";
 import { Player } from "./Player";
 import { Team } from "./Team";
+import { ALL_CARDS } from "../constants/cards";
+const { Cedar, Gravel, Timber, AcornSquire, CloseStrike, FarStrike, GeoWeasel, GraniteRampart, NaturalRestoration, QuillThornback, SlumberJack, TwigCharm } = ALL_CARDS;
 
 const testPlayerId = "testId123"
 
@@ -69,7 +69,7 @@ describe("deck getter and setters", () => {
 describe("discard pile getter and setters", () => {
     test("should correctly set the player's discard pile", () => {
         const player = new Player(testPlayerId);
-        player.setDiscardPile([Cedar]);
+        player.addCardToDiscardPile(Cedar);
         expect(player.getDiscardPile()).toContainEqual(Cedar);
     });
 });
