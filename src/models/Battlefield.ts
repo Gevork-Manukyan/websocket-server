@@ -17,6 +17,9 @@ export class Battlefield {
         numPlayersOnTeam === 1 ? this.initOnePlayerBattlefield() : this.initTwoPlayerBattlefield();
     }
 
+    /**
+     * Initializes the battlefield for a one player game
+     */
     private initOnePlayerBattlefield() {
         let row_1_1, row_2_1, row_2_2, row_3_1, row_3_2, row_3_3;
 
@@ -56,6 +59,9 @@ export class Battlefield {
         this.fieldArray = [row_1_1, row_2_1, row_2_2, row_3_1, row_3_2, row_3_3];
     }
 
+    /**
+     * Initializes the battlefield for a two player game
+     */
     private initTwoPlayerBattlefield() {
         let row_1_1, row_1_2, row_2_1, row_2_2, row_2_3, row_2_4, row_3_1, row_3_2, row_3_3, row_3_4, row_3_5, row_3_6;
 
@@ -143,17 +149,31 @@ export class Battlefield {
         this.fieldArray = [row_1_1, row_1_2, row_2_1, row_2_2, row_2_3, row_2_4, row_3_1, row_3_2, row_3_3, row_3_4, row_3_5, row_3_6];
     }
 
+    /**
+     * Returns the battlefield space at the given space number
+     * @param spaceNumber The space number to get
+     * @returns The battlefield space at the given space number
+     */
     private getBattlefieldSpace<T extends SpaceOption>(spaceNumber: T) {
         this.validateSpaceNumber(spaceNumber)
         return this.fieldArray[spaceNumber - 1];
     }
 
+    /**
+     * Returns the card at the given space number
+     * @param spaceNumber The space number to get the card from
+     * @returns The card at the given space number
+     */
     private getCardAtSpace<T extends SpaceOption>(spaceNumber: T) {
         const card = this.getBattlefieldSpace(spaceNumber).value;
         if (!card) throw new NullSpaceError(spaceNumber, `Cannot get card from empty space: ${spaceNumber}`);
         return card;
     }
 
+    /**
+     * Validates the space number to ensure it is within the correct range
+     * @param spaceNumber The space number to validate
+     */
     private validateSpaceNumber(spaceNumber: SpaceOption): asserts spaceNumber is OnePlayerSpaceOptions | TwoPlayerSpaceOptions {
         const maxSpaceNumber = this.numPlayersOnTeam === 1 ? ONE_PLAYER_SPACE_MAX : TWO_PLAYER_SPACE_MAX;
     
@@ -162,6 +182,11 @@ export class Battlefield {
         }
     }
 
+    /**
+     * Returns the card at the given space number
+     * @param spaceNumber The space number to get the card from
+     * @returns The card at the given space number
+     */
     getCard(spaceNumber: SpaceOption) {
         return this.getBattlefieldSpace(spaceNumber).value;
     }
@@ -190,6 +215,11 @@ export class Battlefield {
         return targetCard;
     }
 
+    /**
+     * Swaps the cards at the given space numbers
+     * @param space1Number The first space number to swap
+     * @param space2Number The second space number to swap
+     */
     swapCards(space1Number: SpaceOption, space2Number: SpaceOption) {
         if (space1Number === space2Number) throw new ValidationError("Cannot swap a card with itself", "spaceNumber");
 
@@ -206,10 +236,17 @@ export class Battlefield {
         space2.setValue(space1Value)
     }
 
+    /**
+     * @returns The battlefield state
+     */
     getBattlefieldState() {
         return this.fieldArray.map(space => space.getBattlefieldSpaceState())
     }
 
+    /**
+     * Returns the space numbers of the cards with Day Break ability
+     * @returns The space numbers of the cards with Day Break ability
+     */
     getDayBreakCards(): SpaceOption[] {
         return this.fieldArray.filter(space => {
             if (space.value === null) return false;
@@ -219,12 +256,22 @@ export class Battlefield {
         }).map(space => space.spaceNumber)
     }
 
+    /**
+     * Activates the Day Break ability of the card at the given space number
+     * @param spaceOption The space number to activate the Day Break ability
+     */
     activateDayBreak(spaceOption: SpaceOption) {
         const targetSpace: BattlefieldSpace = this.getBattlefieldSpace(spaceOption);
         targetSpace.validateDayBreakActivation();
         targetSpace.value.ability();
     }
 
+    /**
+     * Damages the card at the given space number
+     * @param position The position of the card to damage
+     * @param amount The amount of damage to deal
+     * @returns True if the card is destroyed, false otherwise
+     */
     damageCardAtPosition(position: SpaceOption, amount: number): boolean {
         const card = this.getCardAtSpace(position);
 
@@ -238,17 +285,31 @@ export class Battlefield {
         return false;
     }
 
+    /**
+     * Clears the damage on the card at the given space number
+     * @param position The position of the card to clear the damage from
+     */
     clearDamage(position: SpaceOption) {
         const card = this.getCardAtSpace(position);
         card.damageCount = 0;
     }
 
+    /**
+     * Adds shield to the card at the given space number
+     * @param position The position of the card to add shield to
+     * @param amount The amount of shield to add
+     */
     addShieldToCardAtPosition(position: SpaceOption, amount: number) {
         const card = this.getCardAtSpace(position);
         const newShield = card.shieldCount + amount;
         card.shieldCount = newShield;
     }
 
+    /**
+     * Adds boost to the card at the given space number
+     * @param position The position of the card to add boost to
+     * @param amount The amount of boost
+     */
     addBoostToCardAtPosition(position: SpaceOption, amount: number) {
         const card = this.getCardAtSpace(position);
         const newBoost = card.boostCount + amount;
@@ -287,14 +348,27 @@ export class BattlefieldSpace {
         };
     }
 
+    /**
+     * Sets the value of the space
+     * @param value The value to set the space to
+     */
     setValue(value: BattlefieldSpace['value']) {
         this.value = value;
     }
 
+    /**
+     * Returns the space at the given direction
+     * @param direction The direction to get the space from
+     * @returns The space at the given direction
+     */
     getDirection(direction: Direction) {
         return this.connections[direction];
     }
 
+    /**
+     * Returns the battlefield space state
+     * @returns The battlefield space state
+     */
     getBattlefieldSpaceState() {
         return {
             spaceNumber: this.spaceNumber,
@@ -302,6 +376,9 @@ export class BattlefieldSpace {
         }
     }
 
+    /**
+     * Validates the Day Break activation
+     */
     validateDayBreakActivation(): asserts this is BattlefieldSpace & { value: ElementalWarriorCard } {
         if (this.value === null) {
             throw new NullSpaceError(this.spaceNumber, `Cannot activate Day Break on an empty space: ${this.spaceNumber}`);
