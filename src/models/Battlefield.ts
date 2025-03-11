@@ -228,17 +228,19 @@ export class Battlefield {
     damageCardAtPosition(position: SpaceOption, amount: number): boolean {
         const card = this.getCardAtSpace(position);
 
-        const newHealth = card.health - amount;
-        if (newHealth <= 0) return true;
+        const newDamageCount = card.damageCount + amount;
+        if (newDamageCount >= card.health) {
+            card.damageCount = card.health;
+            return true;
+        }
         
-        card.health = newHealth;
+        card.damageCount = newDamageCount;
         return false;
     }
 
     clearDamage(position: SpaceOption) {
         const card = this.getCardAtSpace(position);
-        card.health = card.max
-        // TODO: create damage counter and instead of reducing health increase the counter 
+        card.damageCount = 0;
     }
 
     addShieldToCardAtPosition(position: SpaceOption, amount: number) {
