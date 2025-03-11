@@ -22,53 +22,91 @@ export class Team {
         this.maxGold = teamSize === 1 ? 12 : 20;
     }
 
+    /**
+     * Resets the team by removing all players and resetting the battlefield
+     */
     resetTeam() {
         this.players = []
         this.battlefield = new Battlefield(this.teamSize)
     }
 
+    /**
+     * @returns The battlefield of the team
+     */
     getBattlefield() {
         return this.battlefield;
     }
 
+    /**
+     * @returns The players on the team
+     */
     getTeamNumber() {
         return this.teamNumber;
     }
 
+    /**
+     * @returns The number of players on the team
+     */
     getTeamSize() {
         return this.teamSize;
     }
 
+    /**
+     * @returns The gold the team has
+     */
     getGold() {
         return this.gold;
     }
     
+    /**
+     * Sets the gold the team has
+     * @param amount The amount of gold to set
+     */
     private setGold(amount: number) {
         if (amount > this.maxGold) throw new ValidationError(`Team cannot have more than ${this.maxGold} gold`, "gold");
         this.gold = amount;
     }
 
+    /**
+     * Adds gold to the team
+     * @param amount The amount of gold to add to the team
+     */
     addGold(amount: number) {
         let newGoldAmount = this.gold + amount;
         if (newGoldAmount > this.maxGold) newGoldAmount = this.maxGold;
         this.setGold(newGoldAmount)
     }
 
+    /**
+     * Removes gold from the team
+     * @param amount The amount of gold to remove from the team
+     */
     removeGold(amount: number) {
         let newGoldAmount = this.gold - amount;
         if (newGoldAmount < 0) newGoldAmount = 0;
         this.setGold(newGoldAmount)
     }
 
+    /**
+     * Adds a player to the team
+     * @param player The player to add to the team
+     */
     addPlayerToTeam(player: Player) {
         if (this.players.length === (this.teamSize)) throw new ConflictError(`Team ${this.teamNumber} is full`);
         this.players.push(player)
     }
 
+    /**
+     * Removes a player from the team
+     * @param player The player to remove from the team
+     */
     removePlayerFromTeam(player: Player) {
         this.players = this.players.filter(currPlayer => currPlayer.id !== player.id)
     }
 
+    /**
+     * @returns The players on the team
+     */
     getAllPlayerDecklists() {
         return this.players.map(player => {
             const decklist = player.getDecklist();
@@ -93,6 +131,10 @@ export class Team {
         this.removedCards.push(card);
     }
   
+    /**
+     * Initializes the battlefield with the decklists of the players on the team
+     * @param decklists The decklists of the players on the team
+     */
     initBattlefield(decklists: Decklist[]) {
         const [decklist1, decklist2] = decklists;
 
@@ -122,6 +164,10 @@ export class Team {
         }
     }
 
+    /**
+     * Initializes the battlefield with the ElementalWarriorStarterCards given
+     * @param choices The choices of ElementalWarriorStarterCards to initialize the battlefield with
+     */
     initWarriors(choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
         const [choice1, choice2] = choices;
 
@@ -133,6 +179,10 @@ export class Team {
         }
     }
 
+    /**
+     * Initializes the battlefield with the ElementalWarriorStarterCards given for 2 players
+     * @param choices The choices of ElementalWarriorStarterCards to initialize the battlefield with
+     */
     private initWarriors2Decks(choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
         const [choice1, choice2] = choices;
         
@@ -147,6 +197,10 @@ export class Team {
         }
     }
 
+    /**
+     * Swaps the warriors of the player on the team
+     * @param player The player to swap the warriors of
+     */
     swapWarriors(player: Player) {
         // One player on Team
         if (this.getTeamSize() === 1) {
@@ -166,6 +220,9 @@ export class Team {
         }
     }
 
+    /**
+     * @returns The state of the team
+     */
     getTeamState() {
         return {
             gold: this.gold,
