@@ -83,6 +83,7 @@ export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult
         case AbilityAction.DONT_REMOVE_BOOST:
             break;
         case AbilityAction.REMOVE_ALL_DAMAGE:
+            removeAllDamage(player, fieldTarget);
             break;
     }
 }
@@ -283,8 +284,12 @@ function dontRemoveBoost() {
 
 }
 
-function removeAllDamage() {
+function removeAllDamage(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget']) {
+    if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
 
+    fieldTarget.position.forEach(position => {
+        player.getTeam()!.getBattlefield().clearDamage(position);
+    });
 }
 
 enum PlayerActionType {
