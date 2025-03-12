@@ -87,7 +87,8 @@ export class GameState {
             { acceptableEvents: [TransitionEvent.ALL_PLAYERS_SETUP_COMPLETE], nextState: State.PHASE1 }
         ]);
         this.addTransition(State.PHASE1, [
-            { acceptableEvents: [TransitionEvent.GET_DAY_BREAK_CARDS], nextState: State.RESOLVE_DAY_BREAK_CARDS }
+            { acceptableEvents: [TransitionEvent.GET_DAY_BREAK_CARDS], nextState: State.RESOLVE_DAY_BREAK_CARDS },
+            { acceptableEvents: [TransitionEvent.NEXT_PHASE], nextState: State.PHASE2 }
         ]);
         this.addTransition(State.RESOLVE_DAY_BREAK_CARDS, [
             { acceptableEvents: [TransitionEvent.DAY_BREAK_CARD], nextState: State.RESOLVE_DAY_BREAK_CARDS },
@@ -125,26 +126,47 @@ export class GameState {
         };
     }
 
+    /**
+     * Check if the transition is valid for the event
+     * @param event 
+     * @param transition 
+     * @returns The input that matches the event or undefined if no match
+     */
     private checkTransitionForEvent(event: TransitionEvent, transition: Transition) {
         return transition.possibleInputs.find(input => input.acceptableEvents.includes(event));
     }
 
+    /**
+     * Find the next transition based on the next state
+     * @param nextState 
+     * @returns The transition object or undefined if no match
+     */
     private findNextTransition(nextState: State) {
         return this.stateTransitionTable.find(transition => transition.currentStateValue === nextState);
     }
 
+    /**
+     * Verify if the event is valid for the current state
+     * @param event 
+     * @throws GameStateError if the event is invalid for the current state
+     */
     verifyEvent(event: TransitionEvent) {
         const input = this.checkTransitionForEvent(event, this.currentTransition);
         if (!input) throw new GameStateError(`Invalid event: ${event} for current state: ${this.currentTransition.currentStateValue}`);
     }
 
+    /**
+     * Process the event and move to the next state
+     * @param event The event to process
+     * @throws GameStateError if the event is invalid for the current state
+     */
     processEvent(event: TransitionEvent) {
         const input = this.checkTransitionForEvent(event, this.currentTransition);
-
         if (!input) throw new GameStateError(`Invalid event: ${event} for current state: ${this.currentTransition.currentStateValue}`);
-        const nextTransition = this.findNextTransition(input.nextState);
         
+        const nextTransition = this.findNextTransition(input.nextState);
         if (!nextTransition) throw new GameStateError(`Invalid next state: ${input.nextState}`);
+
         this.currentTransition = nextTransition;
     }
 }
