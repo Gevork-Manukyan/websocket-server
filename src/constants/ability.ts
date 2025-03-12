@@ -284,6 +284,11 @@ function dontRemoveBoost() {
 
 }
 
+/**
+ * Removes all damage from a card on the battlefield
+ * @param player The player that is removing damage
+ * @param fieldTarget The target on the battlefield to clear damage from
+ */
 function removeAllDamage(player: AbilityResult['player'], fieldTarget: AbilityResult['fieldTarget']) {
     if (fieldTarget === undefined) throw new InternalServerError("Field target is not defined");
 
