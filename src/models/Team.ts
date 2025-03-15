@@ -245,7 +245,7 @@ export class Team {
      * @param spaceOption The position of the card to activate the daybreak ability of
      */
     activateDayBreak(spaceOption: SpaceOption) {
-        this.battlefield.activateDayBreak(spaceOption)
+        return this.battlefield.activateDayBreak(spaceOption)
     }
 
     /**

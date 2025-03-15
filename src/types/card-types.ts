@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ElementSchema, SageSchema } from "./types";
+import { AbilityResultSchema } from "../constants/ability";
 
 export const CardSchema = z.object({
   name: z.string(),
@@ -12,7 +13,7 @@ export const StarterCardSchema = z.object({
 });
 
 export const AbilityCardSchema = z.object({
-  ability: z.function().args().returns(z.unknown()),
+  ability: z.function().args().returns(z.array(AbilityResultSchema)),
   rowRequirement: z.array(z.union([z.literal(1), z.literal(2), z.literal(3)])),
 });
 

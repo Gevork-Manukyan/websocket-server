@@ -1,22 +1,12 @@
+import { z } from "zod";
 import { isElementalCard } from "../lib/card-validators";
 import { Player } from "../models";
 import { ActiveConGame } from "../models/ConGame";
 import { InternalServerError } from "../services/CustomError/BaseError";
 import { InvalidCardTypeError } from "../services/CustomError/GameError";
 import { ElementalCard } from "../types";
-import { SpaceOption } from "../types/types";
+import { SpaceOptionsSchema } from "../types/types";
 
-export type AbilityResult = {
-    type: AbilityAction;
-    player: Player;
-    amount?: number;
-    fieldTarget?: {
-        team: 'self' | 'enemy';
-        position: SpaceOption[];
-    };
-    handTarget?: number[];
-    discardTarget?: number[];
-}
 
 export enum AbilityAction {
     COLLECT_GOLD = 'collect_gold',
@@ -37,8 +27,25 @@ export enum AbilityAction {
     REMOVE_ALL_DAMAGE = 'remove_all_damage',
 }
 
-export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult) {
-    const { type, player, amount, fieldTarget, handTarget, discardTarget } = AbilityResult;
+export const AbilityResultSchema = z.object({
+    type: z.nativeEnum(AbilityAction),
+    player: z.instanceof(Player),
+    amount: z.number().optional(),
+    fieldTarget: z
+        .object({
+            team: z.enum(['self', 'enemy']),
+            position: z.array(SpaceOptionsSchema),
+        })
+        .optional(),
+    handTarget: z.array(z.number()).optional(),
+    discardTarget: z.array(z.number()).optional(),
+});
+
+export type AbilityResult = z.infer<typeof AbilityResultSchema>;
+
+
+export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult[]) {
+    const { type, player, amount, fieldTarget, handTarget, discardTarget } = AbilityResult[0];
     switch (type) {
         case AbilityAction.COLLECT_GOLD:
             collectGold(player, amount);

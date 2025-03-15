@@ -1,3 +1,4 @@
+import { AbilityResult } from "../constants/ability";
 import { isElementalWarriorCard } from "../lib/card-validators";
 import { InternalServerError, ValidationError } from "../services/CustomError/BaseError";
 import { NullSpaceError } from "../services/CustomError/GameError";
@@ -260,10 +261,10 @@ export class Battlefield {
      * Activates the Day Break ability of the card at the given space number
      * @param spaceOption The space number to activate the Day Break ability
      */
-    activateDayBreak(spaceOption: SpaceOption) {
+    activateDayBreak(spaceOption: SpaceOption): AbilityResult[] {
         const targetSpace: BattlefieldSpace = this.getBattlefieldSpace(spaceOption);
         targetSpace.validateDayBreakActivation();
-        targetSpace.value.ability();
+        return targetSpace.value.ability();
     }
 
     /**
@@ -377,7 +378,7 @@ export class BattlefieldSpace {
     }
 
     /**
-     * Validates the Day Break activation
+     * Validates the space number to ensure it is within the correct range and that Card has an ability
      */
     validateDayBreakActivation(): asserts this is BattlefieldSpace & { value: ElementalWarriorCard } {
         if (this.value === null) {

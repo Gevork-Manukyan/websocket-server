@@ -8,6 +8,7 @@ import { drawCardFromDeck } from "../lib/utilities";
 import { Player } from "./Player";
 import { Team } from "./Team";
 import { ALL_CARDS } from "../constants/cards";
+import { processAbility } from "../constants/ability";
 const { BambooBerserker, Bruce, CackleRipclaw, CamouChameleon, CurrentConjurer, Dewy, DistantDoubleStrike, ElementalIncantation, ElementalSwap, ExchangeOfNature, FarsightFrenzy, Flint, FocusedFury, ForageThumper, Herbert, HummingHerald, IguanaGuard, LumberClaw, MagicEtherStrike, MeleeShield, MossViper, Mush, NaturalDefense, NaturesWrath, OakLumbertron, Obliterate, PineSnapper, PrimitiveStrike, ProjectileBlast, RangedBarrier, Redstone, ReinforcedImpact, RoamingRazor, Rocco, RubyGuardian, RunePuma, ShrubBeetle, SplashBasilisk, SplinterStinger, StoneDefender, SurgesphereMonk, TerrainTumbler, TwineFeline, TyphoonFist, Wade, WhirlWhipper, Willow } = ALL_CARDS;
 
 type TeamOrder = {
@@ -406,8 +407,14 @@ export class ActiveConGame extends ConGame {
     return this.getPlayer(playerId).getTeam()!.getDayBreakCards();
   }
 
+  /**
+   * Activates the daybreak ability the player chooses
+   * @param playerId
+   * @param spaceOption 
+   */
   activateDayBreak(playerId: Player['id'], spaceOption: SpaceOption) {
-    const team = this.getPlayer(playerId).getTeam()!.activateDayBreak(spaceOption);
+    const abilityResult = this.getPlayer(playerId).getTeam()!.activateDayBreak(spaceOption);
+    processAbility(this, abilityResult)
   }
 
   buyCreature(playerId: Player['id'], creatureShopIndex: ShopIndex) {
