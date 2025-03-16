@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Player } from "../models";
+import type { Player } from "../models";
 import { SpaceOptionsSchema } from "./types";
 
 export enum AbilityAction {
@@ -23,7 +23,7 @@ export enum AbilityAction {
 
 export const AbilityResultSchema = z.object({
     type: z.nativeEnum(AbilityAction),
-    player: z.instanceof(Player),
+    player: z.any() as unknown as z.ZodType<Player>,
     amount: z.number().optional(),
     fieldTarget: z
         .object({
