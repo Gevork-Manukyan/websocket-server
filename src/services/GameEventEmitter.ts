@@ -1,8 +1,6 @@
 import { Server, Socket } from "socket.io";
-import { Player } from "../models";
-import { Team } from "../models/Team";
-import { gameId, Sage } from "../types";
-import { SpaceOption } from "../types/types";
+import { Player, Team } from "../models";
+import { gameId, Sage, SpaceOption } from "../types";
 
 class GameEventEmitter {
   private static instance: GameEventEmitter;

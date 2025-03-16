@@ -1,4 +1,4 @@
-import { ValidationError } from "../services/CustomError/BaseError";
+import { NotFoundError, ValidationError } from "../services";
 import { NullSpaceError } from "../services/CustomError/GameError";
 import { Battlefield, BattlefieldSpace } from "./Battlefield";
 import { ALL_CARDS } from "../constants";

@@ -1,8 +1,6 @@
-import { ConflictError, NotFoundError, ValidationError } from "../services/CustomError/BaseError";
-import { Card, Decklist, ElementalWarriorStarterCard } from "../types/card-types";
-import { SpaceOption } from "../types/types";
-import { Battlefield } from "./Battlefield";
-import { Player } from "./Player";
+import { ConflictError, NotFoundError, ValidationError } from "../services";
+import { Card, Decklist, ElementalWarriorStarterCard, SpaceOption } from "../types";
+import { Battlefield, Player } from "./";
 
 export class Team {
     players: Player[];

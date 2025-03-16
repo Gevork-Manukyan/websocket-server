@@ -1,9 +1,7 @@
-import { isElementalCard } from "../lib/card-validators";
-import { ActiveConGame } from "../models/ConGame";
-import { InternalServerError } from "../services/CustomError/BaseError";
-import { InvalidCardTypeError } from "../services/CustomError/GameError";
-import { ElementalCard } from "../types";
-import { AbilityAction, AbilityResult } from "../types/ability-types";
+import { isElementalCard } from "../lib";
+import { ActiveConGame } from "../models";
+import { InternalServerError, InvalidCardTypeError } from "../services";
+import { ElementalCard, AbilityAction, AbilityResult } from "../types";
 
 
 export function processAbility(game: ActiveConGame, AbilityResult: AbilityResult[]) {

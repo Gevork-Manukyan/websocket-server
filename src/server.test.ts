@@ -1,11 +1,14 @@
 import Client, { Socket } from "socket.io-client";
 import { server } from "./server";
-import { PORT } from "./lib/config";
-import { gameStateManager } from "./services/GameStateManager";
-import { ConGame, Player } from "./models";
-import { AllPlayersSetupEvent, CancelSetupEvent, ChoseWarriorsEvent, ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, PlayerFinishedSetupEvent, SelectSageData, StartGameEvent, SwapWarriorsEvent, ToggleReadyStatusData } from "./types/server-types";
-import { gameEventEmitter } from "./services/GameEventEmitter";
-import { Team } from "./models/Team";
+import { PORT } from "./lib";
+import { gameStateManager, gameEventEmitter } from "./services";
+import { ConGame, Player, Team } from "./models";
+import { 
+  AllPlayersSetupEvent, CancelSetupEvent, ChoseWarriorsEvent, 
+  ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, 
+  PlayerFinishedSetupEvent, SelectSageData, StartGameEvent, 
+  SwapWarriorsEvent 
+} from "./types";
 import { ALL_CARDS } from "./constants";
 const { AcornSquire, QuillThornback } = ALL_CARDS;
 
@@ -18,7 +21,7 @@ const numPlayers = 2;
 const testPlayerId = "test-player"
 
 beforeAll((done) => {
-  // Start the server (ensure it’s tied to your real server.ts code)
+  // Start the server (ensure it's tied to your real server.ts code)
   server.listen(PORT, () => {
     // Connect the client to the same server
     clientSocket = Client(`http://localhost:${PORT}/gameplay`, {

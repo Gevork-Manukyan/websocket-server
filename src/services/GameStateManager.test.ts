@@ -1,7 +1,7 @@
 import { ConGame } from "../models";
 import { gameId } from "../types";
 import { ConflictError } from "./CustomError/BaseError";
-import { gameStateManager } from "./GameStateManager";
+import { gameStateManager } from "./";
 
 
 describe("GameStateManager", () => {
