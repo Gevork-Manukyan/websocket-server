@@ -1,9 +1,9 @@
-import { AbilityResult } from "../constants/ability";
 import { isElementalWarriorCard } from "../lib/card-validators";
-import { InternalServerError, ValidationError } from "../services/CustomError/BaseError";
+import { ValidationError } from "../services/CustomError/BaseError";
 import { NullSpaceError } from "../services/CustomError/GameError";
 import { ElementalCard } from "../types";
-import { ElementalWarriorCard, ElementalWarriorCardSchema } from "../types/card-types";
+import { AbilityResult } from "../types/ability-types";
+import { ElementalWarriorCard } from "../types/card-types";
 import { SpaceOption, OnePlayerSpaceOptions, TwoPlayerSpaceOptions } from "../types/types";
 
 const ONE_PLAYER_SPACE_MAX = 6;

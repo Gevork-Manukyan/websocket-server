@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ElementSchema, SageSchema } from "./types";
-import { AbilityResultSchema } from "../constants/ability";
+import { AbilityResultSchema } from "./ability-types";
 
 export const CardSchema = z.object({
   name: z.string(),
