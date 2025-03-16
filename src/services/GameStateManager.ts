@@ -59,6 +59,7 @@ class GameStateManager {
             state: new GameState(gameId)
         };
 
+        console.log(this.currentGames)
         return this.currentGames[gameId].game;
     }
 
