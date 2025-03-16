@@ -1,6 +1,6 @@
 import { ConflictError, NotFoundError, ValidationError } from "../services/CustomError/BaseError";
-import { Card, ElementalWarriorStarterCard } from "../types/card-types";
-import { Decklist, SpaceOption } from "../types/types";
+import { Card, Decklist, ElementalWarriorStarterCard } from "../types/card-types";
+import { SpaceOption } from "../types/types";
 import { Battlefield } from "./Battlefield";
 import { Player } from "./Player";
 

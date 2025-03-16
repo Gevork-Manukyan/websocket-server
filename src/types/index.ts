@@ -1,5 +1,7 @@
-export type { gameId, Element, Sage } from "./types";
+export type { gameId } from "./types";
 export type {
+  Element, 
+  Sage,
   Card,
   StarterCard,
   ElementalCard,

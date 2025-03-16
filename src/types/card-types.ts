@@ -1,6 +1,22 @@
 import { z } from "zod";
-import { ElementSchema, SageSchema } from "./types";
 import { AbilityResultSchema } from "./ability-types";
+
+export const ElementSchema = z.enum(["twig", "pebble", "leaf", "droplet"]);
+export const SageSchema = z.enum(["Cedar", "Gravel", "Porella", "Torrent"]);
+export type Element = z.infer<typeof ElementSchema>;
+export type Sage = z.infer<typeof SageSchema>;
+
+export type Decklist = {
+  sage: ElementalSage;
+  champions: {
+    level4: ElementalChampion;
+    level6: ElementalChampion;
+    level8: ElementalChampion;
+  },
+  warriors: ElementalWarriorCard[];
+  basic: ElementalStarterCard;
+  items: ItemCard[];
+}
 
 export const CardSchema = z.object({
   name: z.string(),
