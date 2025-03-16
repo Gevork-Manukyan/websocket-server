@@ -28,6 +28,10 @@ const io = new Server(server, {
 
 // Creates the gameplay namespace that will handle all gameplay connections
 const gameNamespace = io.of("/gameplay");
+
+// Initialize the GameEventEmitter with the gameplay namespace
+gameEventEmitter.initializeIO(gameNamespace);
+
 gameNamespace.on("connection", (socket) => {
 
   /* -------- MIDDLEWARE -------- */
@@ -38,7 +42,6 @@ gameNamespace.on("connection", (socket) => {
   socket.on("error", (error: Error) => {
     console.error("Socket error:", error);
   });
-
 
   /* -------- GAME SETUP -------- */
   // TODO: some events should emit to all players that something happened
@@ -161,7 +164,6 @@ gameNamespace.on("connection", (socket) => {
     socket.leave(gameId);
     socket.emit(`${LeaveGameEvent}--success`);
   }));
-
 
   /* -------- GAME BATTLING -------- */
 

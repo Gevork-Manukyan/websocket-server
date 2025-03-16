@@ -1,10 +1,11 @@
-import { Server, Socket } from "socket.io";
+import { Server, Socket, Namespace } from "socket.io";
 import { Player, Team } from "../models";
 import { gameId, Sage, SpaceOption } from "../types";
+import { gameStateManager } from "../services/GameStateManager";
 
 class GameEventEmitter {
   private static instance: GameEventEmitter;
-  private io!: Server;
+  private io!: Server | Namespace;
 
   private constructor() {}
 
@@ -13,6 +14,10 @@ class GameEventEmitter {
       GameEventEmitter.instance = new GameEventEmitter()
 
     return GameEventEmitter.instance;
+  }
+
+  initializeIO(io: Server | Namespace) {
+    this.io = io;
   }
 
   emitToPlayer(playerId: string, eventName: string, data: any = null) {

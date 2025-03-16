@@ -59,8 +59,11 @@ class GameStateManager {
             state: new GameState(gameId)
         };
 
-        console.log(this.currentGames)
         return this.currentGames[gameId].game;
+    }
+
+    getCurrentGames() {
+        return this.currentGames;
     }
 
     deleteGame(gameId: gameId) {
