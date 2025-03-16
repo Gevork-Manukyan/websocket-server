@@ -10,7 +10,7 @@ import { processEvent, socketErrorHandler } from "./lib/utilities";
 import { ValidationError } from "./services/CustomError/BaseError";
 import { InvalidSpaceError, PlayersNotReadyError } from "./services/CustomError/GameError";
 import { AllSpaceOptionsSchema } from "./types/types";
-import { IS_PRODUCTION } from "./constants/env";
+import { IS_PRODUCTION } from "./constants";
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server

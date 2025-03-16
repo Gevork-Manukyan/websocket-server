@@ -6,7 +6,7 @@ import { ConGame, Player } from "./models";
 import { AllPlayersSetupEvent, CancelSetupEvent, ChoseWarriorsEvent, ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, PlayerFinishedSetupEvent, SelectSageData, StartGameEvent, SwapWarriorsEvent, ToggleReadyStatusData } from "./types/server-types";
 import { gameEventEmitter } from "./services/GameEventEmitter";
 import { Team } from "./models/Team";
-import { ALL_CARDS } from "./constants/cards";
+import { ALL_CARDS } from "./constants";
 const { AcornSquire, QuillThornback } = ALL_CARDS;
 
 
