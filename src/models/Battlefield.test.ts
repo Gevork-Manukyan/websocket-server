@@ -1,7 +1,7 @@
 import { ValidationError } from "../services/CustomError/BaseError";
 import { NullSpaceError } from "../services/CustomError/GameError";
 import { Battlefield, BattlefieldSpace } from "./Battlefield";
-import { ALL_CARDS } from "../constants/cards";
+import { ALL_CARDS } from "../constants";
 const { AcornSquire, Timber } = ALL_CARDS;
 
 describe("Battlefield class", () => {

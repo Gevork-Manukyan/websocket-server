@@ -1,8 +1,7 @@
 import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
-import { TwigDeck } from "../constants/decklists";
 import { Player } from "./Player";
 import { Team } from "./Team";
-import { ALL_CARDS } from "../constants/cards";
+import { ALL_CARDS, TwigDeck } from "../constants";
 const { Cedar, Gravel, Timber, AcornSquire, CloseStrike, FarStrike, GeoWeasel, GraniteRampart, NaturalRestoration, QuillThornback, SlumberJack, TwigCharm } = ALL_CARDS;
 
 const testPlayerId = "testId123"

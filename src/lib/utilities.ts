@@ -1,5 +1,5 @@
 import { Card, gameId, Sage } from "../types";
-import { DropletDeck, LeafDeck, PebbleDeck, TwigDeck } from "../constants/decklists";
+import { DropletDeck, LeafDeck, PebbleDeck, TwigDeck } from "../constants";
 import { CustomError, NotFoundError, ValidationError } from "../services/CustomError/BaseError";
 import { HostOnlyActionError, InvalidSageError } from "../services/CustomError/GameError";
 import { AllPlayersSetupEvent, ClearTeamsEvent, EventSchemas, SocketEventMap, StartGameEvent } from "../types/server-types";
