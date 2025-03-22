@@ -1,8 +1,8 @@
-import { NotFoundError, ValidationError } from "../services/CustomError/BaseError";
-import { Card, Sage } from "../types";
-import { Decklist, ElementalWarriorStarterCard } from "../types/card-types";
-import { drawCardFromDeck, getSageDecklist } from "../lib/utilities";
-import { Team } from "./Team";
+import { NotFoundError, ValidationError } from "../../services/CustomError/BaseError";
+import { Card, Sage } from "../../types";
+import { Decklist, ElementalWarriorStarterCard } from "../../types/card-types";
+import { drawCardFromDeck, getSageDecklist } from "../../lib/utilities";
+import { Team } from "../Team/Team";
 
 export class Player {
   id: string;

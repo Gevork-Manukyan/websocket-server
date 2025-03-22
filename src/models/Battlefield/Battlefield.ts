@@ -1,10 +1,10 @@
-import { isElementalWarriorCard } from "../lib/card-validators";
-import { ValidationError } from "../services/CustomError/BaseError";
-import { NullSpaceError } from "../services/CustomError/GameError";
-import { ElementalCard } from "../types";
-import { AbilityResult } from "../types/ability-types";
-import { ElementalWarriorCard } from "../types/card-types";
-import { SpaceOption, OnePlayerSpaceOptions, TwoPlayerSpaceOptions } from "../types/types";
+import { isElementalWarriorCard } from "../../lib/card-validators";
+import { ValidationError } from "../../services/CustomError/BaseError";
+import { NullSpaceError } from "../../services/CustomError/GameError";
+import { ElementalCard } from "../../types";
+import { AbilityResult } from "../../types/ability-types";
+import { ElementalWarriorCard } from "../../types/card-types";
+import { SpaceOption, OnePlayerSpaceOptions, TwoPlayerSpaceOptions } from "../../types/types";
 
 const ONE_PLAYER_SPACE_MAX = 6;
 const TWO_PLAYER_SPACE_MAX = 12;

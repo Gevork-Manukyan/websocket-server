@@ -1,5 +1,5 @@
-import { GameStateError } from "../services/CustomError/GameError";
-import { gameId } from "../types";
+import { GameStateError } from "../../services/CustomError/GameError";
+import { gameId } from "../../types";
 
 export enum State {
     JOINING_GAME = "joining-game",

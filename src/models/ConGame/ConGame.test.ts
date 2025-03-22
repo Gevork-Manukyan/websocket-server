@@ -1,6 +1,6 @@
-import { NotFoundError, PlayersNotReadyError, SageUnavailableError } from "../services";
-import { LeafDeck, TwigDeck } from "../constants";
-import { ConGame, Player, Team } from "./";
+import { NotFoundError, PlayersNotReadyError, SageUnavailableError } from "../../services";
+import { LeafDeck, TwigDeck } from "../../constants";
+import { ConGame, Player, Team } from "../../models";
 
 describe("ConGame", () => {
     let mockGame: ConGame;

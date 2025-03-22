@@ -1,7 +1,7 @@
-import { NotFoundError, ValidationError } from "../services";
-import { NullSpaceError } from "../services/CustomError/GameError";
+import { ValidationError } from "../../services";
+import { NullSpaceError } from "../../services/CustomError/GameError";
 import { Battlefield, BattlefieldSpace } from "./Battlefield";
-import { ALL_CARDS } from "../constants";
+import { ALL_CARDS } from "../../constants";
 const { AcornSquire, Timber } = ALL_CARDS;
 
 describe("Battlefield class", () => {
