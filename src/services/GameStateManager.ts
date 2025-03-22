@@ -1,5 +1,5 @@
 import { ConGame, GameState, TransitionEvent } from "../models";
-import { ActiveConGame } from "../models/ConGame";
+import { ActiveConGame } from "../models";
 import { gameId } from "../types";
 import { ConflictError } from "./CustomError/BaseError";
 import { GameConflictError } from "./CustomError/GameError";
