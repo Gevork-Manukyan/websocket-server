@@ -90,7 +90,6 @@ export class ConGame {
    * @returns The team the player is on
    */
   getPlayerTeam(playerId: Player["id"]) {
-    const player = this.getPlayer(playerId);
     const playerTeam = 
       this.team1.isPlayerOnTeam(playerId) ? this.team1 : 
       this.team2.isPlayerOnTeam(playerId) ? this.team2 : null;
@@ -162,11 +161,10 @@ export class ConGame {
     const player = this.getPlayer(playerId);
 
     // Check if already on team
-    const currTeam = player.getTeam();
+    const currTeam = this.getPlayerTeam(playerId);
     if (currTeam !== null) currTeam.removePlayerFromTeam(player)
 
     teamSelected.addPlayerToTeam(player);
-    player.setTeam(teamSelected);
   }
 
   incrementPlayersReady() {
@@ -351,8 +349,8 @@ export class ActiveConGame extends ConGame {
     const isFourPlayers = this.numPlayersTotal === 4;
 
     const player = this.getPlayer(playerId);
-    const teammate = player.getTeammate();
-    const team = player.getTeam()!;
+    const teammate = this.getPlayerTeammate(playerId);
+    const team = this.getPlayerTeam(playerId);
 
     const enemyTeam = team === this.team1 ? this.team2 : this.team1;
     const enemyTeamPlayer1 = enemyTeam.players[0];
@@ -430,7 +428,7 @@ export class ActiveConGame extends ConGame {
   }
 
   getDayBreakCards(playerId: Player['id']): SpaceOption[] {
-    return this.getPlayer(playerId).getTeam()!.getDayBreakCards();
+    return this.getPlayerTeam(playerId).getDayBreakCards();
   }
 
   /**
@@ -439,7 +437,7 @@ export class ActiveConGame extends ConGame {
    * @param spaceOption 
    */
   activateDayBreak(playerId: Player['id'], spaceOption: SpaceOption) {
-    const abilityResult = this.getPlayer(playerId).getTeam()!.activateDayBreak(spaceOption);
+    const abilityResult = this.getPlayerTeam(playerId).activateDayBreak(spaceOption);
     processAbility(this, abilityResult)
   }
 
@@ -454,7 +452,7 @@ export class ActiveConGame extends ConGame {
   private buyCard(playerId: Player['id'], shopIndex: ShopIndex, shop: ElementalCard[] | ItemCard[]) {
     const currentShopCards = shop === this.creatureShop ? this.currentCreatureShopCards : this.currentItemShopCards;
     const player = this.getPlayer(playerId);
-    const playerTeam = player.getTeam()!;
+    const playerTeam = this.getPlayerTeam(playerId);
     const card = currentShopCards[shopIndex];
     const cost = card.price;
     if (playerTeam.getGold() < cost) throw new NotEnoughGoldError();
