@@ -2,7 +2,7 @@ import { NotFoundError, ValidationError } from "../../services/CustomError/BaseE
 import { Card, Sage } from "../../types";
 import { Decklist, ElementalWarriorStarterCard } from "../../types/card-types";
 import { drawCardFromDeck, getSageDecklist } from "../../lib/utilities";
-import { Team } from "../Team/Team";
+// import { Team } from "../Team/Team";
 
 export class Player {
   id: string;
@@ -10,7 +10,7 @@ export class Player {
   private isSetup: boolean = false;
   private hasChosenWarriors: boolean = false;
   private isGameHost: boolean;
-  private team: Team | null = null;
+  // private team: Team | null = null;
   private sage: Sage | null = null;
   private decklist: Decklist | null = null;
   private level: number = 1;
@@ -53,19 +53,6 @@ export class Player {
 
   getIsGameHost() {
     return this.isGameHost;
-  }
-
-  getTeam() {
-    return this.team;
-  }
-
-  setTeam(team: Player['team']) {
-    this.team = team;
-  }
-
-  getTeammate() {
-    if (!this.team) throw new NotFoundError("Team", "Player does not have a team")
-    return this.team.players.find(player => player.id !== this.id)!;
   }
 
   getSage() {

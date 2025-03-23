@@ -97,6 +97,14 @@ export class Team {
     }
 
     /**
+     * @param playerId The id of the player to check if they are on the team
+     * @returns Whether the player is on the team
+     */
+    isPlayerOnTeam(playerId: Player["id"]) {
+        return this.players.some(player => player.id === playerId)
+    }
+
+    /**
      * Adds a player to the team
      * @param player The player to add to the team
      */

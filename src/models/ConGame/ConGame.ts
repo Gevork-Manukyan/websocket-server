@@ -85,6 +85,30 @@ export class ConGame {
     this.getPlayer(playerId).setSage(sage)
   }
 
+  /**
+   * @param playerId The id of the player to get the team of
+   * @returns The team the player is on
+   */
+  getPlayerTeam(playerId: Player["id"]) {
+    const player = this.getPlayer(playerId);
+    const playerTeam = 
+      this.team1.isPlayerOnTeam(playerId) ? this.team1 : 
+      this.team2.isPlayerOnTeam(playerId) ? this.team2 : null;
+
+    if (!playerTeam) throw new NotFoundError("Team", "Player does not have a team")
+    return playerTeam;
+  }
+
+  /**
+   * @param playerId The id of the player to get the teammate of
+   * @returns The teammate of the player
+   */
+  getPlayerTeammate(playerId: Player["id"]) {
+    const playerTeam = this.getPlayerTeam(playerId);
+    if (playerTeam.players.length === 1) throw new ValidationError("Player has no teammates", "playerTeammate")
+    return playerTeam.players.find(player => player.id !== playerId)!;
+  }
+
   getTeamOrder() {
     return this.teamOrder;
   }
