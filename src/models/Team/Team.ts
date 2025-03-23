@@ -182,6 +182,43 @@ export class Team {
     }
 
     /**
+     * Chooses the warriors for a player
+     * @param player The player to choose the warriors for
+     * @param choices The choices of ElementalWarriorStarterCards to choose from
+     */
+    chooseWarriors(player: Player, choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
+        // If player is not on team
+        if (!this.isPlayerOnTeam(player.id))
+            throw new ValidationError("Player is not on team", "INVALID_INPUT")
+        
+        // If player has already chosen warriors
+        if (player.getHasChosenWarriors())
+            throw new ValidationError("Player has already chosen warriors", "INVALID_INPUT")
+        
+        const decklist = player.getDecklist();
+        if (decklist === null) throw new NotFoundError("Decklist", `Player ${player.id}'s decklist is not set`);
+        const decklistWariors = decklist.warriors
+        const [choice1, choice2] = choices
+        
+        // If chosen cards are the same
+        if (choice1 === choice2)
+            throw new ValidationError("Cannot choose the same warrior twice", "INVALID_INPUT")
+        
+        // If chosen cards are not of the correct deck
+        if (!decklistWariors.includes(choice1) || !decklistWariors.includes(choice2)) 
+            throw new ValidationError("Invalid warrior(s) passed for chosen deck", "INVALID_INPUT")
+        
+        this.initWarriors(choices)
+        player.setHasChosenWarriors(true)
+
+        // Add the non-chosen card to the player's deck
+        decklist.warriors.forEach(card => {
+            if ((card.name !== choice1.name) || (card.name !== choice2.name))
+                player.addCardToDeck(card);
+        })
+    }
+
+    /**
      * Initializes the battlefield with the ElementalWarriorStarterCards given
      * @param choices The choices of ElementalWarriorStarterCards to initialize the battlefield with
      */
@@ -219,6 +256,10 @@ export class Team {
      * @param player The player to swap the warriors of
      */
     swapWarriors(player: Player) {
+        // If player is not on team
+        if (!this.isPlayerOnTeam(player.id))
+            throw new ValidationError("Player is not on team", "INVALID_INPUT")
+        
         // One player on Team
         if (this.getTeamSize() === 1) {
             this.battlefield.swapCards(4, 6)
