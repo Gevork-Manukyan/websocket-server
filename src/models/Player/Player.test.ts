@@ -1,5 +1,5 @@
 import { NotFoundError, ValidationError } from "../../services";
-import { Player, Team } from "../../models";
+import { Player } from "../../models";
 import { ALL_CARDS, TwigDeck } from "../../constants";
 const { Cedar, Gravel, Timber, AcornSquire, CloseStrike, FarStrike, GeoWeasel, GraniteRampart, NaturalRestoration, QuillThornback, SlumberJack, TwigCharm } = ALL_CARDS;
 
@@ -12,7 +12,6 @@ describe("constructor", () => {
         expect(player.id).toBe(testPlayerId)
         expect(player.getIsReady()).toBe(false)
         expect(player.getIsGameHost()).toBe(false)
-        expect(player.getTeam()).toBe(null)
         expect(player.getSage()).toBe(null)
         expect(player.getDecklist()).toBe(null)
         expect(player.getLevel()).toBe(1)
@@ -27,15 +26,6 @@ describe("constructor", () => {
     
         expect(player.getIsGameHost()).toBe(true)
         done()
-    })
-})
-
-describe("team getter and setters", () => {
-    test("should set the player's team", () => {
-        const player = new Player(testPlayerId);
-        const team = new Team(1, 1);
-        player.setTeam(team);
-        expect(player.getTeam()).toBe(team);
     })
 })
 
@@ -154,72 +144,6 @@ describe("initDeck method", () => {
         expect(player.getDeck()).toStrictEqual([Timber, CloseStrike, CloseStrike, FarStrike, NaturalRestoration, TwigCharm])
         done()
     })
-})
-
-describe("chooseWarriors", () => {
-    test("sets warriors for a player and adds non-chosen cards to their deck", () => {
-        const player = new Player("player-1");
-        player.getDecklist = jest.fn().mockReturnValue(TwigDeck);
-        player.setTeam({
-            initWarriors: jest.fn(),
-        } as Partial<Team> as Team);
-    
-        player.chooseWarriors([AcornSquire, SlumberJack]);
-    
-        expect(player.getTeam()?.initWarriors).toHaveBeenCalledWith([AcornSquire, SlumberJack]);
-        expect(player.getHasChosenWarriors()).toBe(true);
-    });
-
-    test("throws ValidationError if the chosen warriors do not match the player's sage element", () => {
-        const player = new Player("player-1");
-        player.getDecklist = jest.fn().mockReturnValue(TwigDeck);
-        player.setTeam({
-            initWarriors: jest.fn(),
-        } as Partial<Team> as Team);
-    
-        expect(() =>
-            player.chooseWarriors([
-              AcornSquire,
-              GeoWeasel,
-            ])
-          ).toThrow(ValidationError);
-    
-          expect(() =>
-              player.chooseWarriors([
-                  GeoWeasel,
-                  AcornSquire,
-              ])
-          ).toThrow(ValidationError);
-    
-          expect(() =>
-              player.chooseWarriors([
-                  GeoWeasel,
-                  GraniteRampart,
-              ])
-          ).toThrow(ValidationError);
-    });
-})
-
-describe("swapWarriors", () => {
-    test("swaps the player's warriors", () => {
-        const player = new Player("player-1");
-        player.setTeam({
-            swapWarriors: jest.fn(),
-        } as Partial<Team> as Team);
-        player.setSage("Cedar")
-        player.setDecklist(TwigDeck);
-    
-        player.swapWarriors();
-    
-        expect(player.getTeam()?.swapWarriors).toHaveBeenCalled();
-    });
-
-    test("throws NotFoundError if player does not have a team", () => {
-        const player = new Player("player-1");
-        player.setTeam(null);
-    
-        expect(() => player.swapWarriors()).toThrow(Error);
-    });
 })
 
 describe("finishedPlayerSetup", () => {

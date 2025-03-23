@@ -2,7 +2,6 @@ import { NotFoundError, ValidationError } from "../../services/CustomError/BaseE
 import { Card, Sage } from "../../types";
 import { Decklist } from "../../types/card-types";
 import { drawCardFromDeck, getSageDecklist } from "../../lib/utilities";
-// import { Team } from "../Team/Team";
 
 export class Player {
   id: string;
@@ -10,7 +9,6 @@ export class Player {
   private isSetup: boolean = false;
   private hasChosenWarriors: boolean = false;
   private isGameHost: boolean;
-  // private team: Team | null = null;
   private sage: Sage | null = null;
   private decklist: Decklist | null = null;
   private level: number = 1;

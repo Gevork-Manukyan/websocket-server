@@ -114,11 +114,9 @@ describe("ConGame", () => {
         const player = new Player("player-1");
         mockGame.addPlayer(player);
         mockGame.team1.addPlayerToTeam = jest.fn()
-        player.setTeam= jest.fn()
         
         mockGame.joinTeam("player-1", 1);
         expect(mockGame.team1.addPlayerToTeam).toHaveBeenCalledWith(player);
-        expect(player.setTeam).toHaveBeenCalledWith(mockGame.team1)
       });
   
       test("removes the player from the current team before joining a new one", () => {
@@ -129,13 +127,11 @@ describe("ConGame", () => {
         
         mockGame.team1.removePlayerFromTeam = jest.fn()
         mockGame.team2.addPlayerToTeam = jest.fn()
-        player.setTeam = jest.fn()
 
         mockGame.joinTeam("player-1", 2);
 
         expect(mockGame.team1.removePlayerFromTeam).toHaveBeenCalledWith(player);
         expect(mockGame.team2.addPlayerToTeam).toHaveBeenCalledWith(player)
-        expect(player.setTeam).toHaveBeenCalledWith(mockGame.team2)
       });
     });
 
