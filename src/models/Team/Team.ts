@@ -22,6 +22,16 @@ export class Team {
     }
 
     /**
+     * @returns The state of the team
+     */
+    getTeamState() {
+        return {
+            gold: this.gold,
+            battlefield: this.battlefield.getBattlefieldState()
+        }
+    }
+
+    /**
      * Resets the team by removing all players and resetting the battlefield
      */
     resetTeam() {
@@ -216,16 +226,6 @@ export class Team {
         } 
         else {
             throw new ValidationError("Player can only swap their own warriors", "element")
-        }
-    }
-
-    /**
-     * @returns The state of the team
-     */
-    getTeamState() {
-        return {
-            gold: this.gold,
-            battlefield: this.battlefield.getBattlefieldState()
         }
     }
 
