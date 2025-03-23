@@ -1,7 +1,6 @@
-import { Document, Schema } from 'mongoose';
+import { Document, Schema, Types } from 'mongoose';
+import { PlayerSchema, IPlayer } from '../Player/db-model';
 
-export interface ITeam extends Document {
-}
+export interface ITeam extends Document {}
 
-export const TeamSchema = new Schema({
-}); 
+export const TeamSchema = new Schema({}); 

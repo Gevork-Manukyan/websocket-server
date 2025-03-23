@@ -7,7 +7,8 @@ type BattlefieldSpaceBase = {
     spaceNumber: SpaceOption;
     value: ElementalCard | null;
     connections: {
-        TL?: number | null;  // Index in the fieldArray
+        // Index in the fieldArray
+        TL?: number | null;
         T?: number | null;
         TR?: number | null;
         L?: number | null;

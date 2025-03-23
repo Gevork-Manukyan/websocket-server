@@ -1,7 +1,28 @@
 import { Document, Schema } from 'mongoose';
+import { Card, Decklist, Sage } from '../../types';
 
 export interface IPlayer extends Document {
+    isReady: boolean;
+    isSetup: boolean;
+    hasChosenWarriors: boolean;
+    isGameHost: boolean;
+    sage: Sage;
+    decklist: Decklist;
+    level: number;
+    hand: Card[];
+    deck: Card[];
+    discardPile: Card[];
 }
 
 export const PlayerSchema = new Schema({
-}); 
+    isReady: { type: Boolean, default: false },
+    isSetup: { type: Boolean, default: false },
+    hasChosenWarriors: { type: Boolean, default: false },
+    isGameHost: { type: Boolean, default: false },
+    sage: { type: Schema.Types.Mixed, required: true },
+    decklist: { type: Schema.Types.Mixed, required: true },
+    level: { type: Number, default: 1 },
+    hand: [{ type: Schema.Types.Mixed, required: true }],
+    deck: [{ type: Schema.Types.Mixed, required: true }],
+    discardPile: [{ type: Schema.Types.Mixed, required: true }]
+});
