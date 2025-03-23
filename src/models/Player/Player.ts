@@ -1,6 +1,6 @@
 import { NotFoundError, ValidationError } from "../../services/CustomError/BaseError";
 import { Card, Sage } from "../../types";
-import { Decklist, ElementalWarriorStarterCard } from "../../types/card-types";
+import { Decklist } from "../../types/card-types";
 import { drawCardFromDeck, getSageDecklist } from "../../lib/utilities";
 // import { Team } from "../Team/Team";
 
@@ -142,32 +142,6 @@ export class Player {
     this.drawCard();
     this.drawCard();
     this.drawCard();
-  }
-
-  chooseWarriors(choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
-    const decklist = this.getDecklist()!
-    const decklistWariors = decklist.warriors
-    const [choice1, choice2] = choices
-
-    // If chosen cards are not of the correct deck
-    if (!decklistWariors.includes(choice1) || !decklistWariors.includes(choice2)) 
-      throw new ValidationError("Invalid warrior(s) passed for chosen deck", "INVALID_INPUT")
-    
-    if (!this.team) throw new NotFoundError("Team", "Player requires a team before choosing warriors")
-
-    this.team.initWarriors(choices)
-    this.hasChosenWarriors = true;
-
-    // Add the non-chosen card to the player's deck
-    decklist.warriors.forEach(card => {
-      if ((card.name !== choice1.name) || (card.name !== choice2.name))
-        this.addCardToDeck(card);
-    })
-  }
-
-  swapWarriors() {
-    if (!this.team) throw new NotFoundError("Team", "Player requires a team before swapping warriors")
-    this.team.swapWarriors(this)
   }
 
   finishPlayerSetup() {
