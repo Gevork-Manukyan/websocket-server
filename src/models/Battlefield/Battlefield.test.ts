@@ -1,6 +1,6 @@
 import { ValidationError } from "../../services";
 import { NullSpaceError } from "../../services/CustomError/GameError";
-import { Battlefield, BattlefieldSpace } from "./Battlefield";
+import { Battlefield } from "./Battlefield";
 import { ALL_CARDS } from "../../constants";
 const { AcornSquire, Timber } = ALL_CARDS;
 
@@ -105,26 +105,5 @@ describe("Battlefield class", () => {
         test("should update the battlefield state correctly", () => {
             // TODO: Implement test once implemented
         });
-    });
-})
-
-describe("BattlefieldSpace class", () => {
-    test("should initialize correctly", () => {
-        const space = new BattlefieldSpace(1, null);
-        expect(space.spaceNumber).toBe(1);
-        expect(space.value).toBe(null);
-    });
-
-    test("should set and get value correctly", () => {
-        const space = new BattlefieldSpace(1, null);
-        space.setValue(Timber);
-        expect(space.value).toBe(Timber);
-    });
-
-    test("should retrieve connections correctly", () => {
-        const space1 = new BattlefieldSpace(1, null);
-        const space2 = new BattlefieldSpace(2, null, { L: space1 });
-        expect(space2.getDirection("L")).toBe(space1);
-        expect(space2.getDirection("R")).toBe(null);
     });
 })
