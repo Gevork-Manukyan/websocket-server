@@ -120,14 +120,18 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(ChoseWarriorsEvent, socketErrorHandler(socket, ChoseWarriorsEvent, async ({ gameId, choices }: ChoseWarriorsData) => {
     gameStateManager.verifyChooseWarriorsEvent(gameId);
-    gameStateManager.getGame(gameId).getPlayer(socket.id).chooseWarriors(choices);
+    const game = gameStateManager.getGame(gameId);
+    const player = game.getPlayer(socket.id);
+    game.getPlayerTeam(player.id).chooseWarriors(player, choices);
     gameStateManager.processChooseWarriorsEvent(gameId);
     socket.emit(`${ChoseWarriorsEvent}--success`)
   }));
 
   socket.on(SwapWarriorsEvent, socketErrorHandler(socket, SwapWarriorsEvent, async ({ gameId }: SwapWarriorsData) => {
     gameStateManager.verifySwapWarriorsEvent(gameId);
-    gameStateManager.getGame(gameId).getPlayer(socket.id).swapWarriors()
+    const game = gameStateManager.getGame(gameId);
+    const player = game.getPlayer(socket.id);
+    game.getPlayerTeam(player.id).swapWarriors(player);
     gameStateManager.processSwapWarriorsEvent(gameId);
     socket.emit(`${SwapWarriorsEvent}--success`)
   }));
