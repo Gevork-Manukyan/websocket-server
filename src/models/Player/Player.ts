@@ -4,7 +4,7 @@ import { Decklist } from "../../types/card-types";
 import { drawCardFromDeck, getSageDecklist } from "../../lib/utilities";
 
 export class Player {
-  id: string;
+  id: string; // socketId
   private isReady: boolean = false;
   private isSetup: boolean = false;
   private hasChosenWarriors: boolean = false;

@@ -21,7 +21,7 @@ export const PlayerSchema = new Schema({
     isGameHost: { type: Boolean, default: false },
     sage: { type: Schema.Types.Mixed, required: true },
     decklist: { type: Schema.Types.Mixed, required: true },
-    level: { type: Number, default: 1 },
+    level: { type: Number, required: true },
     hand: [{ type: Schema.Types.Mixed, required: true }],
     deck: [{ type: Schema.Types.Mixed, required: true }],
     discardPile: [{ type: Schema.Types.Mixed, required: true }]
