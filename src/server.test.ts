@@ -7,15 +7,16 @@ import {
   AllPlayersSetupEvent, CancelSetupEvent, ChoseWarriorsEvent, 
   ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, 
   PlayerFinishedSetupEvent, SelectSageData, StartGameEvent, 
-  SwapWarriorsEvent 
+  SwapWarriorsEvent, 
+  ToggleReadyStatusData
 } from "./types";
 import { ALL_CARDS } from "./constants";
 const { AcornSquire, QuillThornback } = ALL_CARDS;
 
-
 let clientSocket: Socket;
 let mockGame: ConGame;
 let mockPlayer: Player;
+let mockTeam: Team;
 const testGameId = "test-game";
 const numPlayers = 2;
 const testPlayerId = "test-player"
@@ -39,6 +40,7 @@ afterAll(() => {
 beforeEach(() => {
     mockGame = new ConGame(testGameId, numPlayers)
     mockPlayer = new Player(testPlayerId)
+    mockTeam = new Team(1, 1)
 })
 
 afterEach(() => {
@@ -338,7 +340,8 @@ describe("Server.ts", () => {
         test("should successfully choose warriors", (done) => {
             gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
             mockGame.getPlayer = jest.fn().mockReturnValue(mockPlayer)
-            mockPlayer.chooseWarriors = jest.fn()
+            mockGame.getPlayerTeam = jest.fn().mockReturnValue(mockTeam)
+            mockTeam.chooseWarriors = jest.fn()
 
             const choices = [AcornSquire, QuillThornback]
             clientSocket.emit(ChoseWarriorsEvent, { gameId: testGameId, choices })
@@ -346,7 +349,8 @@ describe("Server.ts", () => {
             clientSocket.once(`${ChoseWarriorsEvent}--success`, () => {
                 expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
                 expect(mockGame.getPlayer).toHaveBeenCalledWith(expect.any(String))
-                expect(mockPlayer.chooseWarriors).toHaveBeenCalledWith(choices)
+                expect(mockGame.getPlayerTeam).toHaveBeenCalledWith(expect.any(String))
+                expect(mockTeam.chooseWarriors).toHaveBeenCalledWith(mockPlayer, choices)
                 done()
             })
         })
@@ -356,14 +360,16 @@ describe("Server.ts", () => {
         test("should successfully swap warriors", (done) => {
             gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
             mockGame.getPlayer = jest.fn().mockReturnValue(mockPlayer)
-            mockPlayer.swapWarriors = jest.fn()
+            mockGame.getPlayerTeam = jest.fn().mockReturnValue(mockTeam)
+            mockTeam.swapWarriors = jest.fn()
 
             clientSocket.emit(SwapWarriorsEvent, { gameId: testGameId })
 
             clientSocket.once(`${SwapWarriorsEvent}--success`, () => {
                 expect(gameStateManager.getGame).toHaveBeenCalledWith(testGameId)
                 expect(mockGame.getPlayer).toHaveBeenCalledWith(expect.any(String))
-                expect(mockPlayer.swapWarriors).toHaveBeenCalled()
+                expect(mockGame.getPlayerTeam).toHaveBeenCalledWith(expect.any(String))
+                expect(mockTeam.swapWarriors).toHaveBeenCalledWith(mockPlayer)
                 done()
             })
         })
@@ -419,7 +425,6 @@ describe("Server.ts", () => {
         });
 
         test("should confirm all players setup, if all players are ready (2-players)", (done) => {
-            const mockTeam = new Team(1, 1)
             mockTeam.addPlayerToTeam(mockPlayer)
             mockGame.getTeamGoingFirst = jest.fn().mockReturnValue(mockTeam)
             mockGame.getTeamGoingSecond = jest.fn().mockReturnValue(mockTeam)
@@ -435,7 +440,6 @@ describe("Server.ts", () => {
         });
 
         test("should confirm all players setup, if all players are ready (4-players)", (done) => {
-            const mockTeam = new Team(1, 1)
             mockTeam.addPlayerToTeam(mockPlayer)
             mockGame.numPlayersTotal = 4
 
