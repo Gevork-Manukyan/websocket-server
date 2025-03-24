@@ -5,18 +5,13 @@ import {
   NotEnoughGoldError, PlayersNotReadyError, 
   SageUnavailableError, ShopFullError 
 } from "../../services";
-import { Sage, ElementalCard, gameId, ItemCard, SpaceOption } from "../../types";
+import { Sage, ElementalCard, gameId, ItemCard, SpaceOption, TeamOrder } from "../../types";
 import { drawCardFromDeck } from "../../lib";
 import { Player } from "../Player/Player";
 import { Team } from "../Team/Team";
 import { ALL_CARDS, processAbility } from "../../constants";
 
 const { BambooBerserker, Bruce, CackleRipclaw, CamouChameleon, CurrentConjurer, Dewy, DistantDoubleStrike, ElementalIncantation, ElementalSwap, ExchangeOfNature, FarsightFrenzy, Flint, FocusedFury, ForageThumper, Herbert, HummingHerald, IguanaGuard, LumberClaw, MagicEtherStrike, MeleeShield, MossViper, Mush, NaturalDefense, NaturesWrath, OakLumbertron, Obliterate, PineSnapper, PrimitiveStrike, ProjectileBlast, RangedBarrier, Redstone, ReinforcedImpact, RoamingRazor, Rocco, RubyGuardian, RunePuma, ShrubBeetle, SplashBasilisk, SplinterStinger, StoneDefender, SurgesphereMonk, TerrainTumbler, TwineFeline, TyphoonFist, Wade, WhirlWhipper, Willow } = ALL_CARDS;
-
-type TeamOrder = {
-  first: Team;
-  second: Team;
-}
 
 type ShopIndex = 0 | 1 | 2;
 

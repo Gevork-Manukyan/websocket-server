@@ -46,10 +46,10 @@ gameNamespace.on("connection", (socket) => {
   /* -------- GAME SETUP -------- */
   // TODO: some events should emit to all players that something happened
 
-  socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ gameId, numPlayers }: CreateGameData) => {
-    const newGame = gameStateManager.createGame(gameId, numPlayers);
+  socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ numPlayers }: CreateGameData) => {
+    const newGame = gameStateManager.createGame(numPlayers);
     newGame.addPlayer(new Player(socket.id, true)); // First player to join is the host
-    socket.join(gameId);
+    socket.join(newGame.id);
     socket.emit(`${CreateGameEvent}--success`);
   }));
 

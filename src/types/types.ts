@@ -1,6 +1,12 @@
 import { z } from "zod";
+import { Team } from "../models/Team/Team";
 
 export type gameId = string;
+
+export type TeamOrder = {
+  first: Team;
+  second: Team;
+}
 
 export const OnePlayerSpaceOptionsSchema = z.union([
   z.literal(1),

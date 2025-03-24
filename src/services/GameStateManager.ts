@@ -52,8 +52,8 @@ class GameStateManager {
         return game.getHasFinishedSetup()
     }
 
-    createGame(gameId: gameId, numPlayers: ConGame['numPlayersTotal']) {
-        if (this.currentGames[gameId] !== undefined) throw new ConflictError(`There is already an existing game with the given ID`)
+    createGame(numPlayers: ConGame['numPlayersTotal']) {
+        const gameId = (Math.random() * 1000000).toString(); // TODO: call db function to create gameId
         this.currentGames[gameId] = {
             game: new ConGame(gameId, numPlayers),
             state: new GameState(gameId)

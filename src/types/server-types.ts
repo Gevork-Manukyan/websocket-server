@@ -3,7 +3,6 @@ import { AllSpaceOptionsSchema } from "./types";
 import { ElementalWarriorStarterCardSchema, SageSchema } from "./card-types";
 
 const createGameSchema = z.object({
-  gameId: z.string(),
   numPlayers: z.union([z.literal(2), z.literal(4)]),
 })
 
