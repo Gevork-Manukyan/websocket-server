@@ -12,8 +12,6 @@ import { AllSpaceOptionsSchema } from "./types";
 import { IS_PRODUCTION } from "./constants";
 
 
-// TODO: how to handle ActiveConGame in mongoDB
-
 const app = express();
 const server = http.createServer(); // Create an HTTP server
 

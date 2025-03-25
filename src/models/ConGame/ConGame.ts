@@ -10,10 +10,36 @@ import { drawCardFromDeck } from "../../lib";
 import { Player } from "../Player/Player";
 import { Team } from "../Team/Team";
 import { ALL_CARDS, processAbility } from "../../constants";
+import { IConGame } from './db-model';
 
 const { BambooBerserker, Bruce, CackleRipclaw, CamouChameleon, CurrentConjurer, Dewy, DistantDoubleStrike, ElementalIncantation, ElementalSwap, ExchangeOfNature, FarsightFrenzy, Flint, FocusedFury, ForageThumper, Herbert, HummingHerald, IguanaGuard, LumberClaw, MagicEtherStrike, MeleeShield, MossViper, Mush, NaturalDefense, NaturesWrath, OakLumbertron, Obliterate, PineSnapper, PrimitiveStrike, ProjectileBlast, RangedBarrier, Redstone, ReinforcedImpact, RoamingRazor, Rocco, RubyGuardian, RunePuma, ShrubBeetle, SplashBasilisk, SplinterStinger, StoneDefender, SurgesphereMonk, TerrainTumbler, TwineFeline, TyphoonFist, Wade, WhirlWhipper, Willow } = ALL_CARDS;
 
 type ShopIndex = 0 | 1 | 2;
+
+// Plain interfaces for data structure
+type ConGameData = {
+  id: string;
+  isStarted: boolean;
+  hasFinishedSetup: boolean;
+  numPlayersTotal: 2 | 4;
+  numPlayersReady: number;
+  numPlayersFinishedSetup: number;
+  players: Player[];
+  team1: Team;
+  team2: Team;
+  teamOrder: TeamOrder;
+  creatureShop: ElementalCard[];
+  itemShop: ItemCard[];
+  currentCreatureShopCards: ElementalCard[];
+  currentItemShopCards: ItemCard[];
+}
+
+type ActiveConGameData = ConGameData & {
+  activeTeam: 'first' | 'second';
+  currentPhase: 'phase1' | 'phase2' | 'phase3' | 'phase4';
+  actionPoints: number;
+  maxActionPoints: 3 | 6;
+}
 
 export class ConGame {
   id: gameId;
@@ -325,8 +351,78 @@ export class ConGame {
     this.hasFinishedSetup = true;
     return new ActiveConGame(this);
   }
+
+  // Protected helper for Mongoose conversion
+  protected static getBaseDataFromMongoose(doc: IConGame): ConGameData {
+    return {
+      id: doc._id.toString(),
+      isStarted: doc.isStarted,
+      hasFinishedSetup: doc.hasFinishedSetup,
+      numPlayersTotal: doc.numPlayersTotal,
+      numPlayersReady: doc.numPlayersReady,
+      numPlayersFinishedSetup: doc.numPlayersFinishedSetup,
+      players: doc.players.map(p => Player.fromMongoose(p)),
+      team1: Team.fromMongoose(doc.team1),
+      team2: Team.fromMongoose(doc.team2),
+      teamOrder: doc.teamOrder,
+      creatureShop: doc.creatureShop,
+      itemShop: doc.itemShop,
+      currentCreatureShopCards: doc.currentCreatureShopCards,
+      currentItemShopCards: doc.currentItemShopCards
+    };
+  }
+
+  // Convert from Mongoose document to runtime instance
+  static fromMongoose(doc: IConGame): ConGame {
+    return ConGame.fromData(ConGame.getBaseDataFromMongoose(doc));
+  }
+
+  // Create instance from plain data
+  static fromData(data: ConGameData): ConGame {
+    const game = new ConGame(data.id, data.numPlayersTotal);
+    
+    // Copy all properties
+    Object.assign(game, {
+      isStarted: data.isStarted,
+      hasFinishedSetup: data.hasFinishedSetup,
+      numPlayersReady: data.numPlayersReady,
+      numPlayersFinishedSetup: data.numPlayersFinishedSetup,
+      players: data.players,
+      team1: data.team1,
+      team2: data.team2,
+      teamOrder: data.teamOrder,
+      creatureShop: data.creatureShop,
+      itemShop: data.itemShop,
+      currentCreatureShopCards: data.currentCreatureShopCards,
+      currentItemShopCards: data.currentItemShopCards
+    });
+
+    return game;
+  }
+
+  // Convert runtime instance to plain object for Mongoose
+  toMongoose(): Omit<IConGame, '_id'> {
+    return {
+      isStarted: this.isStarted,
+      hasFinishedSetup: this.hasFinishedSetup,
+      numPlayersTotal: this.numPlayersTotal,
+      numPlayersReady: this.numPlayersReady,
+      numPlayersFinishedSetup: this.numPlayersFinishedSetup,
+      players: this.players.map(p => p.toMongoose()),
+      team1: this.team1.toMongoose(),
+      team2: this.team2.toMongoose(),
+      teamOrder: this.teamOrder,
+      creatureShop: this.creatureShop,
+      itemShop: this.itemShop,
+      currentCreatureShopCards: this.currentCreatureShopCards,
+      currentItemShopCards: this.currentItemShopCards,
+      isActive: false
+    };
+  }
 }
 
+
+/* ------------ Active ConGame ------------ */
 export class ActiveConGame extends ConGame {
   private activeTeam: keyof TeamOrder = "first";
   private currentPhase: "phase1" | "phase2" | "phase3" | "phase4" = "phase1";
@@ -459,5 +555,47 @@ export class ActiveConGame extends ConGame {
     else this.addCardToItemShop();
   }
 
-  
+  // Convert from Mongoose document to runtime instance
+  static fromMongoose(doc: IConGame): ActiveConGame {
+    if (!doc.isActive) {
+      throw new Error('Document is not an active game');
+    }
+
+    const data: ActiveConGameData = {
+      ...ConGame.getBaseDataFromMongoose(doc),
+      activeTeam: doc.activeTeam!,
+      currentPhase: doc.currentPhase!,
+      actionPoints: doc.actionPoints!,
+      maxActionPoints: doc.maxActionPoints!
+    };
+
+    return ActiveConGame.fromData(data);
+  }
+
+  // Create instance from plain data
+  static fromData(data: ActiveConGameData): ActiveConGame {
+    const game = new ActiveConGame(ConGame.fromData(data));
+    
+    // Copy active game properties
+    Object.assign(game, {
+      activeTeam: data.activeTeam,
+      currentPhase: data.currentPhase,
+      actionPoints: data.actionPoints,
+      maxActionPoints: data.maxActionPoints
+    });
+
+    return game;
+  }
+
+  // Convert runtime instance to plain object for Mongoose
+  toMongoose(): Omit<IConGame, '_id'> {
+    return {
+      ...super.toMongoose(),
+      isActive: true,
+      activeTeam: this.activeTeam,
+      currentPhase: this.currentPhase,
+      actionPoints: this.actionPoints,
+      maxActionPoints: this.maxActionPoints
+    };
+  }
 }
