@@ -1,39 +1,38 @@
-import { ConGame, GameState } from "../models";
-import { ActiveConGame } from "../models";
+import { ConGame, GameState, ActiveConGame } from "../models";
 import { gameId, TransitionEvent } from "../types";
 import { GameConflictError } from "./CustomError/GameError";
 
-type CurrentGames = {
-    [key: gameId]: {
-        game: ConGame;
-        state: GameState;
-    }
-};
+type GameStateInfo = {
+    game: ConGame;
+    state: GameState;
+}
 
-class GameStateManager {
+export class GameStateManager {
     private static instance: GameStateManager;
-    private currentGames: CurrentGames = {};
-    
-    private constructor () {}
+    private currentGames: {
+        [key: gameId]: GameStateInfo;
+    } = {};
 
-    static getInstance() {
-        if (!GameStateManager.instance) 
-            GameStateManager.instance = new GameStateManager()
+    private constructor() {}
 
+    static getInstance(): GameStateManager {
+        if (!GameStateManager.instance) {
+            GameStateManager.instance = new GameStateManager();
+        }
         return GameStateManager.instance;
     }
 
-    getGame(gameId: gameId) {
+    getGame(gameId: gameId): ConGame {
         const gameState = this.currentGames[gameId];
         if (!gameState) throw new GameConflictError(gameId);
         return gameState.game;
     }
 
-    private setGame(gameId: gameId, game: ConGame) {
+    private setGame(gameId: gameId, game: ConGame): void {
         this.currentGames[gameId].game = game;
     }
 
-    getGameState(gameId: gameId) {
+    getGameState(gameId: gameId): GameState {
         const gameState = this.currentGames[gameId];
         if (!gameState) throw new GameConflictError(gameId);
         return gameState.state;
@@ -42,32 +41,34 @@ class GameStateManager {
     getActiveGame(gameId: gameId): ActiveConGame {
         const game = this.getGame(gameId);
         if (!this.isActiveGame(game)) {
-          throw new Error("Game has not finished setup yet.");
+            throw new Error("Game has not finished setup yet.");
         }
         return game;
     }
 
     private isActiveGame(game: ConGame): game is ActiveConGame {
-        return game.getHasFinishedSetup()
+        return game.getHasFinishedSetup();
     }
 
-    createGame(numPlayers: ConGame['numPlayersTotal']) {
-        const gameId = (Math.random() * 1000000).toString(); // TODO: call db function to create gameId
+    // TODO: call db function to create gameId
+    createGame(numPlayers: ConGame['numPlayersTotal']): ConGame {
+        const gameId = `game-${Object.keys(this.currentGames).length + 1}` as gameId;
+        const game = new ConGame(gameId, numPlayers);
         this.currentGames[gameId] = {
-            game: new ConGame(gameId, numPlayers),
+            game,
             state: new GameState(gameId)
         };
-
-        return this.currentGames[gameId].game;
+        return game;
     }
 
-    getCurrentGames() {
+    getCurrentGames(): { [key: gameId]: GameStateInfo } {
         return this.currentGames;
     }
 
-    deleteGame(gameId: gameId) {
-        if (this.currentGames.hasOwnProperty(gameId))
-            delete this.currentGames[gameId] 
+    deleteGame(gameId: gameId): void {
+        if (this.currentGames.hasOwnProperty(gameId)) {
+            delete this.currentGames[gameId];
+        }
     }
 
     beginBattle(game: ConGame): ActiveConGame {
@@ -76,10 +77,9 @@ class GameStateManager {
         return activeGame;
     }
 
-    resetGameStateManager() {
+    resetGameStateManager(): void {
         this.currentGames = {};
     }
-
 
     /* -------- PROCESSING GAME STATE -------- */
 
@@ -208,7 +208,7 @@ class GameStateManager {
     processActivateDayBreakEvent(gameId: gameId) {
         this.getGameState(gameId).processEvent(TransitionEvent.DAY_BREAK_CARD);
     }
-
 }
 
+// Export a singleton instance
 export const gameStateManager = GameStateManager.getInstance();
