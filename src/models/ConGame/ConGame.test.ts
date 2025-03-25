@@ -38,7 +38,7 @@ describe("ConGame", () => {
   
     describe("addPlayer", () => {
       test("adds a player to the game", () => {
-        const player = new Player("player-1");
+        const player = new Player("player-1", "socket-1");
         mockGame.addPlayer(player);
         expect(mockGame.players).toContain(player);
       });
@@ -46,7 +46,7 @@ describe("ConGame", () => {
   
     describe("removePlayer", () => {
       test("removes a player from the game by ID", () => {
-        const player = new Player("player-1");
+        const player = new Player("player-1", "socket-1");
         mockGame.addPlayer(player);
         mockGame.removePlayer("player-1");
         expect(mockGame.players).not.toContainEqual(player);
@@ -55,7 +55,7 @@ describe("ConGame", () => {
   
     describe("getPlayer", () => {
       test("returns the correct player by ID", () => {
-        const player = new Player("player-1");
+        const player = new Player("player-1", "socket-1");
         mockGame.addPlayer(player);
         expect(mockGame.getPlayer("player-1")).toBe(player);
       });
@@ -67,7 +67,7 @@ describe("ConGame", () => {
   
     describe("setPlayerSage", () => {
       test("sets the sage for a player if available", () => {
-        const player = new Player("player-1");
+        const player = new Player("player-1", "socket-1");
         player.setSage = jest.fn()
         mockGame.addPlayer(player);
         mockGame.setPlayerSage("player-1", "Cedar");
@@ -75,8 +75,8 @@ describe("ConGame", () => {
       });
   
       test("throws SageUnavailableError if the sage is already chosen", () => {
-        const player1 = new Player("player-1");
-        const player2 = new Player("player-2");
+        const player1 = new Player("player-1", "socket-1");
+        const player2 = new Player("player-2", "socket-2");
         player1.setSage("Cedar");
   
         mockGame.addPlayer(player1);
@@ -111,7 +111,7 @@ describe("ConGame", () => {
   
     describe("joinTeam", () => {
       test("adds a player to the selected team", () => {
-        const player = new Player("player-1");
+        const player = new Player("player-1", "socket-1");
         mockGame.addPlayer(player);
         mockGame.team1.addPlayerToTeam = jest.fn()
         
@@ -120,7 +120,7 @@ describe("ConGame", () => {
       });
   
       test("removes the player from the current team before joining a new one", () => {
-        const player = new Player("player-1");
+        const player = new Player("player-1", "socket-1");
         
         mockGame.addPlayer(player);
         mockGame.joinTeam("player-1", 1)
@@ -206,7 +206,7 @@ describe("ConGame", () => {
   
     describe("startGame", () => {
       test("starts the game if all players are ready and host initiates", () => {
-        const hostPlayer = new Player("player-1", true);
+        const hostPlayer = new Player("player-1", "socket-1", true);
         mockGame.addPlayer(hostPlayer);
         mockGame.numPlayersReady = 4;
   
@@ -221,7 +221,7 @@ describe("ConGame", () => {
       });
   
       test("throws PlayersNotReadyError if not all players are ready", () => {
-        const hostPlayer = new Player("player-1", true);
+        const hostPlayer = new Player("player-1", "socket-1", true);
         mockGame.addPlayer(hostPlayer);
         mockGame.numPlayersReady = 3;
   
@@ -231,8 +231,8 @@ describe("ConGame", () => {
 
     describe("initPlayerDecks", () => {
       test("should initialize the deck for each player", () => {
-        const player1 = new Player("player-1");
-        const player2 = new Player("player-2");
+        const player1 = new Player("player-1", "socket-1");
+        const player2 = new Player("player-2", "socket-2");
         mockGame.addPlayer(player1);
         mockGame.addPlayer(player2);
   
@@ -248,8 +248,8 @@ describe("ConGame", () => {
 
     describe("initPlayerFields", () => {
       test("should initialize the player field for each player", () => {
-        const player1 = new Player("player-1");
-        const player2 = new Player("player-2");
+        const player1 = new Player("player-1", "socket-1");
+        const player2 = new Player("player-2", "socket-2");
         mockGame.addPlayer(player1);
         mockGame.addPlayer(player2);
         mockGame.team1.addPlayerToTeam(player1);

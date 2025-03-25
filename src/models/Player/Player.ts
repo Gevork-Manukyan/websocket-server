@@ -3,6 +3,7 @@ import { Card, Sage } from "../../types";
 import { Decklist } from "../../types/card-types";
 import { drawCardFromDeck, getSageDecklist } from "../../lib/utilities";
 import { IPlayer } from './db-model';
+import { Types } from 'mongoose';
 
 export class Player {
   id: string;           // User ID (persistent)
@@ -177,7 +178,7 @@ export class Player {
   }
 
   // Convert from Mongoose document to runtime instance
-  static fromMongoose(doc: IPlayer): Player {
+  static fromMongoose(doc: Omit<IPlayer, '_id'> | IPlayer): Player {
     const player = new Player(doc.userId.toString(), doc.socketId, doc.isGameHost);
     
     // Set up properties
@@ -197,7 +198,7 @@ export class Player {
   // Convert runtime instance to plain object for Mongoose
   toMongoose(): Omit<IPlayer, '_id'> {
     return {
-      userId: this.id,
+      userId: new Types.ObjectId(this.id),
       socketId: this.socketId,
       isReady: this.isReady,
       isSetup: this.isSetup,

@@ -3,6 +3,8 @@ import { Battlefield, Player, Team } from "../../models";
 import { ALL_CARDS, LeafDeck, TwigDeck } from "../../constants";
 const { AcornSquire, Cedar, Porella, QuillThornback, Sprout, Timber } = ALL_CARDS;
 
+const testSocketId = "socket123"
+
 jest.mock("./Battlefield", () => {
     return {
         Battlefield: jest.fn().mockImplementation(() => {
@@ -75,20 +77,20 @@ describe("Team", () => {
 
     describe("addPlayerToTeam method", () => {
         test("should add player to team", () => {
-            mockTeam.addPlayerToTeam(new Player("testPlayerId_1"))
+            mockTeam.addPlayerToTeam(new Player("testPlayerId_1", testSocketId))
             expect(mockTeam.players[0].id).toBe("testPlayerId_1")
         })
 
         test("should throw error if team is full", () => {
-            mockTeam.addPlayerToTeam(new Player("testPlayerId_1"))
-            expect(() => mockTeam.addPlayerToTeam(new Player("testPlayerId_2"))).toThrow(ConflictError)
+            mockTeam.addPlayerToTeam(new Player("testPlayerId_1", testSocketId))
+            expect(() => mockTeam.addPlayerToTeam(new Player("testPlayerId_2", testSocketId))).toThrow(ConflictError)
         })
     })
 
     describe("removePlayerFromTeam method", () => {
         test("should remove player from the team", () => {
             const playerId = "testPlayerId_1"
-            const player = new Player(playerId)
+            const player = new Player(playerId, testSocketId)
             mockTeam.addPlayerToTeam(player)
             expect(mockTeam.players[0].id).toBe(playerId)
             mockTeam.removePlayerFromTeam(player)
@@ -96,10 +98,10 @@ describe("Team", () => {
         })
 
         test("should return unchanged team if player doesn't exist on team", () => {
-            const player = new Player("testPlayerId_1")
+            const player = new Player("testPlayerId_1", testSocketId)
             mockTeam.addPlayerToTeam(player)
             expect(mockTeam.players[0].id).toBe("testPlayerId_1")
-            mockTeam.removePlayerFromTeam(new Player("testPlayerId_2"))
+            mockTeam.removePlayerFromTeam(new Player("testPlayerId_2", testSocketId))
             expect(mockTeam.players.length).toBe(1)
             expect(mockTeam.players[0].id).toBe("testPlayerId_1")
         })
@@ -107,7 +109,7 @@ describe("Team", () => {
 
     describe("getAllPlayerDecklists method", () => {
         test("should return all player decklists", () => {
-            const player = new Player("testPlayerId_1");
+            const player = new Player("testPlayerId_1", testSocketId);
             player.getDecklist = jest.fn().mockReturnValue({ id: "decklist_1" });
             mockTeam.addPlayerToTeam(player);
             const decklists = mockTeam.getAllPlayerDecklists();
@@ -115,7 +117,7 @@ describe("Team", () => {
         });
     
         test("should throw error if a player has no decklist", () => {
-            const player = new Player("testPlayerId_1");
+            const player = new Player("testPlayerId_1", testSocketId);
             player.getDecklist = jest.fn().mockReturnValue(null);
             mockTeam.addPlayerToTeam(player);
             expect(() => mockTeam.getAllPlayerDecklists()).toThrow(NotFoundError);
@@ -198,7 +200,7 @@ describe("Team", () => {
         let mockPlayer: Player;
 
         beforeEach(() => {
-            mockPlayer = new Player("testPlayerId_1")
+            mockPlayer = new Player("testPlayerId_1", testSocketId)
             mockTeam.getBattlefield().swapCards = jest.fn()
         })
 

@@ -19,7 +19,8 @@ let mockPlayer: Player;
 let mockTeam: Team;
 const testGameId = "test-game";
 const numPlayers = 2;
-const testPlayerId = "test-player"
+const testPlayerId = "test-player";
+const testSocketId = "socket-123";
 
 beforeAll((done) => {
   // Start the server (ensure it's tied to your real server.ts code)
@@ -39,7 +40,7 @@ afterAll(() => {
 
 beforeEach(() => {
     mockGame = new ConGame(testGameId, numPlayers)
-    mockPlayer = new Player(testPlayerId)
+    mockPlayer = new Player(testPlayerId, testSocketId)
     mockTeam = new Team(1, 1)
 })
 
@@ -56,7 +57,7 @@ describe("Server.ts", () => {
     // Write generic tests for all events that tests if [event]--error is called if error is thrown
     test("should emit an error if a function in an event throws an error", (done) => {
         gameStateManager.getGame = jest.fn().mockReturnValue(mockGame)
-        const newPlayer = new Player("player-2")
+        const newPlayer = new Player("player-2", "socket-2")
         newPlayer.setSage("Cedar")
         mockGame.addPlayer(newPlayer)
 
@@ -72,7 +73,7 @@ describe("Server.ts", () => {
             gameStateManager.createGame = jest.fn().mockReturnValue(mockGame)
             mockGame.addPlayer = jest.fn()
             
-            clientSocket.emit("create-game", { gameId: testGameId, numPlayers } as CreateGameData)
+            clientSocket.emit("create-game", { userId: testPlayerId, numPlayers } as CreateGameData)
 
             clientSocket.once("create-game--success", () => {
                 expect(gameStateManager.createGame).toHaveBeenCalledWith(expect.any(ConGame))
@@ -85,14 +86,14 @@ describe("Server.ts", () => {
         })
 
         test("should throw an error if number of players is missing", (done) => {
-            clientSocket.emit("create-game", { gameId: testGameId })
+            clientSocket.emit("create-game", { userId: testPlayerId })
 
             clientSocket.once("create-game--error", () => {
                 done()
             })
         })
 
-        test("should throw an error if game ID is missing", (done) => {
+        test("should throw an error if userId is missing", (done) => {
             clientSocket.emit("create-game", { numPlayers })
 
             clientSocket.once("create-game--error", () => {
@@ -269,7 +270,7 @@ describe("Server.ts", () => {
     describe("clear-teams event", () => {
         beforeEach(() => {
             gameStateManager.getGame = jest.fn().mockReturnValueOnce(mockGame)
-            mockGame.getPlayer = jest.fn().mockReturnValueOnce(new Player(testPlayerId, true))
+            mockGame.getPlayer = jest.fn().mockReturnValueOnce(new Player(testPlayerId, testSocketId, true))
         })
 
         test("should clear all teams of players", (done) => {
@@ -288,7 +289,7 @@ describe("Server.ts", () => {
         })
 
         test("should throw an error if a non-host tries to clear teams", (done) => {
-            mockGame.getPlayer = jest.fn().mockReturnValueOnce(new Player(testPlayerId, false))
+            mockGame.getPlayer = jest.fn().mockReturnValueOnce(new Player(testPlayerId, testSocketId, false))
             
             clientSocket.emit("clear-teams", { gameId: testGameId } as ClearTeamsData)
 
@@ -308,7 +309,7 @@ describe("Server.ts", () => {
     describe("start-game", () => {
         beforeEach(() => {
             gameStateManager.getGame = jest.fn().mockReturnValue(mockGame);
-            const player1 = new Player(testPlayerId, true);
+            const player1 = new Player(testPlayerId, testSocketId, true);
             mockGame.getPlayer = jest.fn().mockReturnValue(player1);
             mockGame.initGame = jest.fn();
             mockGame.setStarted = jest.fn();
@@ -416,7 +417,7 @@ describe("Server.ts", () => {
     describe("all-players-setup", () => {
         beforeEach(() => {
             gameStateManager.getGame = jest.fn().mockReturnValue(mockGame);
-            const player1 = new Player(testPlayerId, true);
+            const player1 = new Player(testPlayerId, testSocketId, true);
             mockGame.getPlayer = jest.fn().mockReturnValue(player1);
             mockGame.numPlayersFinishedSetup = 1;
             mockGame.players = [player1];

@@ -89,11 +89,11 @@ export class ConGame {
   }
 
   getPlayer(playerId: Player["id"]): Player {
-    const player = this.players.find((item) => item.socketId === playerId);
+    const player = this.players.find((item) => item.id === playerId);
     if (!player)
       throw new NotFoundError(
         "Player",
-        `Player with socket ID ${playerId} not found in game ${this.id}`
+        `Player with ID ${playerId} not found in game ${this.id}`
       );
       
     return player;
