@@ -5,11 +5,14 @@ import { Player } from "./models";
 import { gameEventEmitter, gameStateManager } from "./services";
 import { PORT } from "./lib";
 import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData } from "./types";
-import { processEvent, socketErrorHandler } from "./lib";
+import { processEventMiddleware, socketErrorHandler } from "./lib";
 import { ValidationError } from "./services";
 import { InvalidSpaceError, PlayersNotReadyError } from "./services";
 import { AllSpaceOptionsSchema } from "./types";
 import { IS_PRODUCTION } from "./constants";
+
+
+// TODO: how to handle ActiveConGame in mongoDB
 
 const app = express();
 const server = http.createServer(); // Create an HTTP server
@@ -36,7 +39,7 @@ gameNamespace.on("connection", (socket) => {
 
   /* -------- MIDDLEWARE -------- */
   socket.use(([event, rawData], next) => {
-    processEvent(socket, event as keyof SocketEventMap, rawData, next)
+    processEventMiddleware(socket, event as keyof SocketEventMap, rawData, next)
   });
 
   socket.on("error", (error: Error) => {

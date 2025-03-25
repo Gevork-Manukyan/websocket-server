@@ -15,7 +15,7 @@ describe("GameStateManager", () => {
     // Mock a ConGame instance
     mockGame = new ConGame("game-1" as gameId, 4);
 
-    gameStateManager.createGame(mockGame.id, mockGame.numPlayersTotal);
+    gameStateManager.createGame(mockGame.numPlayersTotal);
     gameStateManager.getGame = jest.fn().mockReturnValue(mockGame);
   });
 
@@ -35,12 +35,12 @@ describe("GameStateManager", () => {
 
     test("returns the added game after adding test", () => {
       const newGame = new ConGame("game-2" as gameId, 2);
-      const addedGame = gameStateManager.createGame(newGame.id, newGame.numPlayersTotal);
+      const addedGame = gameStateManager.createGame(newGame.numPlayersTotal);
       expect(addedGame).toEqual(newGame);
     });
 
     test("throws an error if a game with the ID already exists", () => {
-      expect(() => gameStateManager.createGame(mockGame.id, mockGame.numPlayersTotal)).toThrow(ConflictError)
+      expect(() => gameStateManager.createGame(mockGame.numPlayersTotal)).toThrow(ConflictError)
     })
   });
 

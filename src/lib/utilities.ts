@@ -52,7 +52,7 @@ export function handleSocketError(
   });
 }
 
-export function processEvent<T extends keyof SocketEventMap>(socket: Socket, eventName: T, rawData: any, next: (err?: Error) => void) {
+export function processEventMiddleware<T extends keyof SocketEventMap>(socket: Socket, eventName: T, rawData: any, next: (err?: Error) => void) {
   try {
     // Ensure the event is recognized
     if (!(eventName in EventSchemas)) {
@@ -71,7 +71,8 @@ export function processEvent<T extends keyof SocketEventMap>(socket: Socket, eve
     const hostOnlyEvents = [StartGameEvent, ClearTeamsEvent, AllPlayersSetupEvent];
     for (const event of hostOnlyEvents) {
       if (eventName === event) {
-        const player = gameStateManager.getGame(data.gameId as gameId).getPlayer(socket.id);
+        const eventData = data as SocketEventMap[typeof event];
+        const player = gameStateManager.getGame(eventData.gameId).getPlayer(socket.id);
 
         if (!player || !player.getIsGameHost()) {
           throw new HostOnlyActionError();
