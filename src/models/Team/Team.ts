@@ -313,9 +313,9 @@ export class Team {
     }
 
     // Convert from Mongoose document to runtime instance
-    static fromMongoose(doc: ITeam): Team {
+    static fromMongoose(doc: ITeam | Omit<ITeam, '_id'>): Team {
         const team = new Team(doc.teamSize, doc.teamNumber);
-        
+
         team.players = doc.players.map(p => Player.fromMongoose(p));
         team.battlefield = Battlefield.fromMongoose(doc.battlefield);
         team.gold = doc.gold;

@@ -417,7 +417,7 @@ export class ConGame {
       currentCreatureShopCards: this.currentCreatureShopCards,
       currentItemShopCards: this.currentItemShopCards,
       isActive: false
-    };
+    } as Omit<IConGame, '_id'>;
   }
 }
 

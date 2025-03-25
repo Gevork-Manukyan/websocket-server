@@ -10,9 +10,9 @@ type ConGameBase = {
     numPlayersTotal: 2 | 4;
     numPlayersReady: number;
     numPlayersFinishedSetup: number;
-    players: IPlayer[];
-    team1: ITeam;
-    team2: ITeam;
+    players: Omit<IPlayer, '_id'>[];
+    team1: Omit<ITeam, '_id'>;
+    team2: Omit<ITeam, '_id'>;
     teamOrder: TeamOrder;
     creatureShop: ElementalCard[];
     itemShop: ItemCard[];
