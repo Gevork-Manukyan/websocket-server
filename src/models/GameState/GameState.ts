@@ -1,6 +1,7 @@
 import { GameStateError } from "../../services/CustomError/GameError";
 import { gameId } from "../../types";
 import { State, TransitionEvent, Transition, Input } from "../../types/gamestate-types";
+import { IGameState } from './db-model';
 
 export class GameState {
     gameId: gameId;
@@ -112,5 +113,22 @@ export class GameState {
         if (!nextTransition) throw new GameStateError(`Invalid next state: ${input.nextState}`);
 
         this.currentTransition = nextTransition;
+    }
+
+    // Convert from Mongoose document to runtime instance
+    static fromMongoose(doc: IGameState): GameState {
+        const gameState = new GameState(doc.gameId);
+        gameState.stateTransitionTable = doc.stateTransitionTable;
+        gameState.currentTransition = doc.currentTransition;
+        return gameState;
+    }
+
+    // Convert runtime instance to plain object for Mongoose
+    toMongoose(): Pick<IGameState, 'gameId' | 'stateTransitionTable' | 'currentTransition'> {
+        return {
+            gameId: this.gameId,
+            stateTransitionTable: this.stateTransitionTable,
+            currentTransition: this.currentTransition
+        };
     }
 }
