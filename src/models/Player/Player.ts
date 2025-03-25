@@ -215,14 +215,14 @@ export class Player {
 
   // Static utility methods
   static findPlayerById(players: Player[], playerId: string): Player | undefined {
-    return players.find(player => player.id === playerId);
+    return players.find(player => player.socketId === playerId);
   }
 
   static findOtherPlayerById(players: Player[], playerId: string): Player | undefined {
-    return players.find(player => player.id !== playerId);
+    return players.find(player => player.socketId !== playerId);
   }
 
   static filterOutPlayerById(players: Player[], playerId: string): Player[] {
-    return players.filter(player => player.id !== playerId);
+    return players.filter(player => player.socketId !== playerId);
   }
 }

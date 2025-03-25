@@ -84,22 +84,22 @@ export class ConGame {
     this.players.push(player);
   }
 
-  removePlayer(playerId: Player["id"]) {
+  removePlayer(playerId: Player["socketId"]) {
     this.players = Player.filterOutPlayerById(this.players, playerId);
   }
 
-  getPlayer(playerId: Player["id"]): Player {
-    const player = this.players.find((item) => item.id === playerId);
+  getPlayer(playerId: Player["socketId"]): Player {
+    const player = this.players.find((item) => item.socketId === playerId);
     if (!player)
       throw new NotFoundError(
         "Player",
-        `Player with ID ${playerId} not found in game ${this.id}`
+        `Player with socket ID ${playerId} not found in game ${this.id}`
       );
       
     return player;
   }
 
-  setPlayerSage(playerId: Player["id"], sage: Sage) {
+  setPlayerSage(playerId: Player["socketId"], sage: Sage) {
     const isSageAvailable = this.players.every(player => player.getSage() !== sage)
     if (!isSageAvailable) throw new SageUnavailableError(sage);
 
@@ -107,10 +107,10 @@ export class ConGame {
   }
 
   /**
-   * @param playerId The id of the player to get the team of
+   * @param playerId The socket ID of the player to get the team of
    * @returns The team the player is on
    */
-  getPlayerTeam(playerId: Player["id"]) {
+  getPlayerTeam(playerId: Player["socketId"]) {
     const playerTeam = 
       this.team1.isPlayerOnTeam(playerId) ? this.team1 : 
       this.team2.isPlayerOnTeam(playerId) ? this.team2 : null;
@@ -120,10 +120,10 @@ export class ConGame {
   }
 
   /**
-   * @param playerId The id of the player to get the teammate of
+   * @param playerId The socket ID of the player to get the teammate of
    * @returns The teammate of the player
    */
-  getPlayerTeammate(playerId: Player["id"]) {
+  getPlayerTeammate(playerId: Player["socketId"]) {
     const playerTeam = this.getPlayerTeam(playerId);
     if (playerTeam.players.length === 1) throw new ValidationError("Player has no teammates", "playerTeammate")
     const teammate = Player.findOtherPlayerById(playerTeam.players, playerId);
@@ -179,7 +179,7 @@ export class ConGame {
     currentShopCards.push(card);
   }
   
-  joinTeam(playerId: Player['id'], teamNumber: Team['teamNumber']) {
+  joinTeam(playerId: Player['socketId'], teamNumber: Team['teamNumber']) {
     const teamSelected = teamNumber === 1 ? this.team1 : this.team2;
     const player = this.getPlayer(playerId);
 
@@ -438,7 +438,7 @@ export class ActiveConGame extends ConGame {
     this.actionPoints = this.maxActionPoints;
   }
 
-  getGameState(playerId: Player['id']) {
+  getGameState(playerId: Player['socketId']) {
     const isFourPlayers = this.numPlayersTotal === 4;
 
     const player = this.getPlayer(playerId);
@@ -520,7 +520,7 @@ export class ActiveConGame extends ConGame {
     this.actionPoints -= 1;
   }
 
-  getDayBreakCards(playerId: Player['id']): SpaceOption[] {
+  getDayBreakCards(playerId: Player['socketId']): SpaceOption[] {
     return this.getPlayerTeam(playerId).getDayBreakCards();
   }
 
@@ -529,20 +529,20 @@ export class ActiveConGame extends ConGame {
    * @param playerId
    * @param spaceOption 
    */
-  activateDayBreak(playerId: Player['id'], spaceOption: SpaceOption) {
+  activateDayBreak(playerId: Player['socketId'], spaceOption: SpaceOption) {
     const abilityResult = this.getPlayerTeam(playerId).activateDayBreak(spaceOption);
     processAbility(this, abilityResult)
   }
 
-  buyCreature(playerId: Player['id'], creatureShopIndex: ShopIndex) {
+  buyCreature(playerId: Player['socketId'], creatureShopIndex: ShopIndex) {
     this.buyCard(playerId, creatureShopIndex, this.creatureShop);
   }
 
-  buyItem(playerId: Player['id'], itemShopIndex: ShopIndex) {
+  buyItem(playerId: Player['socketId'], itemShopIndex: ShopIndex) {
     this.buyCard(playerId, itemShopIndex, this.itemShop);
   }
 
-  private buyCard(playerId: Player['id'], shopIndex: ShopIndex, shop: ElementalCard[] | ItemCard[]) {
+  private buyCard(playerId: Player['socketId'], shopIndex: ShopIndex, shop: ElementalCard[] | ItemCard[]) {
     const currentShopCards = shop === this.creatureShop ? this.currentCreatureShopCards : this.currentItemShopCards;
     const player = this.getPlayer(playerId);
     const playerTeam = this.getPlayerTeam(playerId);

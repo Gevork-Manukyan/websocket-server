@@ -30,13 +30,13 @@ class GameEventEmitter {
 
   emitToTeam(team: Team, eventName: string, data: any = null) {
     team.players.forEach(player => {
-      this.emitToPlayer(player.id, eventName, data);
+      this.emitToPlayer(player.socketId, eventName, data);
     });
   }
 
   emitPickWarriors(players: Player[]) {
     players.forEach(player => {
-      this.emitToPlayer(player.id, "pick-warriors", player.getDecklist());
+      this.emitToPlayer(player.socketId, "pick-warriors", player.getDecklist());
     })
   }
 

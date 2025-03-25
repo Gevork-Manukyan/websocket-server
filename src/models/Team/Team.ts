@@ -98,11 +98,11 @@ export class Team {
     }
 
     /**
-     * @param playerId The id of the player to check if they are on the team
+     * @param playerId The socket ID of the player to check if they are on the team
      * @returns Whether the player is on the team
      */
-    isPlayerOnTeam(playerId: Player["id"]) {
-        return this.players.some(player => player.id === playerId)
+    isPlayerOnTeam(playerId: Player["socketId"]) {
+        return this.players.some(player => player.socketId === playerId)
     }
 
     /**
@@ -119,7 +119,7 @@ export class Team {
      * @param player The player to remove from the team
      */
     removePlayerFromTeam(player: Player) {
-        this.players = Player.filterOutPlayerById(this.players, player.id);
+        this.players = Player.filterOutPlayerById(this.players, player.socketId);
     }
 
     /**
@@ -128,7 +128,7 @@ export class Team {
     getAllPlayerDecklists() {
         return this.players.map(player => {
             const decklist = player.getDecklist();
-            if (decklist === null) throw new NotFoundError("Decklist", `Player ${player.id}'s decklist is not set`);
+            if (decklist === null) throw new NotFoundError("Decklist", `Player ${player.socketId}'s decklist is not set`);
             return decklist;    
         });
     }
@@ -189,7 +189,7 @@ export class Team {
      */
     chooseWarriors(player: Player, choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
         // If player is not on team
-        if (!this.isPlayerOnTeam(player.id))
+        if (!this.isPlayerOnTeam(player.socketId))
             throw new ValidationError("Player is not on team", "INVALID_INPUT")
         
         // If player has already chosen warriors
@@ -197,7 +197,7 @@ export class Team {
             throw new ValidationError("Player has already chosen warriors", "INVALID_INPUT")
         
         const decklist = player.getDecklist();
-        if (decklist === null) throw new NotFoundError("Decklist", `Player ${player.id}'s decklist is not set`);
+        if (decklist === null) throw new NotFoundError("Decklist", `Player ${player.socketId}'s decklist is not set`);
         const decklistWariors = decklist.warriors
         const [choice1, choice2] = choices
         
@@ -258,7 +258,7 @@ export class Team {
      */
     swapWarriors(player: Player) {
         // If player is not on team
-        if (!this.isPlayerOnTeam(player.id))
+        if (!this.isPlayerOnTeam(player.socketId))
             throw new ValidationError("Player is not on team", "INVALID_INPUT")
         
         // One player on Team
