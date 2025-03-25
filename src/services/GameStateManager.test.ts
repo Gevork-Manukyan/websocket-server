@@ -1,5 +1,7 @@
-import { ConGame } from "../models";
-import { gameId } from "../types";
+import { gameId, TransitionEvent } from "../types";
+import { GameState } from "../models/GameState/GameState";
+import { ConGame } from "../models/ConGame/ConGame";
+import { Player } from "../models/Player/Player";
 import { ConflictError } from "./CustomError/BaseError";
 import { gameStateManager } from "./";
 

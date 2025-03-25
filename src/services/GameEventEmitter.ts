@@ -1,6 +1,6 @@
 import { Server, Socket, Namespace } from "socket.io";
+import { gameId, Sage, SpaceOption, ElementalCard } from "../types";
 import { Player, Team } from "../models";
-import { gameId, Sage, SpaceOption } from "../types";
 import { gameStateManager } from "../services/GameStateManager";
 
 class GameEventEmitter {

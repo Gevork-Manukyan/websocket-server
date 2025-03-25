@@ -1,7 +1,16 @@
 import { Document, Schema } from 'mongoose';
+import { gameId, Transition } from '../../types';
 
-export interface IGameState extends Document {
+type GameStateBase = {
+    gameId: gameId;
+    stateTransitionTable: Transition[];
+    currentTransition: Transition;
 }
 
+export interface IGameState extends Document, GameStateBase {}
+
 export const GameStateSchema = new Schema({
+    gameId: { type: String, required: true },
+    stateTransitionTable: [{ type: Schema.Types.Mixed, required: true }],
+    currentTransition: { type: Schema.Types.Mixed, required: true },
 }); 
