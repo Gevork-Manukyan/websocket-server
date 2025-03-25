@@ -1,7 +1,9 @@
-import { Document, Schema } from 'mongoose';
+import { Document, Schema, Types } from 'mongoose';
 import { Card, Decklist, Sage } from '../../types';
 
 export interface IPlayer extends Document {
+    userId: Types.ObjectId;  // Reference to User
+    socketId: string;        // Current socket ID (temporary)
     isReady: boolean;
     isSetup: boolean;
     hasChosenWarriors: boolean;
@@ -15,6 +17,8 @@ export interface IPlayer extends Document {
 }
 
 export const PlayerSchema = new Schema({
+    userId: { type: Schema.Types.ObjectId, required: true },
+    socketId: { type: String, required: true },
     isReady: { type: Boolean, default: false },
     isSetup: { type: Boolean, default: false },
     hasChosenWarriors: { type: Boolean, default: false },

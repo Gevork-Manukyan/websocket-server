@@ -5,7 +5,8 @@ import { drawCardFromDeck, getSageDecklist } from "../../lib/utilities";
 import { IPlayer } from './db-model';
 
 export class Player {
-  id: string; // socketId
+  id: string;           // User ID (persistent)
+  socketId: string;     // Current socket ID (temporary)
   private isReady: boolean = false;
   private isSetup: boolean = false;
   private hasChosenWarriors: boolean = false;
@@ -17,9 +18,15 @@ export class Player {
   private deck: Card[] = [];
   private discardPile: Card[] = [];
 
-  constructor(socketId: string, isGameHost = false) {
-    this.id = socketId;
+  constructor(userId: string, socketId: string, isGameHost = false) {
+    this.id = userId;
+    this.socketId = socketId;
     this.isGameHost = isGameHost;
+  }
+
+  // Update socket ID when user reconnects
+  updateSocketId(newSocketId: string) {
+    this.socketId = newSocketId;
   }
 
   getIsReady() {
@@ -171,7 +178,7 @@ export class Player {
 
   // Convert from Mongoose document to runtime instance
   static fromMongoose(doc: IPlayer | Omit<IPlayer, '_id'>): Player {
-    const player = new Player(doc.id, doc.isGameHost);
+    const player = new Player(doc.id, doc.socketId, doc.isGameHost);
     
     // Set up properties
     player.isReady = doc.isReady;
