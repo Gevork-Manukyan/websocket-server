@@ -33,7 +33,7 @@ class GameStateManager {
         this.currentGames[gameId].game = game;
     }
 
-    private getGameState(gameId: gameId) {
+    getGameState(gameId: gameId) {
         const gameState = this.currentGames[gameId];
         if (!gameState) throw new GameConflictError(gameId);
         return gameState.state;

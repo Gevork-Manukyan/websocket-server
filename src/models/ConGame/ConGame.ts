@@ -10,7 +10,10 @@ import { drawCardFromDeck } from "../../lib";
 import { Player } from "../Player/Player";
 import { Team } from "../Team/Team";
 import { ALL_CARDS, processAbility } from "../../constants";
-import { IConGame } from './db-model';
+import { IConGame, ConGameModel, ConGameService } from './';
+import { GameSaveService } from '../../services/GameSaveService';
+import { gameStateManager } from '../../services/GameStateManager';
+import { GameStateService, GameStateModel } from '../GameState';
 
 const { BambooBerserker, Bruce, CackleRipclaw, CamouChameleon, CurrentConjurer, Dewy, DistantDoubleStrike, ElementalIncantation, ElementalSwap, ExchangeOfNature, FarsightFrenzy, Flint, FocusedFury, ForageThumper, Herbert, HummingHerald, IguanaGuard, LumberClaw, MagicEtherStrike, MeleeShield, MossViper, Mush, NaturalDefense, NaturesWrath, OakLumbertron, Obliterate, PineSnapper, PrimitiveStrike, ProjectileBlast, RangedBarrier, Redstone, ReinforcedImpact, RoamingRazor, Rocco, RubyGuardian, RunePuma, ShrubBeetle, SplashBasilisk, SplinterStinger, StoneDefender, SurgesphereMonk, TerrainTumbler, TwineFeline, TyphoonFist, Wade, WhirlWhipper, Willow } = ALL_CARDS;
 
@@ -351,7 +354,7 @@ export class ConGame {
 
   finishedSetup(): ActiveConGame {
     this.hasFinishedSetup = true;
-    return new ActiveConGame(this);
+    return new ActiveConGame(this, GameSaveService.getInstance(new ConGameService(ConGameModel), new GameStateService(GameStateModel)));
   }
 
   // Protected helper for Mongoose conversion
@@ -430,9 +433,11 @@ export class ActiveConGame extends ConGame {
   private currentPhase: "phase1" | "phase2" | "phase3" | "phase4" = "phase1";
   private actionPoints: number;
   private maxActionPoints: 3 | 6;
+  private gameSaveService: GameSaveService;
 
-  constructor(conGame: ConGame) {
+  constructor(conGame: ConGame, gameSaveService: GameSaveService) {
     super(conGame.id, conGame.numPlayersTotal);
+    this.gameSaveService = gameSaveService;
 
     this.maxActionPoints = this.numPlayersTotal === 2 ? 3 : 6;
     this.actionPoints = this.maxActionPoints;
@@ -501,7 +506,11 @@ export class ActiveConGame extends ConGame {
   }
 
   endPhase4() {
-    // TODO: end turn and reset all variables
+    // Save the current game state before ending the turn
+    const gameState = gameStateManager.getGameState(this.id);
+    this.gameSaveService.saveGameState(this, gameState);
+
+    // End turn and reset all variables
     this.currentPhase = "phase1";
     this.toggleActiveTeam();
     this.resetActionPoints();
@@ -576,7 +585,7 @@ export class ActiveConGame extends ConGame {
 
   // Create instance from plain data
   static fromData(data: ActiveConGameData): ActiveConGame {
-    const game = new ActiveConGame(ConGame.fromData(data));
+    const game = new ActiveConGame(ConGame.fromData(data), GameSaveService.getInstance(new ConGameService(ConGameModel), new GameStateService(GameStateModel)));
     
     // Copy active game properties
     Object.assign(game, {

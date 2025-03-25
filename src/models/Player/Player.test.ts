@@ -1,7 +1,7 @@
 import { NotFoundError, ValidationError } from "../../services";
 import { Player } from "../../models";
 import { ALL_CARDS, TwigDeck } from "../../constants";
-const { Cedar, Gravel, Timber, AcornSquire, CloseStrike, FarStrike, GeoWeasel, GraniteRampart, NaturalRestoration, QuillThornback, SlumberJack, TwigCharm } = ALL_CARDS;
+const { Cedar, Gravel, Timber, CloseStrike, FarStrike, TwigCharm, NaturalRestoration } = ALL_CARDS;
 
 const testPlayerId = "testId123"
 const testSocketId = "socket123"

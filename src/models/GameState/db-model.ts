@@ -15,4 +15,4 @@ export const GameStateSchema = new Schema({
     currentTransition: { type: Schema.Types.Mixed, required: true },
 }); 
 
-export const GameState = model<IGameState>('GameState', GameStateSchema);
+export const GameStateModel = model<IGameState>('GameState', GameStateSchema);
