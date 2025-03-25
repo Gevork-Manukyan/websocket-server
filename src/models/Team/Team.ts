@@ -119,7 +119,7 @@ export class Team {
      * @param player The player to remove from the team
      */
     removePlayerFromTeam(player: Player) {
-        this.players = this.players.filter(currPlayer => currPlayer.id !== player.id)
+        this.players = Player.filterOutPlayerById(this.players, player.id);
     }
 
     /**

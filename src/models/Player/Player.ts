@@ -177,8 +177,8 @@ export class Player {
   }
 
   // Convert from Mongoose document to runtime instance
-  static fromMongoose(doc: IPlayer | Omit<IPlayer, '_id'>): Player {
-    const player = new Player(doc.id, doc.socketId, doc.isGameHost);
+  static fromMongoose(doc: IPlayer): Player {
+    const player = new Player(doc.userId.toString(), doc.socketId, doc.isGameHost);
     
     // Set up properties
     player.isReady = doc.isReady;
@@ -197,6 +197,8 @@ export class Player {
   // Convert runtime instance to plain object for Mongoose
   toMongoose(): Omit<IPlayer, '_id'> {
     return {
+      userId: this.id,
+      socketId: this.socketId,
       isReady: this.isReady,
       isSetup: this.isSetup,
       hasChosenWarriors: this.hasChosenWarriors,
@@ -208,5 +210,18 @@ export class Player {
       deck: this.deck,
       discardPile: this.discardPile
     } as Omit<IPlayer, '_id'>;
+  }
+
+  // Static utility methods
+  static findPlayerById(players: Player[], playerId: string): Player | undefined {
+    return players.find(player => player.id === playerId);
+  }
+
+  static findOtherPlayerById(players: Player[], playerId: string): Player | undefined {
+    return players.find(player => player.id !== playerId);
+  }
+
+  static filterOutPlayerById(players: Player[], playerId: string): Player[] {
+    return players.filter(player => player.id !== playerId);
   }
 }

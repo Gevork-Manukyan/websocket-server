@@ -85,11 +85,11 @@ export class ConGame {
   }
 
   removePlayer(playerId: Player["id"]) {
-    this.players = this.players.filter((item) => item.id !== playerId);
+    this.players = Player.filterOutPlayerById(this.players, playerId);
   }
 
   getPlayer(playerId: Player["id"]): Player {
-    const player = this.players.find((item) => item.id === playerId);
+    const player = this.players.find((item) => item.socketId === playerId);
     if (!player)
       throw new NotFoundError(
         "Player",
@@ -126,7 +126,9 @@ export class ConGame {
   getPlayerTeammate(playerId: Player["id"]) {
     const playerTeam = this.getPlayerTeam(playerId);
     if (playerTeam.players.length === 1) throw new ValidationError("Player has no teammates", "playerTeammate")
-    return playerTeam.players.find(player => player.id !== playerId)!;
+    const teammate = Player.findOtherPlayerById(playerTeam.players, playerId);
+    if (!teammate) throw new NotFoundError("Player", "Could not find teammate");
+    return teammate;
   }
 
   getTeamOrder() {
