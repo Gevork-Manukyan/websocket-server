@@ -2,6 +2,7 @@ import { ConflictError, NotFoundError, ValidationError } from "../../services";
 import { Card, Decklist, ElementalWarriorStarterCard, SpaceOption } from "../../types";
 import { Battlefield } from "../Battlefield/Battlefield";
 import { Player } from "../Player/Player";
+import { ITeam } from './db-model';
 
 export class Team {
     players: Player[];
@@ -309,5 +310,31 @@ export class Team {
             this.addRemovedCard(removedCard);
         }
         return isDead;
+    }
+
+    // Convert from Mongoose document to runtime instance
+    static fromMongoose(doc: ITeam): Team {
+        const team = new Team(doc.teamSize, doc.teamNumber);
+        
+        team.players = doc.players.map(p => Player.fromMongoose(p));
+        team.battlefield = Battlefield.fromMongoose(doc.battlefield);
+        team.gold = doc.gold;
+        team.maxGold = doc.maxGold;
+        team.removedCards = doc.removedCards;
+
+        return team;
+    }
+
+    // Convert runtime instance to plain object for Mongoose
+    toMongoose(): Omit<ITeam, '_id'> {
+        return {
+            players: this.players.map(p => p.toMongoose()),
+            battlefield: this.battlefield.toMongoose(),
+            teamNumber: this.teamNumber,
+            teamSize: this.teamSize,
+            gold: this.gold,
+            maxGold: this.maxGold,
+            removedCards: this.removedCards
+        } as Omit<ITeam, '_id'>;
     }
 }

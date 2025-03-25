@@ -4,6 +4,7 @@ import { NullSpaceError } from "../../services/CustomError/GameError";
 import { ElementalCard } from "../../types";
 import { ElementalWarriorCard } from "../../types/card-types";
 import { SpaceOption } from "../../types/types";
+import { IBattlefieldSpace } from './db-model';
 
 export type Direction = "TL" | "T" | "TR" | "L" | "R" | "BL" | "B" | "BR"
 
@@ -76,5 +77,26 @@ export class BattlefieldSpace {
         if (!isElementalWarriorCard(this.value) || !this.value.isDayBreak) {
             throw new ValidationError("Cannot activate Day Break on a card that does not have the ability", "INVALID_INPUT");
         }
+    }
+
+    // Convert from Mongoose document to runtime instance
+    static fromMongoose(doc: IBattlefieldSpace): BattlefieldSpace {
+        const space = new BattlefieldSpace(doc.spaceNumber, doc.value);
+        // Connections will be set up by the Battlefield class
+        return space;
+    }
+
+    // Convert runtime instance to plain object for Mongoose
+    toMongoose(): Omit<IBattlefieldSpace, '_id'> {
+        return {
+            spaceNumber: this.spaceNumber,
+            value: this.value,
+            connections: Object.fromEntries(
+                Object.entries(this.connections).map(([key, value]) => [
+                    key,
+                    value?.spaceNumber ?? null
+                ])
+            )
+        } as Omit<IBattlefieldSpace, '_id'>;
     }
 } 

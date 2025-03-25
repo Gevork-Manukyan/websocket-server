@@ -2,6 +2,7 @@ import { NotFoundError, ValidationError } from "../../services/CustomError/BaseE
 import { Card, Sage } from "../../types";
 import { Decklist } from "../../types/card-types";
 import { drawCardFromDeck, getSageDecklist } from "../../lib/utilities";
+import { IPlayer } from './db-model';
 
 export class Player {
   id: string; // socketId
@@ -166,5 +167,39 @@ export class Player {
   drawCard() {
     const drawnCard = drawCardFromDeck(this.deck)
     this.addCardToHand(drawnCard)
+  }
+
+  // Convert from Mongoose document to runtime instance
+  static fromMongoose(doc: IPlayer): Player {
+    const player = new Player(doc._id?.toString() ?? '', doc.isGameHost);
+    
+    // Set up properties
+    player.isReady = doc.isReady;
+    player.isSetup = doc.isSetup;
+    player.hasChosenWarriors = doc.hasChosenWarriors;
+    player.sage = doc.sage;
+    player.decklist = doc.decklist;
+    player.level = doc.level;
+    player.hand = doc.hand;
+    player.deck = doc.deck;
+    player.discardPile = doc.discardPile;
+
+    return player;
+  }
+
+  // Convert runtime instance to plain object for Mongoose
+  toMongoose(): Omit<IPlayer, '_id'> {
+    return {
+      isReady: this.isReady,
+      isSetup: this.isSetup,
+      hasChosenWarriors: this.hasChosenWarriors,
+      isGameHost: this.isGameHost,
+      sage: this.sage,
+      decklist: this.decklist,
+      level: this.level,
+      hand: this.hand,
+      deck: this.deck,
+      discardPile: this.discardPile
+    } as Omit<IPlayer, '_id'>;
   }
 }

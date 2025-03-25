@@ -3,9 +3,10 @@ import { ValidationError } from "../../services/CustomError/BaseError";
 import { NullSpaceError } from "../../services/CustomError/GameError";
 import { ElementalCard } from "../../types";
 import { AbilityResult } from "../../types/ability-types";
-import { ElementalWarriorCard } from "../../types/card-types";
 import { SpaceOption, OnePlayerSpaceOptions, TwoPlayerSpaceOptions } from "../../types/types";
 import { BattlefieldSpace } from "../BattlefieldSpace/BattlefieldSpace";
+import { IBattlefield } from './db-model';
+import { IBattlefieldSpace } from '../BattlefieldSpace/db-model';
 
 const ONE_PLAYER_SPACE_MAX = 6;
 const TWO_PLAYER_SPACE_MAX = 12;
@@ -316,5 +317,36 @@ export class Battlefield {
         const card = this.getCardAtSpace(position);
         const newBoost = card.boostCount + amount;
         card.boostCount = newBoost;
+    }
+
+    // Convert from Mongoose document to runtime instance
+    static fromMongoose(doc: IBattlefield): Battlefield {
+        const battlefield = new Battlefield(doc.numPlayersOnTeam);
+        
+        // Set up spaces and their connections
+        const spaces = doc.fieldArray.map(space => BattlefieldSpace.fromMongoose(space));
+        battlefield.fieldArray = spaces;
+
+        // Set up connections between spaces
+        spaces.forEach(space => {
+            Object.entries(space.connections).forEach(([direction, targetSpaceNumber]) => {
+                if (typeof targetSpaceNumber === 'number') {
+                    const targetSpace = spaces.find(s => s.spaceNumber === targetSpaceNumber);
+                    if (targetSpace) {
+                        space.connections[direction as keyof typeof space.connections] = targetSpace;
+                    }
+                }
+            });
+        });
+
+        return battlefield;
+    }
+
+    // Convert runtime instance to plain object for Mongoose
+    toMongoose(): Omit<IBattlefield, '_id'> {
+        return {
+            fieldArray: this.fieldArray.map(space => space.toMongoose()) as IBattlefieldSpace[],
+            numPlayersOnTeam: this.numPlayersOnTeam
+        } as Omit<IBattlefield, '_id'>;
     }
 }
