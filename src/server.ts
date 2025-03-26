@@ -1,22 +1,21 @@
 import express from "express"; 
 import { createServer } from "http"; 
 import { Server } from "socket.io";
-import { Player } from "./models";
-import { GameEventEmitter } from "./services/GameEventEmitter";
-import { GameStateManager } from "./services/GameStateManager";
-import { PORT } from "./lib";
-import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData } from "./types";
-import { processEventMiddleware, socketErrorHandler } from "./lib";
-import { ValidationError } from "./services";
-import { InvalidSpaceError, PlayersNotReadyError } from "./services";
-import { AllSpaceOptionsSchema } from "./types";
+import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData } from "./types";
+import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
+import { GameEventEmitter, GameStateManager, GameSaveService, ValidationError, InvalidSpaceError, PlayersNotReadyError } from "./services";
 import { IS_PRODUCTION } from "./constants";
-
+import { Player, ConGameService, GameStateService, ConGameModel, GameStateModel } from "./models";
 
 const app = express();
 const server = createServer(app);
 const gameEventEmitter = GameEventEmitter.getInstance(server);
 const gameStateManager = GameStateManager.getInstance();
+
+// Initialize database services
+const conGameService = new ConGameService(ConGameModel);
+const gameStateService = new GameStateService(GameStateModel);
+const gameSaveService = GameSaveService.getInstance(conGameService, gameStateService);
 
 app.use(express.json());
 // const cors = require('cors');
@@ -35,6 +34,27 @@ const gameNamespace = io.of("/gameplay");
 
 // Initialize the GameEventEmitter with the gameplay namespace
 gameEventEmitter.initializeIO(gameNamespace);
+
+// Load existing games from database
+async function loadExistingGames() {
+  try {
+    // Find all games
+    const games = await conGameService.findAllGames();
+    
+    // For each game, load its state and add it to the GameStateManager
+    for (const game of games) {
+      try {
+        const gameState = await gameStateService.findGameStateByGameId(game.id);
+        gameStateManager.loadGame(game, gameState);
+        console.log(`Loaded game ${game.id} from database`);
+      } catch (error) {
+        console.error(`Failed to load game ${game.id}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load existing games:', error);
+  }
+}
 
 gameNamespace.on("connection", (socket) => {
 
@@ -240,8 +260,9 @@ gameNamespace.on("connection", (socket) => {
 
 // Start the server if not in test mode
 if (IS_PRODUCTION) {
-  server.listen(PORT, () => {
+  server.listen(PORT, async () => {
     console.log(`WebSocket server running on http://localhost:${PORT}`);
+    await loadExistingGames();
   });
 }
 

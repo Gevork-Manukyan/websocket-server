@@ -22,6 +22,18 @@ export class GameStateManager {
         return GameStateManager.instance;
     }
 
+    /**
+     * Loads a game from the database and adds it to the current games
+     * @param game - The game to load
+     * @param gameState - The game state to load
+     */
+    loadGame(game: ConGame, gameState: GameState): void {
+        this.currentGames[game.id] = {
+            game: game,
+            state: gameState
+        };
+    }
+
     getGame(gameId: gameId): ConGame {
         const gameState = this.currentGames[gameId];
         if (!gameState) throw new GameConflictError(gameId);

@@ -10,6 +10,11 @@ export class ConGameService {
         this.model = model;
     }
 
+    async findAllGames(): Promise<ConGame[]> {
+        const docs = await this.model.find({});
+        return docs.map(doc => ConGame.fromMongoose(doc));
+    }
+
     async createGame(gameId: string, numPlayers: 2 | 4): Promise<ConGame> {
         const game = new ConGame(gameId, numPlayers);
         const doc = await this.model.create(game.toMongoose());
