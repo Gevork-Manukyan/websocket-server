@@ -34,22 +34,42 @@ export class GameStateManager {
         };
     }
 
+    /**
+     * Gets a game from the current games
+     * @param gameId - The id of the game to get
+     * @returns The game
+     */
     getGame(gameId: gameId): ConGame {
         const gameState = this.currentGames[gameId];
         if (!gameState) throw new GameConflictError(gameId);
         return gameState.game;
     }
 
+    /**
+     * Sets a game in the current games
+     * @param gameId - The id of the game to set
+     * @param game - The game to set
+     */
     private setGame(gameId: gameId, game: ConGame): void {
         this.currentGames[gameId].game = game;
     }
 
+    /**
+     * Gets a game state from the current games
+     * @param gameId - The id of the game to get
+     * @returns The game state
+     */
     getGameState(gameId: gameId): GameState {
         const gameState = this.currentGames[gameId];
         if (!gameState) throw new GameConflictError(gameId);
         return gameState.state;
     }
 
+    /**
+     * Gets an active game from the current games
+     * @param gameId - The id of the game to get
+     * @returns The active game
+     */
     getActiveGame(gameId: gameId): ActiveConGame {
         const game = this.getGame(gameId);
         if (!this.isActiveGame(game)) {
@@ -58,11 +78,21 @@ export class GameStateManager {
         return game;
     }
 
+    /**
+     * Checks if a game is an active game
+     * @param game - The game to check
+     * @returns True if the game is an active game, false otherwise
+     */
     private isActiveGame(game: ConGame): game is ActiveConGame {
         return game.getHasFinishedSetup();
     }
 
     // TODO: call db function to create gameId
+    /**
+     * Creates a new game
+     * @param numPlayers - The number of players in the game
+     * @returns The new game
+    */
     createGame(numPlayers: ConGame['numPlayersTotal']): ConGame {
         const gameId = `game-${Object.keys(this.currentGames).length + 1}` as gameId;
         const game = new ConGame(gameId, numPlayers);
@@ -73,22 +103,38 @@ export class GameStateManager {
         return game;
     }
 
+    /**
+     * Gets the current games
+     * @returns The current games
+     */
     getCurrentGames(): { [key: gameId]: GameStateInfo } {
         return this.currentGames;
     }
 
+    /**
+     * Deletes a game from the current games
+     * @param gameId - The id of the game to delete
+     */
     deleteGame(gameId: gameId): void {
         if (this.currentGames.hasOwnProperty(gameId)) {
             delete this.currentGames[gameId];
         }
     }
 
+    /**
+     * Begins a battle
+     * @param game - The game to begin
+     * @returns The active game
+     */
     beginBattle(game: ConGame): ActiveConGame {
         const activeGame = game.finishedSetup();
         this.setGame(game.id, activeGame);
         return activeGame;
     }
 
+    /**
+     * Resets the game state manager
+     */
     resetGameStateManager(): void {
         this.currentGames = {};
     }
