@@ -209,6 +209,3 @@ export class GameStateManager {
         this.getGameState(gameId).processEvent(TransitionEvent.DAY_BREAK_CARD);
     }
 }
-
-// Export a singleton instance
-export const gameStateManager = GameStateManager.getInstance();

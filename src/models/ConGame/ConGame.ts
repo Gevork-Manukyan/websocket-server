@@ -12,7 +12,7 @@ import { Team } from "../Team/Team";
 import { ALL_CARDS, processAbility } from "../../constants";
 import { IConGame, ConGameModel, ConGameService } from './';
 import { GameSaveService } from '../../services/GameSaveService';
-import { gameStateManager } from '../../services/GameStateManager';
+import { GameStateManager } from '../../services/GameStateManager';
 import { GameStateService, GameStateModel } from '../GameState';
 
 const { BambooBerserker, Bruce, CackleRipclaw, CamouChameleon, CurrentConjurer, Dewy, DistantDoubleStrike, ElementalIncantation, ElementalSwap, ExchangeOfNature, FarsightFrenzy, Flint, FocusedFury, ForageThumper, Herbert, HummingHerald, IguanaGuard, LumberClaw, MagicEtherStrike, MeleeShield, MossViper, Mush, NaturalDefense, NaturesWrath, OakLumbertron, Obliterate, PineSnapper, PrimitiveStrike, ProjectileBlast, RangedBarrier, Redstone, ReinforcedImpact, RoamingRazor, Rocco, RubyGuardian, RunePuma, ShrubBeetle, SplashBasilisk, SplinterStinger, StoneDefender, SurgesphereMonk, TerrainTumbler, TwineFeline, TyphoonFist, Wade, WhirlWhipper, Willow } = ALL_CARDS;
@@ -507,7 +507,7 @@ export class ActiveConGame extends ConGame {
 
   endPhase4() {
     // Save the current game state before ending the turn
-    const gameState = gameStateManager.getGameState(this.id);
+    const gameState = GameStateManager.getInstance().getGameState(this.id);
     this.gameSaveService.saveGameState(this, gameState);
 
     // End turn and reset all variables

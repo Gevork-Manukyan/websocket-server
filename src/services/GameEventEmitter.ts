@@ -1,18 +1,23 @@
 import { Server, Socket, Namespace } from "socket.io";
+import { Server as HttpServer } from "http";
 import { gameId, Sage, SpaceOption, ElementalCard } from "../types";
 import { Player, Team } from "../models";
-import { gameStateManager } from "../services/GameStateManager";
+import { GameStateManager } from "./GameStateManager";
 
-class GameEventEmitter {
+export class GameEventEmitter {
   private static instance: GameEventEmitter;
-  private io!: Server | Namespace;
+  private io: Server | Namespace;
+  private gameStateManager: GameStateManager;
 
-  private constructor() {}
+  private constructor(server: HttpServer) {
+    this.io = new Server(server);
+    this.gameStateManager = GameStateManager.getInstance();
+  }
 
-  static getInstance() {
-    if (!GameEventEmitter.instance) 
-      GameEventEmitter.instance = new GameEventEmitter()
-
+  static getInstance(server: HttpServer): GameEventEmitter {
+    if (!GameEventEmitter.instance) {
+      GameEventEmitter.instance = new GameEventEmitter(server);
+    }
     return GameEventEmitter.instance;
   }
 
@@ -61,5 +66,3 @@ class GameEventEmitter {
     this.emitToTeam(activeTeam, "day-break-cards", dayBreakCards);
   }
 }
- 
-export const gameEventEmitter = GameEventEmitter.getInstance();

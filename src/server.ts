@@ -1,8 +1,9 @@
 import express from "express"; 
-import http from "http"; 
+import { createServer } from "http"; 
 import { Server } from "socket.io";
 import { Player } from "./models";
-import { gameEventEmitter, gameStateManager } from "./services";
+import { GameEventEmitter } from "./services/GameEventEmitter";
+import { GameStateManager } from "./services/GameStateManager";
 import { PORT } from "./lib";
 import { CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData } from "./types";
 import { processEventMiddleware, socketErrorHandler } from "./lib";
@@ -13,7 +14,9 @@ import { IS_PRODUCTION } from "./constants";
 
 
 const app = express();
-const server = http.createServer(); // Create an HTTP server
+const server = createServer(app);
+const gameEventEmitter = GameEventEmitter.getInstance(server);
+const gameStateManager = GameStateManager.getInstance();
 
 app.use(express.json());
 // const cors = require('cors');

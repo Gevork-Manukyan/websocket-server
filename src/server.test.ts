@@ -1,7 +1,9 @@
 import Client, { Socket } from "socket.io-client";
-import { server } from "./server";
+import express from "express";
+import { createServer } from "http";
 import { PORT } from "./lib";
-import { gameStateManager, gameEventEmitter } from "./services";
+import { GameStateManager } from "./services/GameStateManager";
+import { GameEventEmitter } from "./services/GameEventEmitter";
 import { ConGame, Player, Team } from "./models";
 import { 
   AllPlayersSetupEvent, CancelSetupEvent, ChoseWarriorsEvent, 
@@ -22,9 +24,14 @@ const numPlayers = 2;
 const testPlayerId = "test-player";
 const testSocketId = "socket-123";
 
+let testServer: any;
+const gameEventEmitter = GameEventEmitter.getInstance(createServer(express()));
+const gameStateManager = GameStateManager.getInstance();
+
 beforeAll((done) => {
   // Start the server (ensure it's tied to your real server.ts code)
-  server.listen(PORT, () => {
+  testServer = require("./server").server;
+  testServer.listen(PORT, () => {
     // Connect the client to the same server
     clientSocket = Client(`http://localhost:${PORT}/gameplay`, {
       transports: ["websocket"],
@@ -34,7 +41,7 @@ beforeAll((done) => {
 });
 
 afterAll(() => {
-  server.close(); 
+  testServer.close(); 
   clientSocket.close(); 
 });
 

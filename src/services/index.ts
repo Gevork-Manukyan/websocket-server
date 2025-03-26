@@ -1,5 +1,5 @@
-import { gameStateManager } from './GameStateManager';
-export { gameStateManager };
+import { GameStateManager } from './GameStateManager';
+export { GameStateManager };
 
 export * from './GameStateManager';
 export * from './GameEventEmitter';

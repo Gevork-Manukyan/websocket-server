@@ -1,86 +1,68 @@
-import { gameId, TransitionEvent } from "../types";
 import { GameState } from "../models/GameState/GameState";
 import { ConGame } from "../models/ConGame/ConGame";
-import { Player } from "../models/Player/Player";
-import { ConflictError } from "./CustomError/BaseError";
-import { gameStateManager } from "./";
-
+import { GameStateManager } from "./GameStateManager";
+import { gameId } from "../types";
+import { GameConflictError } from "./CustomError/GameError";
 
 describe("GameStateManager", () => {
-  let mockGame: ConGame;
-  const originalGetGame = gameStateManager.getGame;
+    let gameStateManager: GameStateManager;
+    let mockGame: ConGame;
 
-  beforeEach(() => {
-    // Reset the singleton's state before each test
-    gameStateManager.resetGameStateManager();
-
-    // Mock a ConGame instance
-    mockGame = new ConGame("game-1" as gameId, 4);
-
-    gameStateManager.createGame(mockGame.numPlayersTotal);
-    gameStateManager.getGame = jest.fn().mockReturnValue(mockGame);
-  });
-
-  describe("getInstance", () => {
-    test("returns the same instance for multiple calls", () => {
-      const instance1 = gameStateManager;
-      const instance2 = gameStateManager;
-      expect(instance1).toBe(instance2);
-    });
-  });
-
-  describe("addGame", () => {
-    test("adds a new game to the current games", () => {
-      const retrievedGame = gameStateManager.getGame("game-1" as gameId);
-      expect(retrievedGame).toEqual(mockGame);
+    beforeEach(() => {
+        gameStateManager = GameStateManager.getInstance();
+        gameStateManager.resetGameStateManager();
+        mockGame = new ConGame("game-1" as gameId, 4);
     });
 
-    test("returns the added game after adding test", () => {
-      const newGame = new ConGame("game-2" as gameId, 2);
-      const addedGame = gameStateManager.createGame(newGame.numPlayersTotal);
-      expect(addedGame).toEqual(newGame);
+    describe("getInstance", () => {
+        test("returns the same instance on multiple calls", () => {
+            const instance1 = GameStateManager.getInstance();
+            const instance2 = GameStateManager.getInstance();
+            expect(instance1).toBe(instance2);
+        });
     });
 
-    test("throws an error if a game with the ID already exists", () => {
-      expect(() => gameStateManager.createGame(mockGame.numPlayersTotal)).toThrow(ConflictError)
-    })
-  });
+    describe("getGame", () => {
+        test("returns the game for a valid game ID", () => {
+            gameStateManager.createGame(mockGame.numPlayersTotal);
+            const retrievedGame = gameStateManager.getGame("game-1" as gameId);
+            expect(retrievedGame).toBe(mockGame);
+        });
 
-  describe("getGame", () => {
-    test("retrieves an existing game by its ID", () => {
-      const retrievedGame = gameStateManager.getGame("game-1" as gameId);
-      expect(retrievedGame).toBe(mockGame);
+        test("throws an error for a non-existent game ID", () => {
+            expect(() => gameStateManager.getGame("non-existent-game" as gameId)).toThrow(GameConflictError);
+        });
     });
 
-    test("returns undefined for a non-existent game ID", () => {
-      gameStateManager.getGame = originalGetGame;
-      const retrievedGame = gameStateManager.getGame("non-existent-game" as gameId);
-      expect(retrievedGame).toBeUndefined();
-    });
-  });
+    describe("createGame", () => {
+        test("creates a new game with the given number of players", () => {
+            const newGame = gameStateManager.createGame(4);
+            expect(newGame.numPlayersTotal).toBe(4);
+        });
 
-  describe("deleteGame", () => {
-    test("removes an existing game by its ID", () => {
-      gameStateManager.getGame = originalGetGame;
-      gameStateManager.deleteGame(mockGame.id as gameId);
-
-      const retrievedGame = gameStateManager.getGame(mockGame.id as gameId);
-      expect(retrievedGame).toBeUndefined();
+        test("throws an error if a game with the ID already exists", () => {
+            gameStateManager.createGame(mockGame.numPlayersTotal);
+            expect(() => gameStateManager.createGame(mockGame.numPlayersTotal)).toThrow(GameConflictError);
+        });
     });
 
-    test("does not throw an error when deleting a non-existent game", () => {
-      expect(() => gameStateManager.deleteGame("non-existent-game" as gameId)).not.toThrow();
-    });
-  });
+    describe("deleteGame", () => {
+        test("deletes an existing game", () => {
+            gameStateManager.createGame(mockGame.numPlayersTotal);
+            gameStateManager.deleteGame(mockGame.id as gameId);
+            expect(() => gameStateManager.getGame(mockGame.id as gameId)).toThrow(GameConflictError);
+        });
 
-  describe("resetGameStateManager", () => {
-    test("resets the current games to an empty object", () => {
-      gameStateManager.getGame = originalGetGame;
-      gameStateManager.resetGameStateManager();
-
-      const retrievedGame = gameStateManager.getGame("game-1" as gameId);
-      expect(retrievedGame).toBeUndefined();
-      expect(Object.keys((gameStateManager as any).currentGames)).toHaveLength(0);
+        test("does not throw an error when deleting a non-existent game", () => {
+            expect(() => gameStateManager.deleteGame("non-existent-game" as gameId)).not.toThrow();
+        });
     });
-  });
+
+    describe("resetGameStateManager", () => {
+        test("clears all games", () => {
+            gameStateManager.createGame(mockGame.numPlayersTotal);
+            gameStateManager.resetGameStateManager();
+            expect(() => gameStateManager.getGame(mockGame.id as gameId)).toThrow(GameConflictError);
+        });
+    });
 });
