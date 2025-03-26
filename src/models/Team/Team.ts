@@ -4,6 +4,10 @@ import { Battlefield } from "../Battlefield/Battlefield";
 import { Player } from "../Player/Player";
 import { ITeam } from './db-model';
 
+/**
+ * Represents a team in the Command of Nature game
+ * @class Team
+ */
 export class Team {
     players: Player[];
     private battlefield: Battlefield;
@@ -13,7 +17,11 @@ export class Team {
     private maxGold: 12 | 20;
     private removedCards: Card[] = [];
 
-  
+    /**
+     * Creates a new Team instance
+     * @param {1 | 2} teamSize - The number of players in the team
+     * @param {1 | 2} teamNumber - The team's number (1 or 2)
+     */
     constructor(teamSize: Team['teamSize'], teamNumber: Team['teamNumber']) {
         this.players = [];
         this.battlefield = new Battlefield(teamSize);

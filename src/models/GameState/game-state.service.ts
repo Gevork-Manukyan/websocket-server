@@ -4,9 +4,17 @@ import { GameState } from './GameState';
 import { NotFoundError } from '../../services/CustomError/BaseError';
 import { TransitionEvent } from '../../types/gamestate-types';
 
+/**
+ * Service class for managing GameState instances in the database
+ * @class GameStateService
+ */
 export class GameStateService {
     private model: Model<IGameState>;
 
+    /**
+     * Creates a new GameStateService instance
+     * @param {Model<IGameState>} model - The Mongoose model for GameState
+     */
     constructor(model: Model<IGameState>) {
         this.model = model;
     }

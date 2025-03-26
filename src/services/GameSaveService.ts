@@ -18,6 +18,11 @@ export class GameSaveService {
         return GameSaveService.instance;
     }
 
+    /**
+     * Saves the game state
+     * @param game - The game to save
+     * @param gameState - The game state to save
+     */
     async saveGameState(game: ConGame, gameState: GameState): Promise<void> {
         try {
             // Save both the game and game state in parallel

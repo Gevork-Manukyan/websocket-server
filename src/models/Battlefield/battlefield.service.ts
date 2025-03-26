@@ -3,9 +3,17 @@ import { IBattlefield } from './db-model';
 import { Battlefield } from './Battlefield';
 import { NotFoundError } from '../../services/CustomError/BaseError';
 
+/**
+ * Service class for managing Battlefield instances in the database
+ * @class BattlefieldService
+ */
 export class BattlefieldService {
     private model: Model<IBattlefield>;
 
+    /**
+     * Creates a new BattlefieldService instance
+     * @param {Model<IBattlefield>} model - The Mongoose model for Battlefield
+     */
     constructor(model: Model<IBattlefield>) {
         this.model = model;
     }

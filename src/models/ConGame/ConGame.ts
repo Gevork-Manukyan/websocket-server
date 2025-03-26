@@ -44,6 +44,10 @@ type ActiveConGameData = ConGameData & {
   maxActionPoints: 3 | 6;
 }
 
+/**
+ * Represents a Command of Nature (C.O.N) game instance
+ * @class ConGame
+ */
 export class ConGame {
   id: gameId;
   isStarted: boolean = false;
@@ -60,6 +64,11 @@ export class ConGame {
   protected itemShop: ItemCard[] = [];
   protected currentItemShopCards: ItemCard[] = [];
 
+  /**
+   * Creates a new ConGame instance
+   * @param {gameId} gameId - The unique identifier for the game
+   * @param {2 | 4} numPlayers - The total number of players in the game
+   */
   constructor(gameId: ConGame['id'], numPlayers: ConGame['numPlayersTotal']) {
     this.id = gameId;
     this.numPlayersTotal = numPlayers;
@@ -150,7 +159,11 @@ export class ConGame {
     return team === this.team1 ? this.team2 : this.team1;
   }
 
-  getCreatureShop() {
+  /**
+   * Gets the current creature shop cards
+   * @returns Array of available creature cards in the shop
+   */
+  getCreatureShop(): ElementalCard[] {
     return this.creatureShop;
   }
 
@@ -162,7 +175,11 @@ export class ConGame {
     this.addCardToShop(this.creatureShop, this.currentCreatureShopCards);
   }
 
-  getItemShop() {
+  /**
+   * Gets the current item shop cards
+   * @returns Array of available item cards in the shop
+   */
+  getItemShop(): ItemCard[] {
     return this.itemShop;
   }
 
@@ -225,6 +242,10 @@ export class ConGame {
     this.players.forEach(player => player.setIsReady(false))
   }
 
+  /**
+   * Initializes the game by setting up player decks, hands, fields, and shops
+   * @throws {PlayersNotReadyError} If not all players are ready
+   */
   initGame() {
     // All players must be ready
     if (this.numPlayersReady !== this.numPlayersTotal) throw new PlayersNotReadyError(this.numPlayersReady, this.numPlayersTotal)
@@ -254,6 +275,9 @@ export class ConGame {
     this.team2.initBattlefield(team2Decklists)
   }
 
+  /**
+   * Initializes the creature shop with available cards
+   */
   initCreatureShop() {
     this.creatureShop = [
       Willow,
@@ -303,6 +327,9 @@ export class ConGame {
     this.addCardToCreatureShop();
   }
 
+  /**
+   * Initializes the item shop with available cards
+   */
   initItemShop() {
     this.itemShop = [
       DistantDoubleStrike,
@@ -352,6 +379,10 @@ export class ConGame {
     this.addCardToItemShop();
   }
 
+  /**
+   * Marks the game setup as finished and returns an ActiveConGame instance
+   * @returns A new active game instance
+   */
   finishedSetup(): ActiveConGame {
     this.hasFinishedSetup = true;
     return new ActiveConGame(this, GameSaveService.getInstance(new ConGameService(ConGameModel), new GameStateService(GameStateModel)));
@@ -428,6 +459,11 @@ export class ConGame {
 
 
 /* ------------ Active ConGame ------------ */
+/**
+ * Represents an active Command of Nature game with additional game state
+ * @class ActiveConGame
+ * @extends ConGame
+ */
 export class ActiveConGame extends ConGame {
   private activeTeam: keyof TeamOrder = "first";
   private currentPhase: "phase1" | "phase2" | "phase3" | "phase4" = "phase1";
@@ -477,7 +513,11 @@ export class ActiveConGame extends ConGame {
     return gameState;
   }
 
-  getActiveTeam() {
+  /**
+   * Gets the currently active team
+   * @returns The active team
+   */
+  getActiveTeam(): Team {
     return this.teamOrder[this.activeTeam];
   }
 
@@ -489,18 +529,31 @@ export class ActiveConGame extends ConGame {
     this.activeTeam = this.activeTeam === "first" ? "second" : "first";
   }
 
-  getCurrentPhase() {
+  /**
+   * Gets the current game phase
+   * @returns The current phase
+   */
+  getCurrentPhase(): "phase1" | "phase2" | "phase3" | "phase4" {
     return this.currentPhase;
   }
 
+  /**
+   * Advances the game to phase 2
+   */
   endPhase1() {
     this.currentPhase = "phase2";
   }
 
+  /**
+   * Advances the game to phase 3
+   */
   endPhase2() {
     this.currentPhase = "phase3";
   }
 
+  /**
+   * Advances the game to phase 4
+   */
   endPhase3() {
     this.currentPhase = "phase4";
   }
@@ -516,7 +569,11 @@ export class ActiveConGame extends ConGame {
     this.resetActionPoints();
   }
 
-  getActionPoints() {
+  /**
+   * Gets the current number of action points
+   * @returns The current action points
+   */
+  getActionPoints(): number {
     return this.actionPoints;
   }
 

@@ -3,9 +3,17 @@ import { IConGame } from './db-model';
 import { ConGame, ActiveConGame } from './ConGame';
 import { NotFoundError } from '../../services/CustomError/BaseError';
 
+/**
+ * Service class for managing ConGame instances in the database
+ * @class ConGameService
+ */
 export class ConGameService {
     private model: Model<IConGame>;
 
+    /**
+     * Creates a new ConGameService instance
+     * @param {Model<IConGame>} model - The Mongoose model for ConGame
+     */
     constructor(model: Model<IConGame>) {
         this.model = model;
     }

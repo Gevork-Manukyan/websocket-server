@@ -3,9 +3,17 @@ import { ITeam } from './db-model';
 import { Team } from './Team';
 import { NotFoundError } from '../../services/CustomError/BaseError';
 
+/**
+ * Service class for managing Team instances in the database
+ * @class TeamService
+ */
 export class TeamService {
     private model: Model<ITeam>;
 
+    /**
+     * Creates a new TeamService instance
+     * @param {Model<ITeam>} model - The Mongoose model for Team
+     */
     constructor(model: Model<ITeam>) {
         this.model = model;
     }

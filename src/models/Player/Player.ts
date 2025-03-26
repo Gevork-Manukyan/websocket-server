@@ -5,6 +5,10 @@ import { drawCardFromDeck, getSageDecklist } from "../../lib/utilities";
 import { IPlayer } from './db-model';
 import { Types } from 'mongoose';
 
+/**
+ * Represents a player in the Command of Nature game
+ * @class Player
+ */
 export class Player {
   id: string;           // User ID (persistent)
   socketId: string;     // Current socket ID (temporary)
@@ -19,6 +23,12 @@ export class Player {
   private deck: Card[] = [];
   private discardPile: Card[] = [];
 
+  /**
+   * Creates a new Player instance
+   * @param {string} userId - The unique identifier for the user
+   * @param {string} socketId - The current socket connection ID
+   * @param {boolean} [isGameHost=false] - Whether this player is the game host
+   */
   constructor(userId: string, socketId: string, isGameHost = false) {
     this.id = userId;
     this.socketId = socketId;

@@ -3,9 +3,17 @@ import { IPlayer } from './db-model';
 import { Player } from './Player';
 import { NotFoundError } from '../../services/CustomError/BaseError';
 
+/**
+ * Service class for managing Player instances in the database
+ * @class PlayerService
+ */
 export class PlayerService {
     private model: Model<IPlayer>;
 
+    /**
+     * Creates a new PlayerService instance
+     * @param {Model<IPlayer>} model - The Mongoose model for Player
+     */
     constructor(model: Model<IPlayer>) {
         this.model = model;
     }
