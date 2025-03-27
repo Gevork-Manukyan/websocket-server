@@ -5,8 +5,8 @@ import { ConflictError, CustomError, ValidationError } from "./BaseError";
  * When the game with the given ID does not exist
  */
 export class GameConflictError extends ConflictError {
-    constructor(gameId: gameId) {
-        super(`Game with ID ${gameId} does not exist`);
+    constructor(gameId: gameId, message?: string) {
+        super(message || `Game with id ${gameId} not found or in invalid state`);
     }
 }
 

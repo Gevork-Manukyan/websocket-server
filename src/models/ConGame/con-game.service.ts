@@ -23,7 +23,7 @@ export class ConGameService {
         return docs.map(doc => ConGame.fromMongoose(doc));
     }
 
-    async createGame(numPlayers: 2 | 4): Promise<ConGame> {
+    async createGame(numPlayers: ConGame['numPlayersTotal']): Promise<ConGame> {
         const game = new ConGame(numPlayers);
         const doc = await this.model.create(game.toMongoose());
         return ConGame.fromMongoose(doc);

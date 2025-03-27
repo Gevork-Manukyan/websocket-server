@@ -3,8 +3,8 @@ import { Server } from "socket.io";
 import mongoose from "mongoose";
 import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData } from "./types";
 import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
-import { GameEventEmitter, GameStateManager, GameSaveService, ValidationError, InvalidSpaceError, PlayersNotReadyError } from "./services";
-import { Player, ConGameService, GameStateService, ConGameModel, GameStateModel } from "./models";
+import { GameEventEmitter, GameStateManager, ValidationError, InvalidSpaceError, PlayersNotReadyError } from "./services";
+import { Player } from "./models";
 import { IS_PRODUCTION } from "./constants";
 
 const server = createServer();
@@ -18,33 +18,30 @@ const io = new Server(server, {
 // Initialize services
 const gameEventEmitter = GameEventEmitter.getInstance(io);
 const gameStateManager = GameStateManager.getInstance();
-const conGameService = new ConGameService(ConGameModel);
-const gameStateService = new GameStateService(GameStateModel);
-const gameSaveService = GameSaveService.getInstance(conGameService, gameStateService);
 
 // Creates the gameplay namespace that will handle all gameplay connections
 const gameNamespace = io.of("/gameplay");
 
-// Load existing games from database
-async function loadExistingGames() {
-  try {
-    // Find all games
-    const games = await conGameService.findAllGames();
+// TODO: Load existing games from database
+// async function loadExistingGames() {
+//   try {
+//     // Find all games
+//     const games = await ConGameService.findAllGames();
     
-    // For each game, load its state and add it to the GameStateManager
-    for (const game of games) {
-      try {
-        const gameState = await gameStateService.findGameStateByGameId(game.id);
-        gameStateManager.loadGame(game, gameState);
-        console.log(`Loaded game ${game.id} from database`);
-      } catch (error) {
-        console.error(`Failed to load game ${game.id}:`, error);
-      }
-    }
-  } catch (error) {
-    console.error('Failed to load existing games:', error);
-  }
-}
+//     // For each game, load its state and add it to the GameStateManager
+//     for (const game of games) {
+//       try {
+//         const gameState = await gameStateService.findGameStateByGameId(game.id);
+//         gameStateManager.addGameAndState(game.id, game, gameState);
+//         console.log(`Loaded game ${game.id} from database`);
+//       } catch (error) {
+//         console.error(`Failed to load game ${game.id}:`, error);
+//       }
+//     }
+//   } catch (error) {
+//     console.error('Failed to load existing games:', error);
+//   }
+// }
 
 gameNamespace.on("connection", (socket) => {
 
@@ -60,25 +57,16 @@ gameNamespace.on("connection", (socket) => {
   /* -------- GAME SETUP -------- */
   // TODO: some events should emit to all players that something happened
 
-  socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ userId, numPlayers }: CreateGameData) => {
-    try {
-      // Create game in memory
-      const newGame = gameStateManager.createGame(numPlayers);
-      newGame.addPlayer(new Player(userId, socket.id, true)); // First player to join is the host
-      
-      // Save game to database
-      const savedGame = await gameSaveService.saveNewGame(newGame);
-      console.log('Game saved to database:', savedGame.id);
+  socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ userId, numPlayers }: CreateGameData) => {      
+      // Create game and save to database
+      const { game } = await gameStateManager.createGame(numPlayers);
+      game.addPlayer(new Player(userId, socket.id, true)); // First player to join is the host
       
       // Join socket room
-      socket.join(newGame.id);
+      socket.join(game.id);
       
       // Emit success
       socket.emit(`${CreateGameEvent}--success`);
-    } catch (error) {
-      console.error('Game creation error:', error);
-      socket.emit(`${CreateGameEvent}--error`, { message: 'Failed to create game' });
-    }
   }));
 
   socket.on(JoinGameEvent, socketErrorHandler(socket, JoinGameEvent, async ({ userId, gameId }: JoinGameData) => {
@@ -271,7 +259,7 @@ if (IS_PRODUCTION) {
       // Start the server after successful database connection
       server.listen(PORT, async () => {
         console.log(`WebSocket server running on http://localhost:${PORT}`);
-        await loadExistingGames();
+        // await loadExistingGames();
       });
     })
     .catch((error) => {

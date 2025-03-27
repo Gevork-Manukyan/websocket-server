@@ -10,7 +10,7 @@ type GameStateBase = {
 export interface IGameState extends Document, GameStateBase {}
 
 export const GameStateSchema = new Schema({
-    gameId: { type: String, required: true },
+    gameId: { type: Schema.Types.ObjectId, required: true },
     stateTransitionTable: [{ type: Schema.Types.Mixed, required: true }],
     currentTransition: { type: Schema.Types.Mixed, required: true },
 }); 

@@ -66,7 +66,7 @@ describe('Server Game Loading', () => {
             const games = await conGameService.findAllGames();
             for (const game of games) {
                 const gameState = await gameStateService.findGameStateByGameId(game.id);
-                gameStateManager.loadGame(game, gameState);
+                gameStateManager.addGameAndState(game, gameState);
             }
 
             // Verify games are loaded in GameStateManager
@@ -87,7 +87,7 @@ describe('Server Game Loading', () => {
             for (const game of games) {
                 try {
                     const gameState = await gameStateService.findGameStateByGameId(game.id);
-                    gameStateManager.loadGame(game, gameState);
+                    gameStateManager.addGameAndState(game, gameState);
                 } catch (error: any) {
                     // Expected error when game state is missing
                     expect(error.message).toContain('GameState for game');
@@ -115,7 +115,7 @@ describe('Server Game Loading', () => {
             const games = await conGameService.findAllGames();
             for (const game of games) {
                 const gameState = await gameStateService.findGameStateByGameId(game.id);
-                gameStateManager.loadGame(game, gameState);
+                gameStateManager.addGameAndState(game, gameState);
             }
 
             // Verify game state transitions are maintained

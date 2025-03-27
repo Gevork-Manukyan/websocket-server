@@ -68,7 +68,8 @@ export class ConGame {
    * Creates a new ConGame instance
    * @param {2 | 4} numPlayers - The total number of players in the game
    */
-  constructor(numPlayers: ConGame['numPlayersTotal']) {
+  constructor(numPlayers: ConGame['numPlayersTotal'], id?: gameId) {
+    if (id) this.id = id;
     this.numPlayersTotal = numPlayers;
     
     const teamSize = (numPlayers / 2) as Team['teamSize'];

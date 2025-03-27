@@ -1,6 +1,6 @@
-import { ConGameService, ConGame } from '../models/ConGame';
-import { GameStateService, GameState } from '../models/GameState';
-import { State } from '../types/gamestate-types';
+import { ConGameService, ConGame, ConGameModel } from '../models/ConGame';
+import { GameStateService, GameState, GameStateModel } from '../models/GameState';
+import { GameStateInfo } from '../types';
 
 export class GameSaveService {
     private static instance: GameSaveService;
@@ -20,24 +20,21 @@ export class GameSaveService {
     }
 
     /**
-     * Saves a new game to the database
-     * @param game - The game to save
-     * @returns The saved game
+     * Creates and saves a new game to the database
+     * @param numPlayersTotal - The number of players in the game
+     * @returns The newly created/saved game and game state
      */
-    async saveNewGame(game: ConGame): Promise<ConGame> {
+    async saveNewGame(numPlayersTotal: ConGame['numPlayersTotal']): Promise<GameStateInfo> {
         console.log('Saving new game');
         try {
             // First save the game to get its ID
-            const savedGame = await this.conGameService.createGame(game.numPlayersTotal);
+            const savedGame = await this.conGameService.createGame(numPlayersTotal);
             
-            // Then create the game state with the new game ID
-            await this.gameStateService.createGameState(savedGame.id);
-
-            // Set the ID on the runtime game object
-            game.setId(savedGame.id);
+            // Create and save the game state with the new game ID
+            const savedGameState = await this.gameStateService.createGameState(savedGame.id);
 
             console.log('Game and state saved successfully:', savedGame.id);
-            return savedGame;
+            return { game: savedGame, state: savedGameState };
         } catch (error) {
             console.error('Failed to save new game:', error);
             throw error;
@@ -63,3 +60,7 @@ export class GameSaveService {
         }
     }
 } 
+
+const conGameService = new ConGameService(ConGameModel);
+const gameStateService = new GameStateService(GameStateModel);
+export const gameSaveService = GameSaveService.getInstance(conGameService, gameStateService);

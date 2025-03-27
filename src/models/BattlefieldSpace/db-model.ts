@@ -18,6 +18,6 @@ export interface IBattlefieldSpace extends Document, BattlefieldSpaceBase {}
 // Define the schema
 export const BattlefieldSpaceSchema = new Schema<IBattlefieldSpace>({
     spaceNumber: { type: Number, required: true },
-    value: { type: Schema.Types.Mixed, required: true, default: null },
+    value: { type: Schema.Types.Mixed, required: false, default: null },
     connections: { type: Schema.Types.Mixed, required: true, default: null }
 }); 

@@ -1,11 +1,7 @@
-import { ConGame, GameState, ActiveConGame } from "../models";
-import { gameId, TransitionEvent } from "../types";
+import { ConGame, GameState, ActiveConGame, ConGameService, ConGameModel, GameStateModel, GameStateService } from "../models";
+import { gameId, GameStateInfo, TransitionEvent } from "../types";
 import { GameConflictError } from "./CustomError/GameError";
-
-type GameStateInfo = {
-    game: ConGame;
-    state: GameState;
-}
+import { gameSaveService } from "./GameSaveService";
 
 export class GameStateManager {
     private static instance: GameStateManager;
@@ -23,12 +19,24 @@ export class GameStateManager {
     }
 
     /**
-     * Loads a game from the database and adds it to the current games
-     * @param game - The game to load
-     * @param gameState - The game state to load
+     * Creates a new game/state and saves it to the database
+     * @param numPlayersTotal - The number of players in the game
+     * @returns The newly created/saved game and game state
      */
-    loadGame(game: ConGame, gameState: GameState): void {
-        this.currentGames[game.id] = {
+    async createGame(numPlayersTotal: ConGame['numPlayersTotal']): Promise<GameStateInfo> {
+        const { game, state } = await gameSaveService.saveNewGame(numPlayersTotal);
+        this.addGameAndState(game.id, game, state);
+        return { game, state };
+    }
+
+    /**
+     * Adds a game and game state to the current games
+     * @param gameId - The id of the game to add
+     * @param game - The game to add
+     * @param gameState - The game state to add
+     */
+    addGameAndState(gameId: gameId, game: ConGame, gameState: GameState): void {
+        this.currentGames[gameId] = {
             game: game,
             state: gameState
         };
@@ -50,7 +58,7 @@ export class GameStateManager {
      * @param gameId - The id of the game to set
      * @param game - The game to set
      */
-    private setGame(gameId: gameId, game: ConGame): void {
+    setGame(gameId: gameId, game: ConGame): void {
         this.currentGames[gameId].game = game;
     }
 
@@ -62,7 +70,17 @@ export class GameStateManager {
     getGameState(gameId: gameId): GameState {
         const gameState = this.currentGames[gameId];
         if (!gameState) throw new GameConflictError(gameId);
+        if (!gameState.state) throw new GameConflictError(gameId, 'Game state not loaded');
         return gameState.state;
+    }
+
+    /**
+     * Sets a game state in the current games
+     * @param gameId - The id of the game to set
+     * @param gameState - The game state to set
+     */
+    setGameState(gameId: gameId, gameState: GameState): void {
+        this.currentGames[gameId].state = gameState;
     }
 
     /**
@@ -87,20 +105,7 @@ export class GameStateManager {
         return game.getHasFinishedSetup();
     }
 
-    // TODO: call db function to create gameId
-    /**
-     * Creates a new game
-     * @param numPlayers - The number of players in the game
-     * @returns The new game
-    */
-    createGame(numPlayers: ConGame['numPlayersTotal']): ConGame {
-        const game = new ConGame(numPlayers);
-        this.currentGames[game.id] = {
-            game,
-            state: new GameState(game.id)
-        };
-        return game;
-    }
+
 
     /**
      * Gets the current games
