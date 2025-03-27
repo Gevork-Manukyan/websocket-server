@@ -1,5 +1,6 @@
 import { ConGameService, ConGame } from '../models/ConGame';
 import { GameStateService, GameState } from '../models/GameState';
+import { State } from '../types/gamestate-types';
 
 export class GameSaveService {
     private static instance: GameSaveService;
@@ -19,11 +20,34 @@ export class GameSaveService {
     }
 
     /**
+     * Saves a new game to the database
+     * @param game - The game to save
+     * @returns The saved game
+     */
+    async saveNewGame(game: ConGame): Promise<ConGame> {
+        console.log('Saving new game:', game.id);
+        try {
+            // Save both the game and game state in parallel
+            const [savedGame, savedState] = await Promise.all([
+                this.conGameService.createGame(game.id, game.numPlayersTotal),
+                this.gameStateService.createGameState(game.id)
+            ]);
+
+            console.log('Game and state saved successfully:', savedGame.id);
+            return savedGame;
+        } catch (error) {
+            console.error('Failed to save new game:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Saves the game state
      * @param game - The game to save
      * @param gameState - The game state to save
      */
     async saveGameState(game: ConGame, gameState: GameState): Promise<void> {
+        console.log('Saving game state for game:', game.id);
         try {
             // Save both the game and game state in parallel
             await Promise.all([
@@ -32,8 +56,7 @@ export class GameSaveService {
             ]);
         } catch (error) {
             console.error('Failed to save game state:', error);
-            // TODO: You might want to add error handling here
-            // For example, retrying the save or notifying the game server
+            throw error;
         }
     }
 } 

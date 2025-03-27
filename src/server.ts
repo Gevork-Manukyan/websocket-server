@@ -61,10 +61,24 @@ gameNamespace.on("connection", (socket) => {
   // TODO: some events should emit to all players that something happened
 
   socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ userId, numPlayers }: CreateGameData) => {
-    const newGame = gameStateManager.createGame(numPlayers);
-    newGame.addPlayer(new Player(userId, socket.id, true)); // First player to join is the host
-    socket.join(newGame.id);
-    socket.emit(`${CreateGameEvent}--success`);
+    try {
+      // Create game in memory
+      const newGame = gameStateManager.createGame(numPlayers);
+      newGame.addPlayer(new Player(userId, socket.id, true)); // First player to join is the host
+      
+      // Save game to database
+      const savedGame = await gameSaveService.saveNewGame(newGame);
+      console.log('Game saved to database:', savedGame.id);
+      
+      // Join socket room
+      socket.join(newGame.id);
+      
+      // Emit success
+      socket.emit(`${CreateGameEvent}--success`);
+    } catch (error) {
+      console.error('Game creation error:', error);
+      socket.emit(`${CreateGameEvent}--error`, { message: 'Failed to create game' });
+    }
   }));
 
   socket.on(JoinGameEvent, socketErrorHandler(socket, JoinGameEvent, async ({ userId, gameId }: JoinGameData) => {
