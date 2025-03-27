@@ -33,7 +33,6 @@ export class GameSaveService {
             // Create and save the game state with the new game ID
             const savedGameState = await this.gameStateService.createGameState(savedGame.id);
 
-            console.log('Game and state saved successfully:', savedGame.id);
             return { game: savedGame, state: savedGameState };
         } catch (error) {
             console.error('Failed to save new game:', error);

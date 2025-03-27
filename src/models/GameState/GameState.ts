@@ -2,6 +2,7 @@ import { GameStateError } from "../../services/CustomError/GameError";
 import { gameId } from "../../types";
 import { State, TransitionEvent, Transition, Input } from "../../types/gamestate-types";
 import { IGameState } from './db-model';
+import { Types } from 'mongoose';
 
 export class GameState {
     gameId: gameId;
@@ -117,7 +118,7 @@ export class GameState {
 
     // Convert from Mongoose document to runtime instance
     static fromMongoose(doc: IGameState): GameState {
-        const gameState = new GameState(doc.gameId);
+        const gameState = new GameState(doc.gameId.toString());
         gameState.stateTransitionTable = doc.stateTransitionTable;
         gameState.currentTransition = doc.currentTransition;
         return gameState;

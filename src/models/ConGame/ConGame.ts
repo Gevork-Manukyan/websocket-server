@@ -419,7 +419,7 @@ export class ConGame {
 
   // Create instance from plain data
   static fromData(data: ConGameData): ConGame {
-    const game = new ConGame(data.numPlayersTotal);
+    const game = new ConGame(data.numPlayersTotal, data.id);
     
     // Copy all properties
     Object.assign(game, {

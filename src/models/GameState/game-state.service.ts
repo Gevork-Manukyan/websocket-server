@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { IGameState } from './db-model';
 import { GameState } from './GameState';
 import { NotFoundError } from '../../services/CustomError/BaseError';
@@ -21,7 +21,10 @@ export class GameStateService {
 
     async createGameState(gameId: string): Promise<GameState> {
         const gameState = new GameState(gameId);
-        const doc = await this.model.create(gameState.toMongoose());
+        const doc = await this.model.create({
+            ...gameState.toMongoose(),
+            gameId: new Types.ObjectId(gameId)
+        });
         return GameState.fromMongoose(doc);
     }
 
