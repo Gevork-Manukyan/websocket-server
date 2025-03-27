@@ -1,6 +1,7 @@
 import express from "express"; 
 import { createServer } from "http"; 
 import { Server } from "socket.io";
+import cors from "cors";
 import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData } from "./types";
 import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
 import { GameEventEmitter, GameStateManager, GameSaveService, ValidationError, InvalidSpaceError, PlayersNotReadyError } from "./services";
@@ -8,7 +9,7 @@ import { IS_PRODUCTION } from "./constants";
 import { Player, ConGameService, GameStateService, ConGameModel, GameStateModel } from "./models";
 
 const app = express();
-const server = createServer(app);
+const server = createServer();
 const gameEventEmitter = GameEventEmitter.getInstance(server);
 const gameStateManager = GameStateManager.getInstance();
 
@@ -17,15 +18,15 @@ const conGameService = new ConGameService(ConGameModel);
 const gameStateService = new GameStateService(GameStateModel);
 const gameSaveService = GameSaveService.getInstance(conGameService, gameStateService);
 
+// Configure CORS for HTTP routes first
+// app.use(cors());
 app.use(express.json());
-// const cors = require('cors');
-// app.use(cors())
 
-// Initialize the WebSocket server with CORS settings
+// Initialize Socket.IO with CORS settings
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow all origins (for development)
-    methods: ["GET", "POST"], // Allowed HTTP methods
+    origin: "*",
+    methods: ["GET", "POST"],
   },
 });
 

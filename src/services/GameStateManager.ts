@@ -266,4 +266,14 @@ export class GameStateManager {
     processActivateDayBreakEvent(gameId: gameId) {
         this.getGameState(gameId).processEvent(TransitionEvent.DAY_BREAK_CARD);
     }
+
+    // Add method to get all games for testing
+    getAllGames(): { [key: gameId]: GameStateInfo } {
+        return this.currentGames;
+    }
+
+    // Add method to clear games for testing
+    clearGames(): void {
+        this.currentGames = {};
+    }
 }
