@@ -2,6 +2,7 @@ import express from "express";
 import { createServer } from "http"; 
 import { Server } from "socket.io";
 import cors from "cors";
+import mongoose from "mongoose";
 import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData } from "./types";
 import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
 import { GameEventEmitter, GameStateManager, GameSaveService, ValidationError, InvalidSpaceError, PlayersNotReadyError } from "./services";
@@ -261,10 +262,20 @@ gameNamespace.on("connection", (socket) => {
 
 // Start the server if not in test mode
 if (IS_PRODUCTION) {
-  server.listen(PORT, async () => {
-    console.log(`WebSocket server running on http://localhost:${PORT}`);
-    await loadExistingGames();
-  });
+  // Connect to MongoDB first
+  mongoose.connect(process.env.DATABASE_URL || "mongodb://localhost:27017/command_of_nature")
+    .then(() => {
+      console.log('Connected to MongoDB');
+      // Start the server after successful database connection
+      server.listen(PORT, async () => {
+        console.log(`WebSocket server running on http://localhost:${PORT}`);
+        await loadExistingGames();
+      });
+    })
+    .catch((error) => {
+      console.error('MongoDB connection error:', error);
+      process.exit(1);
+    });
 }
 
 export { server, io, app };
