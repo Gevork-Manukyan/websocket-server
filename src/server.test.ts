@@ -1,9 +1,6 @@
 import Client, { Socket } from "socket.io-client";
-import express from "express";
-import { createServer } from "http";
 import { PORT } from "./lib";
-import { GameStateManager } from "./services/GameStateManager";
-import { GameEventEmitter } from "./services/GameEventEmitter";
+import { GameStateManager, GameEventEmitter } from "./services";
 import { ConGame, Player, Team } from "./models";
 import { 
   AllPlayersSetupEvent, CancelSetupEvent, ChoseWarriorsEvent, 
@@ -13,6 +10,7 @@ import {
   ToggleReadyStatusData
 } from "./types";
 import { ALL_CARDS } from "./constants";
+import { io } from "./server";
 const { AcornSquire, QuillThornback } = ALL_CARDS;
 
 let clientSocket: Socket;
@@ -25,7 +23,7 @@ const testPlayerId = "test-player";
 const testSocketId = "socket-123";
 
 let testServer: any;
-const gameEventEmitter = GameEventEmitter.getInstance(createServer(express()));
+const gameEventEmitter = GameEventEmitter.getInstance(io);
 const gameStateManager = GameStateManager.getInstance();
 
 beforeAll((done) => {
