@@ -25,13 +25,16 @@ export class GameSaveService {
      * @returns The saved game
      */
     async saveNewGame(game: ConGame): Promise<ConGame> {
-        console.log('Saving new game:', game.id);
+        console.log('Saving new game');
         try {
-            // Save both the game and game state in parallel
-            const [savedGame, savedState] = await Promise.all([
-                this.conGameService.createGame(game.id, game.numPlayersTotal),
-                this.gameStateService.createGameState(game.id)
-            ]);
+            // First save the game to get its ID
+            const savedGame = await this.conGameService.createGame(game.numPlayersTotal);
+            
+            // Then create the game state with the new game ID
+            await this.gameStateService.createGameState(savedGame.id);
+
+            // Set the ID on the runtime game object
+            game.setId(savedGame.id);
 
             console.log('Game and state saved successfully:', savedGame.id);
             return savedGame;

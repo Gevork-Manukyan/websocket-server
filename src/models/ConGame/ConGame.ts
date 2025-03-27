@@ -49,7 +49,7 @@ type ActiveConGameData = ConGameData & {
  * @class ConGame
  */
 export class ConGame {
-  id: gameId;
+  id!: gameId;
   isStarted: boolean = false;
   protected hasFinishedSetup: boolean = false;
   numPlayersTotal: 2 | 4;
@@ -66,11 +66,9 @@ export class ConGame {
 
   /**
    * Creates a new ConGame instance
-   * @param {gameId} gameId - The unique identifier for the game
    * @param {2 | 4} numPlayers - The total number of players in the game
    */
-  constructor(gameId: ConGame['id'], numPlayers: ConGame['numPlayersTotal']) {
-    this.id = gameId;
+  constructor(numPlayers: ConGame['numPlayersTotal']) {
     this.numPlayersTotal = numPlayers;
     
     const teamSize = (numPlayers / 2) as Team['teamSize'];
@@ -82,6 +80,11 @@ export class ConGame {
       first: teamOrder[0],
       second: teamOrder[1]
     }
+  }
+
+  // Add method to set ID after creation
+  setId(id: gameId) {
+    this.id = id;
   }
 
   setStarted(value: boolean) {
@@ -415,7 +418,7 @@ export class ConGame {
 
   // Create instance from plain data
   static fromData(data: ConGameData): ConGame {
-    const game = new ConGame(data.id, data.numPlayersTotal);
+    const game = new ConGame(data.numPlayersTotal);
     
     // Copy all properties
     Object.assign(game, {
@@ -472,7 +475,7 @@ export class ActiveConGame extends ConGame {
   private gameSaveService: GameSaveService;
 
   constructor(conGame: ConGame, gameSaveService: GameSaveService) {
-    super(conGame.id, conGame.numPlayersTotal);
+    super(conGame.numPlayersTotal);
     this.gameSaveService = gameSaveService;
 
     this.maxActionPoints = this.numPlayersTotal === 2 ? 3 : 6;

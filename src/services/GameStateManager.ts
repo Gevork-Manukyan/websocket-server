@@ -94,11 +94,10 @@ export class GameStateManager {
      * @returns The new game
     */
     createGame(numPlayers: ConGame['numPlayersTotal']): ConGame {
-        const gameId = `game-${Object.keys(this.currentGames).length + 1}` as gameId;
-        const game = new ConGame(gameId, numPlayers);
-        this.currentGames[gameId] = {
+        const game = new ConGame(numPlayers);
+        this.currentGames[game.id] = {
             game,
-            state: new GameState(gameId)
+            state: new GameState(game.id)
         };
         return game;
     }
