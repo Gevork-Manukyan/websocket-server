@@ -9,20 +9,16 @@ export class GameEventEmitter {
   private io: Server | Namespace;
   private gameStateManager: GameStateManager;
 
-  private constructor(server: HttpServer) {
-    this.io = new Server(server);
+  private constructor(io: Server | Namespace) {
+    this.io = io;
     this.gameStateManager = GameStateManager.getInstance();
   }
 
-  static getInstance(server: HttpServer): GameEventEmitter {
+  static getInstance(io: Server | Namespace): GameEventEmitter {
     if (!GameEventEmitter.instance) {
-      GameEventEmitter.instance = new GameEventEmitter(server);
+      GameEventEmitter.instance = new GameEventEmitter(io);
     }
     return GameEventEmitter.instance;
-  }
-
-  initializeIO(io: Server | Namespace) {
-    this.io = io;
   }
 
   emitToPlayer(playerId: string, eventName: string, data: any = null) {

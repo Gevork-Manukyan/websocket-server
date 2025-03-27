@@ -1,47 +1,29 @@
-import express from "express"; 
 import { createServer } from "http"; 
 import { Server } from "socket.io";
 import mongoose from "mongoose";
 import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData } from "./types";
 import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
 import { GameEventEmitter, GameStateManager, GameSaveService, ValidationError, InvalidSpaceError, PlayersNotReadyError } from "./services";
-import { IS_PRODUCTION } from "./constants";
 import { Player, ConGameService, GameStateService, ConGameModel, GameStateModel } from "./models";
+import { IS_PRODUCTION } from "./constants";
 
-// const app = express();
 const server = createServer();
-const gameEventEmitter = GameEventEmitter.getInstance(server);
-const gameStateManager = GameStateManager.getInstance();
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
-// Initialize database services
+// Initialize services
+const gameEventEmitter = GameEventEmitter.getInstance(io);
+const gameStateManager = GameStateManager.getInstance();
 const conGameService = new ConGameService(ConGameModel);
 const gameStateService = new GameStateService(GameStateModel);
 const gameSaveService = GameSaveService.getInstance(conGameService, gameStateService);
 
-// Initialize Socket.IO with CORS settings
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-});
-
-io.on('connection', (socket) => {
-  console.log('a user connected');
-
-  socket.emit('hello', { message: 'Hello from server!' });
-
-  socket.on('message', (data) => {
-      console.log('Message received from client:', data);
-      socket.emit('response', { message: `Server received: ${JSON.stringify(data)}` });
-  });
-});
-
 // Creates the gameplay namespace that will handle all gameplay connections
 const gameNamespace = io.of("/gameplay");
-
-// Initialize the GameEventEmitter with the gameplay namespace
-gameEventEmitter.initializeIO(gameNamespace);
 
 // Load existing games from database
 async function loadExistingGames() {
