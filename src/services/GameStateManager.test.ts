@@ -7,11 +7,14 @@ import { GameConflictError } from "./CustomError/GameError";
 describe("GameStateManager", () => {
     let gameStateManager: GameStateManager;
     let mockGame: ConGame;
+    const testGameId = 'test-game-id' as gameId;
+    const numPlayers = 4;
 
     beforeEach(() => {
         gameStateManager = GameStateManager.getInstance();
         gameStateManager.resetGameStateManager();
-        mockGame = new ConGame("game-1" as gameId, 4);
+        mockGame = new ConGame(numPlayers);
+        mockGame.setId(testGameId);
     });
 
     describe("getInstance", () => {
@@ -24,7 +27,7 @@ describe("GameStateManager", () => {
 
     describe("getGame", () => {
         test("returns the game for a valid game ID", () => {
-            gameStateManager.createGame(mockGame.numPlayersTotal);
+            gameStateManager.createGame(4);
             const retrievedGame = gameStateManager.getGame("game-1" as gameId);
             expect(retrievedGame).toBe(mockGame);
         });
@@ -35,20 +38,20 @@ describe("GameStateManager", () => {
     });
 
     describe("createGame", () => {
-        test("creates a new game with the given number of players", () => {
-            const newGame = gameStateManager.createGame(4);
-            expect(newGame.numPlayersTotal).toBe(4);
+        test("creates a new game with the given number of players", async () => {
+            const newGame = await gameStateManager.createGame(4);
+            expect(newGame.game.numPlayersTotal).toBe(4);
         });
 
-        test("throws an error if a game with the ID already exists", () => {
-            gameStateManager.createGame(mockGame.numPlayersTotal);
-            expect(() => gameStateManager.createGame(mockGame.numPlayersTotal)).toThrow(GameConflictError);
+        test("throws an error if a game with the ID already exists", async () => {
+            await gameStateManager.createGame(4);
+            await expect(gameStateManager.createGame(4)).rejects.toThrow(GameConflictError);
         });
     });
 
     describe("deleteGame", () => {
-        test("deletes an existing game", () => {
-            gameStateManager.createGame(mockGame.numPlayersTotal);
+        test("deletes an existing game", async () => {
+            await gameStateManager.createGame(4);
             gameStateManager.deleteGame(mockGame.id as gameId);
             expect(() => gameStateManager.getGame(mockGame.id as gameId)).toThrow(GameConflictError);
         });
@@ -59,8 +62,8 @@ describe("GameStateManager", () => {
     });
 
     describe("resetGameStateManager", () => {
-        test("clears all games", () => {
-            gameStateManager.createGame(mockGame.numPlayersTotal);
+        test("clears all games", async () => {
+            await gameStateManager.createGame(4);
             gameStateManager.resetGameStateManager();
             expect(() => gameStateManager.getGame(mockGame.id as gameId)).toThrow(GameConflictError);
         });

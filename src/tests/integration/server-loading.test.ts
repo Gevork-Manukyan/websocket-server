@@ -45,8 +45,8 @@ describe('Server Game Loading', () => {
     describe('Game Loading on Server Start', () => {
         it('should load all games from database into GameStateManager', async () => {
             // Create multiple games with different states
-            const game1 = await conGameService.createGame('game1', 2);
-            const game2 = await conGameService.createGame('game2', 4);
+            const game1 = await conGameService.createGame(2);
+            const game2 = await conGameService.createGame(4);
             const gameState1 = await gameStateService.createGameState('game1');
             const gameState2 = await gameStateService.createGameState('game2');
 
@@ -66,7 +66,7 @@ describe('Server Game Loading', () => {
             const games = await conGameService.findAllGames();
             for (const game of games) {
                 const gameState = await gameStateService.findGameStateByGameId(game.id);
-                gameStateManager.addGameAndState(game, gameState);
+                gameStateManager.addGameAndState(game.id, game, gameState);
             }
 
             // Verify games are loaded in GameStateManager
@@ -80,14 +80,14 @@ describe('Server Game Loading', () => {
 
         it('should handle missing game states gracefully', async () => {
             // Create a game without a game state
-            const game = await conGameService.createGame(testGameId, testNumPlayers);
+            const game = await conGameService.createGame(2);
 
             // Simulate server start by loading games
             const games = await conGameService.findAllGames();
             for (const game of games) {
                 try {
                     const gameState = await gameStateService.findGameStateByGameId(game.id);
-                    gameStateManager.addGameAndState(game, gameState);
+                    gameStateManager.addGameAndState(game.id, game, gameState);
                 } catch (error: any) {
                     // Expected error when game state is missing
                     expect(error.message).toContain('GameState for game');
@@ -101,7 +101,7 @@ describe('Server Game Loading', () => {
 
         it('should maintain game state transitions after loading', async () => {
             // Create a game and its state
-            const game = await conGameService.createGame(testGameId, testNumPlayers);
+            const game = await conGameService.createGame(2);
             const gameState = await gameStateService.createGameState(testGameId);
 
             // Update game state with multiple transitions
@@ -115,7 +115,7 @@ describe('Server Game Loading', () => {
             const games = await conGameService.findAllGames();
             for (const game of games) {
                 const gameState = await gameStateService.findGameStateByGameId(game.id);
-                gameStateManager.addGameAndState(game, gameState);
+                gameStateManager.addGameAndState(game.id, game, gameState);
             }
 
             // Verify game state transitions are maintained

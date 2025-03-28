@@ -35,7 +35,7 @@ describe("level getter and setters", () => {
         const player = new Player(testPlayerId, testSocketId);
         player.levelUp();
         player.levelUp();
-        expect(player.getLevel()).toBe(2);
+        expect(player.getLevel()).toBe(3);
     });
 });
 

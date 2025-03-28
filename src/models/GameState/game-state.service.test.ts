@@ -3,13 +3,14 @@ import { GameStateModel } from './db-model';
 import { GameState } from './GameState';
 import { NotFoundError } from '../../services/CustomError/BaseError';
 import { TransitionEvent } from '../../types/gamestate-types';
+import { gameId } from '../../types/types';
 
 // Mock the Mongoose model
 jest.mock('./db-model');
 
 describe('GameStateService', () => {
     let gameStateService: GameStateService;
-    const testGameId = 'test-game-123';
+    const testGameId = "507f1f77bcf86cd799439011" as gameId;
 
     beforeEach(() => {
         // Clear all mocks before each test

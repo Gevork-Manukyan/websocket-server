@@ -44,7 +44,8 @@ afterAll(() => {
 });
 
 beforeEach(() => {
-    mockGame = new ConGame(testGameId, numPlayers)
+    mockGame = new ConGame(numPlayers);
+    mockGame.setId(testGameId);
     mockPlayer = new Player(testPlayerId, testSocketId)
     mockTeam = new Team(1, 1)
 })

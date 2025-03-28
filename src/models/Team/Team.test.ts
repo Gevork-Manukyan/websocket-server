@@ -5,7 +5,7 @@ const { AcornSquire, Cedar, Porella, QuillThornback, Sprout, Timber } = ALL_CARD
 
 const testSocketId = "socket123"
 
-jest.mock("./Battlefield", () => {
+jest.mock("../Battlefield", () => {
     return {
         Battlefield: jest.fn().mockImplementation(() => {
             return {

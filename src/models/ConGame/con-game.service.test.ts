@@ -19,12 +19,12 @@ describe('ConGameService', () => {
 
     describe('createGame', () => {
         it('should create a new game', async () => {
-            const mockGame = new ConGame(testGameId, testNumPlayers);
+            const mockGame = new ConGame(2, testGameId);
             const mockDoc = { ...mockGame.toMongoose(), _id: testGameId };
             
             (ConGameModel.create as jest.Mock).mockResolvedValue(mockDoc);
 
-            const result = await conGameService.createGame(testGameId, testNumPlayers);
+            const result = await conGameService.createGame(2);
 
             expect(ConGameModel.create).toHaveBeenCalledWith(mockGame.toMongoose());
             expect(result).toBeInstanceOf(ConGame);
@@ -34,7 +34,7 @@ describe('ConGameService', () => {
 
     describe('findGameById', () => {
         it('should find a game by id', async () => {
-            const mockGame = new ConGame(testGameId, testNumPlayers);
+            const mockGame = new ConGame(2, testGameId);
             const mockDoc = { ...mockGame.toMongoose(), _id: testGameId };
             
             (ConGameModel.findById as jest.Mock).mockResolvedValue(mockDoc);
@@ -58,8 +58,8 @@ describe('ConGameService', () => {
     describe('findAllGames', () => {
         it('should find all games', async () => {
             const mockGames = [
-                new ConGame('game1', 2),
-                new ConGame('game2', 4)
+                new ConGame(2, 'game1'),
+                new ConGame(4, 'game2')
             ];
             const mockDocs = mockGames.map(game => ({ ...game.toMongoose(), _id: game.id }));
             
@@ -76,7 +76,7 @@ describe('ConGameService', () => {
 
     describe('updateGameState', () => {
         it('should update game state', async () => {
-            const mockGame = new ConGame(testGameId, testNumPlayers);
+            const mockGame = new ConGame(2, testGameId);
             const mockDoc = { ...mockGame.toMongoose(), _id: testGameId };
             const updates = { isStarted: true };
             

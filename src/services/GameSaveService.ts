@@ -25,7 +25,6 @@ export class GameSaveService {
      * @returns The newly created/saved game and game state
      */
     async saveNewGame(numPlayersTotal: ConGame['numPlayersTotal']): Promise<GameStateInfo> {
-        console.log('Saving new game');
         try {
             // First save the game to get its ID
             const savedGame = await this.conGameService.createGame(numPlayersTotal);

@@ -12,7 +12,10 @@ describe('GameSaveService', () => {
     let gameSaveService: GameSaveService;
     let conGameService: jest.Mocked<ConGameService>;
     let gameStateService: jest.Mocked<GameStateService>;
-    const testGameId = 'test-game-123';
+    let mockGame: ConGame;
+    let mockGameState: GameState;
+    const testGameId = 'test-game-id';
+    const numPlayers = 2;
 
     beforeEach(() => {
         // Clear all mocks before each test
@@ -24,11 +27,16 @@ describe('GameSaveService', () => {
         
         // Create the service with mocked dependencies
         gameSaveService = GameSaveService.getInstance(conGameService, gameStateService);
+
+        mockGame = new ConGame(numPlayers);
+        mockGame.setId(testGameId);
+        mockGameState = new GameState(testGameId);
     });
 
     describe('saveGameState', () => {
         it('should save both game and game state', async () => {
-            const mockGame = new ConGame(testGameId, 2);
+            const mockGame = new ConGame(numPlayers);
+            mockGame.setId(testGameId);
             const mockGameState = new GameState(testGameId);
 
             // Mock the update methods
@@ -43,7 +51,8 @@ describe('GameSaveService', () => {
         });
 
         it('should handle errors when saving fails', async () => {
-            const mockGame = new ConGame(testGameId, 2);
+            const mockGame = new ConGame(numPlayers);
+            mockGame.setId(testGameId);
             const mockGameState = new GameState(testGameId);
             const mockError = new Error('Save failed');
 
