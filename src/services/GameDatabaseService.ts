@@ -2,8 +2,8 @@ import { ConGameService, ConGame, ConGameModel } from '../models/ConGame';
 import { GameStateService, GameState, GameStateModel } from '../models/GameState';
 import { GameStateInfo } from '../types';
 
-export class GameSaveService {
-    private static instance: GameSaveService;
+export class GameDatabaseService {
+    private static instance: GameDatabaseService;
     private conGameService: ConGameService;
     private gameStateService: GameStateService;
 
@@ -12,11 +12,11 @@ export class GameSaveService {
         this.gameStateService = gameStateService;
     }
 
-    static getInstance(conGameService: ConGameService, gameStateService: GameStateService): GameSaveService {
-        if (!GameSaveService.instance) {
-            GameSaveService.instance = new GameSaveService(conGameService, gameStateService);
+    static getInstance(conGameService: ConGameService, gameStateService: GameStateService): GameDatabaseService {
+        if (!GameDatabaseService.instance) {
+            GameDatabaseService.instance = new GameDatabaseService(conGameService, gameStateService);
         }
-        return GameSaveService.instance;
+        return GameDatabaseService.instance;
     }
 
     /**
@@ -57,8 +57,22 @@ export class GameSaveService {
             throw error;
         }
     }
+
+    /**
+     * Gets all games from the database
+     */
+    async findAllGames(): Promise<ConGame[]> {
+        return this.conGameService.findAllGames();
+    }
+
+    /**
+     * Gets a game state by game ID from the database
+     */
+    async findGameStateByGameId(gameId: string): Promise<GameState> {
+        return this.gameStateService.findGameStateByGameId(gameId);
+    }
 } 
 
 const conGameService = new ConGameService(ConGameModel);
 const gameStateService = new GameStateService(GameStateModel);
-export const gameSaveService = GameSaveService.getInstance(conGameService, gameStateService);
+export const gameDatabaseService = GameDatabaseService.getInstance(conGameService, gameStateService);

@@ -1,7 +1,7 @@
-import { ConGame, GameState, ActiveConGame, ConGameService, ConGameModel, GameStateModel, GameStateService } from "../models";
+import { ConGame, GameState, ActiveConGame } from "../models";
 import { gameId, GameStateInfo, TransitionEvent } from "../types";
 import { GameConflictError } from "./CustomError/GameError";
-import { gameSaveService } from "./GameSaveService";
+import { gameDatabaseService } from "./GameDatabaseService";
 
 export class GameStateManager {
     private static instance: GameStateManager;
@@ -24,9 +24,32 @@ export class GameStateManager {
      * @returns The newly created/saved game and game state
      */
     async createGame(numPlayersTotal: ConGame['numPlayersTotal']): Promise<GameStateInfo> {
-        const { game, state } = await gameSaveService.saveNewGame(numPlayersTotal);
+        const { game, state } = await gameDatabaseService.saveNewGame(numPlayersTotal);
         this.addGameAndState(game.id, game, state);
         return { game, state };
+    }
+
+    /**
+     * Loads all existing games from the database into the GameStateManager
+     */
+    async loadExistingGames(): Promise<void> {
+        try {
+            // Find all games
+            const games = await gameDatabaseService.findAllGames();
+            
+            // For each game, load its state and add it to the GameStateManager
+            for (const game of games) {
+                try {
+                    const gameState = await gameDatabaseService.findGameStateByGameId(game.id);
+                    this.addGameAndState(game.id, game, gameState);
+                    console.log(`Loaded game ${game.id} from database`);
+                } catch (error) {
+                    console.error(`Failed to load game ${game.id}:`, error);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load existing games:', error);
+        }
     }
 
     /**

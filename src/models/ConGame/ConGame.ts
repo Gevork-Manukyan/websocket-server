@@ -1,6 +1,6 @@
 // Command of Nature (C.O.N)
 
-import { NotFoundError, ValidationError } from "../../services";
+import { GameDatabaseService, NotFoundError, ValidationError } from "../../services";
 import { 
   NotEnoughGoldError, PlayersNotReadyError, 
   SageUnavailableError, ShopFullError 
@@ -11,7 +11,6 @@ import { Player } from "../Player/Player";
 import { Team } from "../Team/Team";
 import { ALL_CARDS, processAbility } from "../../constants";
 import { IConGame, ConGameModel, ConGameService } from './';
-import { GameSaveService } from '../../services/GameSaveService';
 import { GameStateManager } from '../../services/GameStateManager';
 import { GameStateService, GameStateModel } from '../GameState';
 
@@ -389,7 +388,7 @@ export class ConGame {
    */
   finishedSetup(): ActiveConGame {
     this.hasFinishedSetup = true;
-    return new ActiveConGame(this, GameSaveService.getInstance(new ConGameService(ConGameModel), new GameStateService(GameStateModel)));
+    return new ActiveConGame(this, GameDatabaseService.getInstance(new ConGameService(ConGameModel), new GameStateService(GameStateModel)));
   }
 
   // Protected helper for Mongoose conversion
@@ -473,11 +472,11 @@ export class ActiveConGame extends ConGame {
   private currentPhase: "phase1" | "phase2" | "phase3" | "phase4" = "phase1";
   private actionPoints: number;
   private maxActionPoints: 3 | 6;
-  private gameSaveService: GameSaveService;
+  private gameDatabaseService: GameDatabaseService;
 
-  constructor(conGame: ConGame, gameSaveService: GameSaveService) {
+  constructor(conGame: ConGame, gameDatabaseService: GameDatabaseService) {
     super(conGame.numPlayersTotal);
-    this.gameSaveService = gameSaveService;
+    this.gameDatabaseService = gameDatabaseService;
 
     this.maxActionPoints = this.numPlayersTotal === 2 ? 3 : 6;
     this.actionPoints = this.maxActionPoints;
@@ -565,7 +564,7 @@ export class ActiveConGame extends ConGame {
   endPhase4() {
     // Save the current game state before ending the turn
     const gameState = GameStateManager.getInstance().getGameState(this.id);
-    this.gameSaveService.saveGameState(this, gameState);
+    this.gameDatabaseService.saveGameState(this, gameState);
 
     // End turn and reset all variables
     this.currentPhase = "phase1";
@@ -646,7 +645,7 @@ export class ActiveConGame extends ConGame {
 
   // Create instance from plain data
   static fromData(data: ActiveConGameData): ActiveConGame {
-    const game = new ActiveConGame(ConGame.fromData(data), GameSaveService.getInstance(new ConGameService(ConGameModel), new GameStateService(GameStateModel)));
+    const game = new ActiveConGame(ConGame.fromData(data), GameDatabaseService.getInstance(new ConGameService(ConGameModel), new GameStateService(GameStateModel)));
     
     // Copy active game properties
     Object.assign(game, {

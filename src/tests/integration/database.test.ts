@@ -5,13 +5,13 @@ import { ConGameModel } from '../../models/ConGame/db-model';
 import { GameStateModel } from '../../models/GameState/db-model';
 import { ConGame } from '../../models/ConGame/ConGame';
 import { GameState } from '../../models/GameState/GameState';
-import { GameSaveService } from '../../services/GameSaveService';
+import { GameDatabaseService } from '../../services/GameDatabaseService';
 import { TransitionEvent, State } from '../../types/gamestate-types';
 
 describe('Database Integration Tests', () => {
     let conGameService: ConGameService;
     let gameStateService: GameStateService;
-    let gameSaveService: GameSaveService;
+    let gameDatabaseService: GameDatabaseService;
     const testGameId = 'test-game-123';
     const testNumPlayers = 2;
 
@@ -23,7 +23,7 @@ describe('Database Integration Tests', () => {
         // Initialize services
         conGameService = new ConGameService(ConGameModel);
         gameStateService = new GameStateService(GameStateModel);
-        gameSaveService = GameSaveService.getInstance(conGameService, gameStateService);
+        gameDatabaseService = GameDatabaseService.getInstance(conGameService, gameStateService);
     });
 
     afterAll(async () => {
@@ -77,7 +77,7 @@ describe('Database Integration Tests', () => {
             gameState.processEvent(TransitionEvent.PLAYER_JOINED);
 
             // Save both
-            await gameSaveService.saveGameState(game, gameState);
+            await gameDatabaseService.saveGameState(game, gameState);
 
             // Retrieve and verify
             const retrievedGame = await conGameService.findGameById(testGameId);

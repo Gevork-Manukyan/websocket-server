@@ -22,27 +22,6 @@ const gameStateManager = GameStateManager.getInstance();
 // Creates the gameplay namespace that will handle all gameplay connections
 const gameNamespace = io.of("/gameplay");
 
-// TODO: Load existing games from database
-// async function loadExistingGames() {
-//   try {
-//     // Find all games
-//     const games = await ConGameService.findAllGames();
-    
-//     // For each game, load its state and add it to the GameStateManager
-//     for (const game of games) {
-//       try {
-//         const gameState = await gameStateService.findGameStateByGameId(game.id);
-//         gameStateManager.addGameAndState(game.id, game, gameState);
-//         console.log(`Loaded game ${game.id} from database`);
-//       } catch (error) {
-//         console.error(`Failed to load game ${game.id}:`, error);
-//       }
-//     }
-//   } catch (error) {
-//     console.error('Failed to load existing games:', error);
-//   }
-// }
-
 gameNamespace.on("connection", (socket) => {
 
   /* -------- MIDDLEWARE -------- */
@@ -58,15 +37,10 @@ gameNamespace.on("connection", (socket) => {
   // TODO: some events should emit to all players that something happened
 
   socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ userId, numPlayers }: CreateGameData) => {      
-      // Create game and save to database
       const { game } = await gameStateManager.createGame(numPlayers);
       game.addPlayer(new Player(userId, socket.id, true)); // First player to join is the host
-      
-      // Join socket room
       socket.join(game.id);
-      
-      // Emit success
-      socket.emit(`${CreateGameEvent}--success`);
+      socket.emit(`${CreateGameEvent}--success`, game.id);
   }));
 
   socket.on(JoinGameEvent, socketErrorHandler(socket, JoinGameEvent, async ({ userId, gameId }: JoinGameData) => {
@@ -74,7 +48,7 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.getGame(gameId).addPlayer(new Player(userId, socket.id));
     socket.join(gameId);
     gameStateManager.processJoinGameEvent(gameId);
-    socket.emit(`${JoinGameEvent}--success`);
+    socket.emit(`${JoinGameEvent}--success`, gameId);
   }));
 
   socket.on(SelectSageEvent, socketErrorHandler(socket, SelectSageEvent, async ({ gameId, sage }: SelectSageData) => {
@@ -259,7 +233,7 @@ if (IS_PRODUCTION) {
       // Start the server after successful database connection
       server.listen(PORT, async () => {
         console.log(`WebSocket server running on http://localhost:${PORT}`);
-        // await loadExistingGames();
+        await gameStateManager.loadExistingGames();
       });
     })
     .catch((error) => {
