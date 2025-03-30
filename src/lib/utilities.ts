@@ -1,6 +1,6 @@
 import { Card, gameId, Sage } from "../types";
 import { DropletDeck, IS_PRODUCTION, LeafDeck, PebbleDeck, TwigDeck } from "../constants";
-import { CustomError, NotFoundError, ValidationError, HostOnlyActionError, InvalidSageError } from "../services";
+import { CustomError, NotFoundError, ValidationError, HostOnlyActionError, InvalidSageError, InvalidDataError } from "../services";
 import { AllPlayersSetupEvent, ClearTeamsEvent, EventSchemas, SocketEventMap, StartGameEvent } from "../types";
 import { Socket } from "socket.io";
 import { GameStateManager } from "../services/GameStateManager";
@@ -68,7 +68,7 @@ export function processEventMiddleware<T extends keyof SocketEventMap>(socket: S
     // Validate data schema
     const result = EventSchemas[eventName].safeParse(rawData);
     if (!result.success) {
-      throw new ValidationError(`Invalid data for event: ${eventName}`, rawData);
+      throw new InvalidDataError(`Invalid data for event: ${eventName}`, EventSchemas[eventName].shape.toString(), rawData.toString());
     }
 
     const data = result.data;

@@ -90,3 +90,14 @@ export class InvalidCardTypeError extends ValidationError {
         super(message, "INVALID_CARD_TYPE");
     }
 }
+
+export class InvalidDataError extends ValidationError {
+    expected;
+    received;
+
+    constructor(message = "Invalid data", expected: string, received: string) {
+        super(`${message}. Expected ${expected}, received ${received}`, "INVALID_DATA");
+        this.expected = expected;
+        this.received = received;
+    }
+}
