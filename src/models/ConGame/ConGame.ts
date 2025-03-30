@@ -18,7 +18,9 @@ const { BambooBerserker, Bruce, CackleRipclaw, CamouChameleon, CurrentConjurer, 
 
 type ShopIndex = 0 | 1 | 2;
 
-// Plain interfaces for data structure
+/**
+ * Plain interfaces for data structure
+ */
 type ConGameData = {
   id: string;
   isStarted: boolean;
@@ -36,6 +38,9 @@ type ConGameData = {
   currentItemShopCards: ItemCard[];
 }
 
+/**
+ * Plain interfaces for active game data structure
+ */
 type ActiveConGameData = ConGameData & {
   activeTeam: 'first' | 'second';
   currentPhase: 'phase1' | 'phase2' | 'phase3' | 'phase4';
@@ -82,28 +87,52 @@ export class ConGame {
     }
   }
 
-  // Add method to set ID after creation
+  /**
+   * Sets the ID of the game
+   * @param id - The ID to set
+   */
   setId(id: gameId) {
     this.id = id;
   }
 
+  /**
+   * Sets the started status of the game
+   * @param value - The value to set the started status to
+   */
   setStarted(value: boolean) {
     this.isStarted = value;
   }
 
+  /**
+   * Gets the has finished setup status of the game
+   * @returns The has finished setup status of the game
+   */
   getHasFinishedSetup() {
     return this.hasFinishedSetup;
   }
 
+  /**
+   * Adds a player to the game
+   * @param player - The player to add
+   */
   addPlayer(player: Player) {
     if (this.players.length >= this.numPlayersTotal) throw new ValidationError("Cannot add more players", "players");
     this.players.push(player);
   }
 
+  /**
+   * Removes a player from the game
+   * @param playerId - The socket ID of the player to remove
+   */
   removePlayer(playerId: Player["socketId"]) {
     this.players = Player.filterOutPlayerById(this.players, playerId);
   }
 
+  /**
+   * Gets a player from the game
+   * @param playerId - The socket ID of the player to get
+   * @returns The player
+   */
   getPlayer(playerId: Player["socketId"]): Player {
     const player = this.players.find((item) => item.socketId === playerId);
     if (!player)
@@ -115,6 +144,11 @@ export class ConGame {
     return player;
   }
 
+  /**
+   * Sets the sage for a player
+   * @param playerId - The socket ID of the player to set the sage for
+   * @param sage - The sage to set
+   */
   setPlayerSage(playerId: Player["socketId"], sage: Sage) {
     const isSageAvailable = this.players.every(player => player.getSage() !== sage)
     if (!isSageAvailable) throw new SageUnavailableError(sage);
@@ -123,7 +157,17 @@ export class ConGame {
   }
 
   /**
-   * @param playerId The socket ID of the player to get the team of
+   * Checks if all players have selected a sage
+   * @returns True if all players have selected a sage, false otherwise
+   */
+  validateAllPlayersSeclectedSage() {
+    if (this.players.length !== this.numPlayersTotal) throw new ValidationError(`Missing ${this.numPlayersTotal - this.players.length} players`, "players");
+    if (this.players.some(player => !player.getSage())) throw new ValidationError("All players must select a sage", "sage");
+  }
+
+  /**
+   * Gets the team the player is on
+   * @param playerId - The socket ID of the player to get the team of
    * @returns The team the player is on
    */
   getPlayerTeam(playerId: Player["socketId"]) {
@@ -136,7 +180,8 @@ export class ConGame {
   }
 
   /**
-   * @param playerId The socket ID of the player to get the teammate of
+   * Gets the teammate of the player
+   * @param playerId - The socket ID of the player to get the teammate of
    * @returns The teammate of the player
    */
   getPlayerTeammate(playerId: Player["socketId"]) {
@@ -147,18 +192,35 @@ export class ConGame {
     return teammate;
   }
 
+  /**
+   * Gets the team order
+   * @returns The team order
+   */
   getTeamOrder() {
     return this.teamOrder;
   }
 
+  /**
+   * Gets the team going first
+   * @returns The team going first
+   */
   getTeamGoingFirst() {
     return this.teamOrder.first;
   }
 
+  /**
+   * Gets the team going second
+   * @returns The team going second
+   */
   getTeamGoingSecond() {
     return this.teamOrder.second;
   }
 
+  /**
+   * Gets the opposing team
+   * @param team - The team to get the opposing team of
+   * @returns The opposing team
+   */
   getOpposingTeam(team: Team) {
     return team === this.team1 ? this.team2 : this.team1;
   }
@@ -171,10 +233,17 @@ export class ConGame {
     return this.creatureShop;
   }
 
+  /**
+   * Gets the current creature shop cards
+   * @returns Array of available creature cards in the shop
+   */
   getCurrentCreatureShopCards() {
     return this.currentCreatureShopCards;
   }
 
+  /**
+   * Adds a card to the creature shop
+   */
   addCardToCreatureShop() {
     this.addCardToShop(this.creatureShop, this.currentCreatureShopCards);
   }
@@ -187,14 +256,26 @@ export class ConGame {
     return this.itemShop;
   }
 
+  /**
+   * Gets the current item shop cards
+   * @returns Array of available item cards in the shop
+   */
   getCurrentItemShopCards() {
     return this.currentItemShopCards;
   }
 
+  /**
+   * Adds a card to the item shop
+   */
   addCardToItemShop() {
     this.addCardToShop(this.itemShop, this.currentItemShopCards);
   }
 
+  /**
+   * Adds a card to the shop
+   * @param shop - The shop to add the card to
+   * @param currentShopCards - The current shop cards
+   */
   private addCardToShop<T extends ElementalCard | ItemCard>(shop: T[], currentShopCards: T[]) {
     const shopType = shop === this.creatureShop ? "creature" : "item";
     if (shop.length === 3) throw new ShopFullError(shopType);
@@ -203,41 +284,75 @@ export class ConGame {
     currentShopCards.push(card);
   }
   
+  /**
+   * Joins a player to a team
+   * @param playerId - The socket ID of the player to join the team
+   * @param teamNumber - The team number to join
+   */
   joinTeam(playerId: Player['socketId'], teamNumber: Team['teamNumber']) {
     const teamSelected = teamNumber === 1 ? this.team1 : this.team2;
     const player = this.getPlayer(playerId);
 
-    // Check if already on team
-    const currTeam = this.getPlayerTeam(playerId);
-    if (currTeam !== null) currTeam.removePlayerFromTeam(player)
+    if (this.team1.isPlayerOnTeam(playerId)) {
+      this.team1.removePlayerFromTeam(player);
+    } else if (this.team2.isPlayerOnTeam(playerId)) {
+      this.team2.removePlayerFromTeam(player);
+    }
 
     teamSelected.addPlayerToTeam(player);
   }
 
+  /**
+   * Increments the number of players ready
+   * @returns The number of players ready
+   */
   incrementPlayersReady() {
     this.numPlayersReady++
     if (this.numPlayersReady > this.numPlayersTotal) this.numPlayersReady = this.numPlayersTotal
     return this.numPlayersReady;
   }
 
+  /**
+   * Decrements the number of players ready
+   * @returns The number of players ready
+   */
   decrementPlayersReady() {
     this.numPlayersReady--
     if (this.numPlayersReady < 0) this.numPlayersReady = 0
     return this.numPlayersReady;
   }
 
+  /**
+   * Checks if all players have finished setup
+   * @returns True if all players have finished setup, false otherwise
+   */
+  validateAllPlayersReady() {
+    if (this.numPlayersReady !== this.numPlayersTotal) throw new PlayersNotReadyError(this.numPlayersReady, this.numPlayersTotal)
+  }
+
+  /**
+   * Increments the number of players finished setup
+   * @returns The number of players finished setup
+   */
   incrementPlayersFinishedSetup() {
     this.numPlayersFinishedSetup++
     if (this.numPlayersFinishedSetup > this.numPlayersTotal) this.numPlayersFinishedSetup = this.numPlayersTotal
     return this.numPlayersFinishedSetup;
   }
 
+  /**
+   * Decrements the number of players finished setup
+   * @returns The number of players finished setup
+   */
   decrementPlayersFinishedSetup() {
     this.numPlayersFinishedSetup--
     if (this.numPlayersFinishedSetup < 0) this.numPlayersFinishedSetup = 0
     return this.numPlayersFinishedSetup;
   }
 
+  /**
+   * Clears the teams
+   */
   clearTeams() {
     this.team1.resetTeam()
     this.team2.resetTeam()
@@ -251,8 +366,7 @@ export class ConGame {
    * @throws {PlayersNotReadyError} If not all players are ready
    */
   initGame() {
-    // All players must be ready
-    if (this.numPlayersReady !== this.numPlayersTotal) throw new PlayersNotReadyError(this.numPlayersReady, this.numPlayersTotal)
+    this.validateAllPlayersReady();
 
     this.initPlayerDecks();
     this.initPlayerHands();
@@ -263,14 +377,23 @@ export class ConGame {
     this.setStarted(true)
   }
 
+  /**
+   * Initializes the player decks
+   */
   initPlayerDecks() {
     this.players.forEach(player => player.initDeck())
   }
 
+  /**
+   * Initializes the player hands
+   */
   initPlayerHands() {
     this.players.forEach(player => player.initHand())
   }
 
+  /**
+   * Initializes the player fields
+   */
   initPlayerFields() {
     const team1Decklists = this.team1.getAllPlayerDecklists()
     const team2Decklists = this.team2.getAllPlayerDecklists()
@@ -392,7 +515,11 @@ export class ConGame {
     return new ActiveConGame(this, GameDatabaseService.getInstance(new ConGameService(ConGameModel), new GameStateService(GameStateModel)));
   }
 
-  // Protected helper for Mongoose conversion
+  /**
+   * Gets the base data from Mongoose
+   * @param doc - The Mongoose document to get the base data from
+   * @returns The base data
+   */
   protected static getBaseDataFromMongoose(doc: IConGame): ConGameData {
     return {
       id: doc._id.toString(),
@@ -412,12 +539,20 @@ export class ConGame {
     };
   }
 
-  // Convert from Mongoose document to runtime instance
+  /**
+   * Converts a Mongoose document to a ConGame instance
+   * @param doc - The Mongoose document to convert
+   * @returns A new ConGame instance
+   */
   static fromMongoose(doc: IConGame): ConGame {
     return ConGame.fromData(ConGame.getBaseDataFromMongoose(doc));
   }
 
-  // Create instance from plain data
+  /**
+   * Creates a new ConGame instance from plain data
+   * @param data - The plain data to create the instance from
+   * @returns A new ConGame instance
+   */
   static fromData(data: ConGameData): ConGame {
     const game = new ConGame(data.numPlayersTotal, data.id);
     
@@ -440,7 +575,10 @@ export class ConGame {
     return game;
   }
 
-  // Convert runtime instance to plain object for Mongoose
+  /**
+   * Converts the runtime instance to a plain object for Mongoose
+   * @returns A plain object representation of the ConGame instance
+   */
   toMongoose(): Omit<IConGame, '_id'> {
     return {
       isStarted: this.isStarted,

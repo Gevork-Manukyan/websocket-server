@@ -68,7 +68,11 @@ export function processEventMiddleware<T extends keyof SocketEventMap>(socket: S
     // Validate data schema
     const result = EventSchemas[eventName].safeParse(rawData);
     if (!result.success) {
-      throw new InvalidDataError(`Invalid data for event: ${eventName}`, EventSchemas[eventName].shape.toString(), rawData.toString());
+      throw new InvalidDataError(
+        `Invalid data for event: ${eventName}`, 
+        JSON.stringify(EventSchemas[eventName].shape, null, 2),
+        JSON.stringify(rawData, null, 2)
+      );
     }
 
     const data = result.data;

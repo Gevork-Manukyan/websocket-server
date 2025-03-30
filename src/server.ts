@@ -66,8 +66,11 @@ gameNamespace.on("connection", (socket) => {
   }));
 
   socket.on(AllSagesSelectedEvent, socketErrorHandler(socket, AllSagesSelectedEvent, async ({ gameId }: AllSagesSelectedData) => {
+    gameStateManager.verifyAllSagesSelectedEvent(gameId);
+    gameStateManager.getGame(gameId).validateAllPlayersSeclectedSage();
     gameStateManager.processAllSagesSelectedEvent(gameId);
     gameEventEmitter.emitAllSagesSelected(gameId);
+    socket.emit(`${AllSagesSelectedEvent}--success`);
   }));
 
   socket.on(JoinTeamEvent, socketErrorHandler(socket, JoinTeamEvent, async ({ gameId, team }: JoinTeamData) => {
@@ -100,18 +103,16 @@ gameNamespace.on("connection", (socket) => {
       socket.emit("ready-status--not-ready");
     }
     gameStateManager.processToggleReadyStatusEvent(gameId);
+    socket.emit(`${ToggleReadyStatusEvent}--success`);
   }));
 
   socket.on(StartGameEvent, socketErrorHandler(socket, StartGameEvent, async ({ gameId }: StartGameData) => {
-    const game = gameStateManager.getGame(gameId);
-
-    // All players must be ready
-    if (game.numPlayersReady !== game.numPlayersTotal) throw new PlayersNotReadyError(game.numPlayersReady, game.numPlayersTotal)
     gameStateManager.verifyAllPlayersReadyEvent(gameId);
-
+    const game = gameStateManager.getGame(gameId);
     game.initGame();
     gameStateManager.processAllPlayersReadyEvent(gameId);
     gameEventEmitter.emitPickWarriors(game.players);
+    socket.emit(`${StartGameEvent}--success`);
   }));
 
   socket.on(ChoseWarriorsEvent, socketErrorHandler(socket, ChoseWarriorsEvent, async ({ gameId, choices }: ChoseWarriorsData) => {
@@ -157,6 +158,7 @@ gameNamespace.on("connection", (socket) => {
     const activeGame = gameStateManager.beginBattle(game);
     gameStateManager.processAllPlayersSetupEvent(gameId);
     gameEventEmitter.emitStartTurn(activeGame.getActiveTeam(), activeGame.getWaitingTeam());
+    socket.emit(`${AllPlayersSetupEvent}--success`);
   }));
 
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {
