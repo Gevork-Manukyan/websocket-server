@@ -42,7 +42,7 @@ export class GameStateManager {
                 try {
                     const gameState = await gameDatabaseService.findGameStateByGameId(game.id);
                     this.addGameAndState(game.id, game, gameState);
-                    console.log(`Loaded game ${game.id} from database`);
+                    console.debug(`Loaded game ${game.id} from database`);
                 } catch (error) {
                     console.error(`Failed to load game ${game.id}:`, error);
                 }

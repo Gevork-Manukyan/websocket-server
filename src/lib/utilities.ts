@@ -1,5 +1,5 @@
 import { Card, gameId, Sage } from "../types";
-import { DropletDeck, LeafDeck, PebbleDeck, TwigDeck } from "../constants";
+import { DropletDeck, IS_PRODUCTION, LeafDeck, PebbleDeck, TwigDeck } from "../constants";
 import { CustomError, NotFoundError, ValidationError, HostOnlyActionError, InvalidSageError } from "../services";
 import { AllPlayersSetupEvent, ClearTeamsEvent, EventSchemas, SocketEventMap, StartGameEvent } from "../types";
 import { Socket } from "socket.io";
@@ -53,6 +53,12 @@ export function handleSocketError(
 }
 
 export function processEventMiddleware<T extends keyof SocketEventMap>(socket: Socket, eventName: T, rawData: any, next: (err?: Error) => void) {
+  // TODO: FOR DEBUGING
+  if (!IS_PRODUCTION && eventName === "debug") {
+    next();
+    return;
+  }
+  
   try {
     // Ensure the event is recognized
     if (!(eventName in EventSchemas)) {

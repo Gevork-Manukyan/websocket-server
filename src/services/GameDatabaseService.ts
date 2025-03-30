@@ -45,7 +45,7 @@ export class GameDatabaseService {
      * @param gameState - The game state to save
      */
     async saveGameState(game: ConGame, gameState: GameState): Promise<void> {
-        console.log('Saving game state for game:', game.id);
+        console.debug('Saving game state for game:', game.id);
         try {
             // Save both the game and game state in parallel
             await Promise.all([

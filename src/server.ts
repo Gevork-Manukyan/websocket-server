@@ -1,7 +1,7 @@
 import { createServer } from "http"; 
 import { Server } from "socket.io";
 import mongoose from "mongoose";
-import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData } from "./types";
+import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData, DebugData, DebugEvent } from "./types";
 import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
 import { GameEventEmitter, GameStateManager, ValidationError, InvalidSpaceError, PlayersNotReadyError } from "./services";
 import { Player } from "./models";
@@ -35,6 +35,12 @@ gameNamespace.on("connection", (socket) => {
 
   /* -------- GAME SETUP -------- */
   // TODO: some events should emit to all players that something happened
+
+  // TODO: FOR DEBUGING
+  socket.on(DebugEvent, socketErrorHandler(socket, DebugEvent, async ({ gameId }: DebugData) => {
+    const game = gameStateManager.getGame(gameId);
+    socket.emit(DebugEvent, game);
+  }));
 
   socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ userId, numPlayers }: CreateGameData) => {      
       const { game } = await gameStateManager.createGame(numPlayers);
@@ -229,10 +235,10 @@ if (IS_PRODUCTION) {
   // Connect to MongoDB first
   mongoose.connect(process.env.DATABASE_URL || "mongodb://localhost:27017/command_of_nature")
     .then(() => {
-      console.log('Connected to MongoDB');
+      console.debug('Connected to MongoDB');
       // Start the server after successful database connection
       server.listen(PORT, async () => {
-        console.log(`WebSocket server running on http://localhost:${PORT}`);
+        console.debug(`WebSocket server running on http://localhost:${PORT}`);
         await gameStateManager.loadExistingGames();
       });
     })
