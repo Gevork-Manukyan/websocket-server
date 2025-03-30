@@ -128,8 +128,6 @@ export class GameStateManager {
         return game.getHasFinishedSetup();
     }
 
-
-
     /**
      * Gets the current games
      * @returns The current games

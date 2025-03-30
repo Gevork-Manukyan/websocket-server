@@ -118,6 +118,7 @@ export class ConGame {
   addPlayer(player: Player) {
     if (this.players.length >= this.numPlayersTotal) throw new ValidationError("Cannot add more players", "players");
     this.players.push(player);
+    
   }
 
   /**

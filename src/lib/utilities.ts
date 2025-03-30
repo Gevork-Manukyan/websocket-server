@@ -1,4 +1,4 @@
-import { Card, gameId, Sage } from "../types";
+import { Card, ExitGameEvent, gameId, Sage } from "../types";
 import { DropletDeck, IS_PRODUCTION, LeafDeck, PebbleDeck, TwigDeck } from "../constants";
 import { CustomError, NotFoundError, ValidationError, HostOnlyActionError, InvalidSageError, InvalidDataError } from "../services";
 import { AllPlayersSetupEvent, ClearTeamsEvent, EventSchemas, SocketEventMap, StartGameEvent } from "../types";
@@ -78,8 +78,8 @@ export function processEventMiddleware<T extends keyof SocketEventMap>(socket: S
     const data = result.data;
 
     // Check for host-only actions
-    const hostOnlyEvents = [StartGameEvent, ClearTeamsEvent, AllPlayersSetupEvent];
-    for (const event of hostOnlyEvents) {
+    const HOST_ONLY_EVENTS = [StartGameEvent, ClearTeamsEvent, AllPlayersSetupEvent, ExitGameEvent];
+    for (const event of HOST_ONLY_EVENTS) {
       if (eventName === event) {
         const eventData = data as SocketEventMap[typeof event];
         const player = GameStateManager.getInstance().getGame(eventData.gameId).getPlayer(socket.id);
