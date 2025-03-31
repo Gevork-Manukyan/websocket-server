@@ -1,4 +1,4 @@
-import { ConGame, GameState, ActiveConGame } from "../models";
+import { ConGame, GameState, ActiveConGame, Player } from "../models";
 import { gameId, GameStateInfo, TransitionEvent } from "../types";
 import { GameConflictError } from "./CustomError/GameError";
 import { gameDatabaseService } from "./GameDatabaseService";
@@ -27,6 +27,19 @@ export class GameStateManager {
         const { game, state } = await gameDatabaseService.saveNewGame(numPlayersTotal);
         this.addGameAndState(game.id, game, state);
         return { game, state };
+    }
+
+    /**
+     * Adds a player to a game and saves the game state to the database
+     * @param userId - The id of the user to add
+     * @param socketId - The id of the socket to add
+     * @param gameId - The id of the game to add the player to
+     * @param isHost - Whether the player is the host
+     */
+    async addPlayerToGame(userId: string, socketId: string, gameId: gameId, isHost: boolean): Promise<void> {
+        const game = this.getGame(gameId);
+        game.addPlayer(new Player(userId, socketId, isHost));
+        await gameDatabaseService.saveGameState(game, this.getGameState(gameId));
     }
 
     /**

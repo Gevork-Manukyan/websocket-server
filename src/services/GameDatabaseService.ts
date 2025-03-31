@@ -50,7 +50,7 @@ export class GameDatabaseService {
             // Save both the game and game state in parallel
             await Promise.all([
                 this.conGameService.updateGameState(game.id, game),
-                this.gameStateService.updateGameState(gameState.gameId, gameState)
+                this.gameStateService.updateGameStateByGameId(game.id, gameState)
             ]);
         } catch (error) {
             console.error('Failed to save game state:', error);

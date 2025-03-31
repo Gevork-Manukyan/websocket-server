@@ -6,6 +6,7 @@ import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
 import { GameEventEmitter, GameStateManager, ValidationError, InvalidSpaceError, PlayersNotReadyError } from "./services";
 import { Player } from "./models";
 import { IS_PRODUCTION } from "./constants";
+import { gameDatabaseService } from "./services";
 
 const server = createServer();
 const io = new Server(server, {
@@ -44,16 +45,16 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ userId, numPlayers }: CreateGameData) => {      
       const { game } = await gameStateManager.createGame(numPlayers);
-      game.addPlayer(new Player(userId, socket.id, true)); // First player to join is the host
+      gameStateManager.addPlayerToGame(userId, socket.id, game.id, true);
       socket.join(game.id);
       socket.emit(`${CreateGameEvent}--success`, game.id);
   }));
 
   socket.on(JoinGameEvent, socketErrorHandler(socket, JoinGameEvent, async ({ userId, gameId }: JoinGameData) => {
     gameStateManager.verifyJoinGameEvent(gameId);
-    gameStateManager.getGame(gameId).addPlayer(new Player(userId, socket.id));
-    socket.join(gameId);
+    gameStateManager.addPlayerToGame(userId, socket.id, gameId, false);
     gameStateManager.processJoinGameEvent(gameId);
+    socket.join(gameId);
     socket.emit(`${JoinGameEvent}--success`, gameId);
   }));
 

@@ -56,6 +56,18 @@ export class GameStateService {
         return GameState.fromMongoose(doc);
     }
 
+    async updateGameStateByGameId(gameId: string, updates: Partial<GameState>): Promise<GameState> {
+        const doc = await this.model.findOneAndUpdate(
+            { gameId },
+            { $set: updates },
+            { new: true }
+        );
+        if (!doc) {
+            throw new NotFoundError('GameState', `GameState for game ${gameId} not found`);
+        }
+        return GameState.fromMongoose(doc);
+    }
+
     async processGameStateEvent(id: string, event: TransitionEvent): Promise<GameState> {
         const gameState = await this.findGameStateById(id);
         gameState.processEvent(event);

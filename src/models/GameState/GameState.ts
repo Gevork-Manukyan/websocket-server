@@ -2,7 +2,6 @@ import { GameStateError } from "../../services/CustomError/GameError";
 import { gameId } from "../../types";
 import { State, TransitionEvent, Transition, Input } from "../../types/gamestate-types";
 import { IGameState } from './db-model';
-import { Types } from 'mongoose';
 
 export class GameState {
     gameId: gameId;

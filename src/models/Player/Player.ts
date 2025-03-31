@@ -189,7 +189,7 @@ export class Player {
 
   // Convert from Mongoose document to runtime instance
   static fromMongoose(doc: Omit<IPlayer, '_id'> | IPlayer): Player {
-    const player = new Player(doc.userId.toString(), doc.socketId, doc.isGameHost);
+    const player = new Player(doc.id.toString(), doc.socketId, doc.isGameHost);
     
     // Set up properties
     player.isReady = doc.isReady;
