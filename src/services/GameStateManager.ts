@@ -39,7 +39,8 @@ export class GameStateManager {
     async addPlayerToGame(userId: string, socketId: string, gameId: gameId, isHost: boolean): Promise<void> {
         const game = this.getGame(gameId);
         game.addPlayer(new Player(userId, socketId, isHost));
-        await gameDatabaseService.saveGameState(game, this.getGameState(gameId));
+        const savedGame = await gameDatabaseService.saveGameState(game);
+        this.setGame(gameId, savedGame);
     }
 
     /**

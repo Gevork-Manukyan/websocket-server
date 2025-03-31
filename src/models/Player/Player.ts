@@ -15,7 +15,7 @@ export class Player {
   private isReady: boolean = false;
   private isSetup: boolean = false;
   private hasChosenWarriors: boolean = false;
-  private isGameHost: boolean;
+  private isGameHost: boolean = false;
   private sage: Sage | null = null;
   private decklist: Decklist | null = null;
   private level: number = 1;

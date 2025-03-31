@@ -58,7 +58,7 @@ export class GameStateService {
 
     async updateGameStateByGameId(gameId: string, updates: Partial<GameState>): Promise<GameState> {
         const doc = await this.model.findOneAndUpdate(
-            { gameId },
+            { gameId: new Types.ObjectId(gameId) },
             { $set: updates },
             { new: true }
         );

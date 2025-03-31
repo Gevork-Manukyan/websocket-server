@@ -24,6 +24,16 @@ export function getSageDecklist(sage: Sage | null) {
       }
 }
 
+function convertToCustomError(error: unknown): CustomError {
+  if (error instanceof CustomError) {
+    return error;
+  }
+  return new CustomError(
+    error instanceof Error ? error.message : "An unexpected error occurred",
+    "INTERNAL_ERROR"
+  );
+}
+
 export function socketErrorHandler<T extends keyof SocketEventMap>(
   socket: Socket,
   eventName: T,
@@ -33,7 +43,8 @@ export function socketErrorHandler<T extends keyof SocketEventMap>(
     try {
       await fn(rawData as SocketEventMap[T])
     } catch (error) {
-      handleSocketError(socket, eventName, error as CustomError)
+      handleSocketError(socket, eventName, convertToCustomError(error));
+      return;
     }
   }
 }
@@ -97,9 +108,8 @@ export function processEventMiddleware<T extends keyof SocketEventMap>(socket: S
 
     next();
   } catch (error) {
-    const customError = error as CustomError;
-    handleSocketError(socket, eventName, customError)
-    next(customError)
+    handleSocketError(socket, eventName, convertToCustomError(error));
+    return;
   }
 }
 
