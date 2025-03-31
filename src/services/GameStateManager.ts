@@ -1,5 +1,6 @@
 import { ConGame, GameState, ActiveConGame, Player } from "../models";
-import { gameId, GameStateInfo, TransitionEvent } from "../types";
+import { gameId, GameStateInfo, RejoinGameEvent, TransitionEvent } from "../types";
+import { ValidationError } from "./CustomError/BaseError";
 import { GameConflictError } from "./CustomError/GameError";
 import { gameDatabaseService } from "./GameDatabaseService";
 
@@ -39,6 +40,31 @@ export class GameStateManager {
     async addPlayerToGame(userId: string, socketId: string, gameId: gameId, isHost: boolean): Promise<void> {
         const game = this.getGame(gameId);
         game.addPlayer(new Player(userId, socketId, isHost));
+        const savedGame = await gameDatabaseService.saveGameState(game);
+        this.setGame(gameId, savedGame);
+    }
+
+    async playerRejoinedGame(gameId: gameId, userId: string, socketId: string): Promise<void> {
+        const game = this.getGame(gameId);
+        for (const player of game.players) {
+          if (player.id === userId) {
+            player.updateSocketId(socketId);
+            const savedGame = await gameDatabaseService.saveGameState(game);
+            this.setGame(gameId, savedGame);
+            return;
+          }
+        }
+        throw new ValidationError("User not found in game", "userId");
+    }
+
+    /**
+     * Removes a player from a game and saves the game state to the database
+     * @param gameId - The id of the game to remove the player from
+     * @param socketId - The id of the socket to remove
+     */
+    async removePlayerFromGame(gameId: gameId, socketId: string): Promise<void> {
+        const game = this.getGame(gameId);
+        game.removePlayer(socketId);
         const savedGame = await gameDatabaseService.saveGameState(game);
         this.setGame(gameId, savedGame);
     }

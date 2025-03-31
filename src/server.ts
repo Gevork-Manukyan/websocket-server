@@ -174,23 +174,17 @@ gameNamespace.on("connection", (socket) => {
    * Rejoin the game after disconnecting or exiting
    */
   socket.on(RejoinGameEvent, socketErrorHandler(socket, RejoinGameEvent, async ({ gameId, userId }: RejoinGameData) => {
-    const game = gameStateManager.getGame(gameId);
-    for (const player of game.players) {
-      if (player.id === userId) {
-        player.updateSocketId(socket.id);
-        socket.join(gameId);
-        socket.emit(`${RejoinGameEvent}--success`);
-        return;
-      }
-    }
-    throw new ValidationError("User not found in game", "userId");
+    await gameStateManager.playerRejoinedGame(gameId, userId, socket.id);
+    socket.join(gameId);
+    socket.emit(`${RejoinGameEvent}--success`);
   }));
 
   /**
    * Leave the game
    */
+  // TODO: db is not updated when a player leaves the game
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {
-    gameStateManager.getGame(gameId).removePlayer(socket.id);
+    await gameStateManager.removePlayerFromGame(gameId, socket.id);
     socket.leave(gameId);
     socket.emit(`${LeaveGameEvent}--success`);
   }));
