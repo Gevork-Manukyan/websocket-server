@@ -52,7 +52,7 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(JoinGameEvent, socketErrorHandler(socket, JoinGameEvent, async ({ userId, gameId }: JoinGameData) => {
     gameStateManager.verifyJoinGameEvent(gameId);
-    gameStateManager.addPlayerToGame(userId, socket.id, gameId, false);
+    await gameStateManager.addPlayerToGame(userId, socket.id, gameId, false);
     gameStateManager.processJoinGameEvent(gameId);
     socket.join(gameId);
     socket.emit(`${JoinGameEvent}--success`, gameId);
