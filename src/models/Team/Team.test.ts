@@ -78,7 +78,7 @@ describe("Team", () => {
     describe("addPlayerToTeam method", () => {
         test("should add player to team", () => {
             mockTeam.addPlayerToTeam(new Player("testPlayerId_1", testSocketId))
-            expect(mockTeam.players[0].id).toBe("testPlayerId_1")
+            expect(mockTeam.players[0].userId).toBe("testPlayerId_1")
         })
 
         test("should throw error if team is full", () => {
@@ -92,7 +92,7 @@ describe("Team", () => {
             const playerId = "testPlayerId_1"
             const player = new Player(playerId, testSocketId)
             mockTeam.addPlayerToTeam(player)
-            expect(mockTeam.players[0].id).toBe(playerId)
+            expect(mockTeam.players[0].userId).toBe(playerId)
             mockTeam.removePlayerFromTeam(player)
             expect(mockTeam.players.length).toBe(0)
         })
@@ -100,10 +100,10 @@ describe("Team", () => {
         test("should return unchanged team if player doesn't exist on team", () => {
             const player = new Player("testPlayerId_1", testSocketId)
             mockTeam.addPlayerToTeam(player)
-            expect(mockTeam.players[0].id).toBe("testPlayerId_1")
+            expect(mockTeam.players[0].userId).toBe("testPlayerId_1")
             mockTeam.removePlayerFromTeam(new Player("testPlayerId_2", testSocketId))
             expect(mockTeam.players.length).toBe(1)
-            expect(mockTeam.players[0].id).toBe("testPlayerId_1")
+            expect(mockTeam.players[0].userId).toBe("testPlayerId_1")
         })
     })
 

@@ -126,6 +126,7 @@ export class ConGame {
    */
   removePlayer(playerId: Player["socketId"]) {
     this.players = Player.filterOutPlayerById(this.players, playerId);
+    return this.players;
   }
 
   /**

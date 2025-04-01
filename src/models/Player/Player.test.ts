@@ -10,7 +10,7 @@ describe("constructor", () => {
     test("should call constructor and create default player", (done) => {
         const player = new Player(testPlayerId, testSocketId)
     
-        expect(player.id).toBe(testPlayerId)
+        expect(player.userId).toBe(testPlayerId)
         expect(player.getIsReady()).toBe(false)
         expect(player.getIsGameHost()).toBe(false)
         expect(player.getSage()).toBe(null)

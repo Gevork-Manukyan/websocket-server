@@ -120,7 +120,7 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.verifyChooseWarriorsEvent(gameId);
     const game = gameStateManager.getGame(gameId);
     const player = game.getPlayer(socket.id);
-    game.getPlayerTeam(player.id).chooseWarriors(player, choices);
+    game.getPlayerTeam(player.userId).chooseWarriors(player, choices);
     gameStateManager.processChooseWarriorsEvent(gameId);
     socket.emit(`${ChoseWarriorsEvent}--success`)
   }));
@@ -129,7 +129,7 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.verifySwapWarriorsEvent(gameId);
     const game = gameStateManager.getGame(gameId);
     const player = game.getPlayer(socket.id);
-    game.getPlayerTeam(player.id).swapWarriors(player);
+    game.getPlayerTeam(player.userId).swapWarriors(player);
     gameStateManager.processSwapWarriorsEvent(gameId);
     socket.emit(`${SwapWarriorsEvent}--success`)
   }));
@@ -184,6 +184,8 @@ gameNamespace.on("connection", (socket) => {
    */
   // TODO: db is not updated when a player leaves the game
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {
+    // TODO: what if host leaves? How to handle if someone leaves the game midway through?
+    // If host leaves before game starts, set new host
     await gameStateManager.removePlayerFromGame(gameId, socket.id);
     socket.leave(gameId);
     socket.emit(`${LeaveGameEvent}--success`);

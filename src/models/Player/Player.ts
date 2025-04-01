@@ -10,8 +10,8 @@ import { Types } from 'mongoose';
  * @class Player
  */
 export class Player {
-  id: string;           // User ID (persistent)
-  socketId: string;     // Current socket ID (temporary)
+  userId: string;           // User ID (persistent)
+  socketId: string;         // Current socket ID (temporary)
   private isReady: boolean = false;
   private isSetup: boolean = false;
   private hasChosenWarriors: boolean = false;
@@ -30,7 +30,7 @@ export class Player {
    * @param {boolean} [isGameHost=false] - Whether this player is the game host
    */
   constructor(userId: string, socketId: string, isGameHost = false) {
-    this.id = userId;
+    this.userId = userId;
     this.socketId = socketId;
     this.isGameHost = isGameHost;
   }
@@ -189,7 +189,7 @@ export class Player {
 
   // Convert from Mongoose document to runtime instance
   static fromMongoose(doc: Omit<IPlayer, '_id'> | IPlayer): Player {
-    const player = new Player(doc.id.toString(), doc.socketId, doc.isGameHost);
+    const player = new Player(doc.userId.toString(), doc.socketId, doc.isGameHost);
     
     // Set up properties
     player.isReady = doc.isReady;
@@ -208,7 +208,7 @@ export class Player {
   // Convert runtime instance to plain object for Mongoose
   toMongoose(): Omit<IPlayer, '_id'> {
     return {
-      userId: new Types.ObjectId(this.id),
+      userId: new Types.ObjectId(this.userId),
       socketId: this.socketId,
       isReady: this.isReady,
       isSetup: this.isSetup,

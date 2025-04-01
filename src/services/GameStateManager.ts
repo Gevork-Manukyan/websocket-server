@@ -3,6 +3,7 @@ import { gameId, GameStateInfo, RejoinGameEvent, TransitionEvent } from "../type
 import { ValidationError } from "./CustomError/BaseError";
 import { GameConflictError } from "./CustomError/GameError";
 import { gameDatabaseService } from "./GameDatabaseService";
+import { Types } from 'mongoose';
 
 export class GameStateManager {
     private static instance: GameStateManager;
@@ -39,15 +40,22 @@ export class GameStateManager {
      */
     async addPlayerToGame(userId: string, socketId: string, gameId: gameId, isHost: boolean): Promise<void> {
         const game = this.getGame(gameId);
-        game.addPlayer(new Player(userId, socketId, isHost));
+        const player = new Player(new Types.ObjectId(userId).toString(), socketId, isHost);
+        game.addPlayer(player);
         const savedGame = await gameDatabaseService.saveGameState(game);
         this.setGame(gameId, savedGame);
     }
 
+    /**
+     * Adds a player to a game and saves the game state to the database
+     * @param gameId - The id of the game to add the player to
+     * @param userId - The id of the user to add
+     * @param socketId - The id of the socket to add
+     */
     async playerRejoinedGame(gameId: gameId, userId: string, socketId: string): Promise<void> {
         const game = this.getGame(gameId);
         for (const player of game.players) {
-          if (player.id === userId) {
+          if (player.userId === userId) {
             player.updateSocketId(socketId);
             const savedGame = await gameDatabaseService.saveGameState(game);
             this.setGame(gameId, savedGame);
