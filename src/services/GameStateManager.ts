@@ -40,6 +40,12 @@ export class GameStateManager {
      */
     async addPlayerToGame(userId: string, socketId: string, gameId: gameId, isHost: boolean): Promise<void> {
         const game = this.getGame(gameId);
+        
+        // Check for duplicate socket ID
+        if (game.players.some(p => p.socketId === socketId || p.userId === userId)) {
+            throw new ValidationError("A player with this socket ID or user ID already exists in the game", "socketId");
+        }
+
         const player = new Player(new Types.ObjectId(userId).toString(), socketId, isHost);
         game.addPlayer(player);
         const savedGame = await gameDatabaseService.saveGame(game);
