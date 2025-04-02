@@ -704,7 +704,8 @@ export class ActiveConGame extends ConGame {
   endPhase4() {
     // Save the current game state before ending the turn
     const gameState = GameStateManager.getInstance().getGameState(this.id);
-    this.gameDatabaseService.saveGameState(this, gameState);
+    this.gameDatabaseService.saveGame(this);
+    this.gameDatabaseService.saveGameState(this.id, gameState);
 
     // End turn and reset all variables
     this.currentPhase = "phase1";

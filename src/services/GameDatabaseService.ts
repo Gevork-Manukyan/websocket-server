@@ -40,20 +40,29 @@ export class GameDatabaseService {
     }
 
     /**
-     * Saves the game state
+     * Saves the game to the database
      * @param game - The game to save
-     * @param gameState - Optional game state to save
      * @returns The saved game
      */
-    async saveGameState(game: ConGame, gameState?: GameState): Promise<ConGame> {
-        console.debug('Saving game state for game:', game.id);
+    async saveGame(game: ConGame): Promise<ConGame> {
+        console.debug('Saving game:', game.id);
         try {
-            // Save game and optionally save game state in parallel
-            const [savedGame] = await Promise.all([
-                this.conGameService.updateGameState(game.id, game),
-                ...(gameState ? [this.gameStateService.updateGameStateByGameId(game.id, gameState)] : [])
-            ]);
-            return savedGame;
+            return await this.conGameService.updateGameState(game.id, game);
+        } catch (error) {
+            console.error('Failed to save game:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Saves the game state to the database
+     * @param gameId - The ID of the game
+     * @param gameState - The game state to save
+     */
+    async saveGameState(gameId: string, gameState: GameState): Promise<void> {
+        console.debug('Saving game state for game:', gameId);
+        try {
+            await this.gameStateService.updateGameStateByGameId(gameId, gameState);
         } catch (error) {
             console.error('Failed to save game state:', error);
             throw error;

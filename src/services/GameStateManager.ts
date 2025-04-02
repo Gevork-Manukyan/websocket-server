@@ -42,7 +42,7 @@ export class GameStateManager {
         const game = this.getGame(gameId);
         const player = new Player(new Types.ObjectId(userId).toString(), socketId, isHost);
         game.addPlayer(player);
-        const savedGame = await gameDatabaseService.saveGameState(game);
+        const savedGame = await gameDatabaseService.saveGame(game);
         this.setGame(gameId, savedGame);
     }
 
@@ -57,7 +57,7 @@ export class GameStateManager {
         for (const player of game.players) {
           if (player.userId === userId) {
             player.updateSocketId(socketId);
-            const savedGame = await gameDatabaseService.saveGameState(game);
+            const savedGame = await gameDatabaseService.saveGame(game);
             this.setGame(gameId, savedGame);
             return;
           }
@@ -73,7 +73,7 @@ export class GameStateManager {
     async removePlayerFromGame(gameId: gameId, socketId: string): Promise<void> {
         const game = this.getGame(gameId);
         game.removePlayer(socketId);
-        const savedGame = await gameDatabaseService.saveGameState(game);
+        const savedGame = await gameDatabaseService.saveGame(game);
         this.setGame(gameId, savedGame);
     }
 

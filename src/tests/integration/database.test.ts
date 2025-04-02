@@ -77,7 +77,8 @@ describe('Database Integration Tests', () => {
             gameState.processEvent(TransitionEvent.PLAYER_JOINED);
 
             // Save both
-            await gameDatabaseService.saveGameState(game, gameState);
+            await gameDatabaseService.saveGame(game);
+            await gameDatabaseService.saveGameState(testGameId, gameState);
 
             // Retrieve and verify
             const retrievedGame = await conGameService.findGameById(testGameId);

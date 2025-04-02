@@ -68,7 +68,8 @@ describe('GameDatabaseService', () => {
             conGameService.updateGameState.mockResolvedValue(mockGame);
             gameStateService.updateGameState.mockResolvedValue(mockGameState);
 
-            await gameDatabaseService.saveGameState(mockGame, mockGameState);
+            await gameDatabaseService.saveGame(mockGame);
+            await gameDatabaseService.saveGameState(testGameId, mockGameState);
 
             // Verify both services were called
             expect(conGameService.updateGameState).toHaveBeenCalledWith(testGameId, mockGame);
@@ -84,7 +85,8 @@ describe('GameDatabaseService', () => {
 
             // The error should be caught and logged
             const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-            await gameDatabaseService.saveGameState(mockGame, mockGameState);
+            await gameDatabaseService.saveGame(mockGame);
+            await gameDatabaseService.saveGameState(testGameId, mockGameState);
             consoleSpy.mockRestore();
 
             expect(consoleSpy).toHaveBeenCalledWith('Failed to save game state:', mockError);

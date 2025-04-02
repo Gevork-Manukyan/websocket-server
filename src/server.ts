@@ -72,6 +72,7 @@ gameNamespace.on("connection", (socket) => {
     socket.emit(`${AllSagesSelectedEvent}--success`);
   }));
 
+  // Test
   socket.on(JoinTeamEvent, socketErrorHandler(socket, JoinTeamEvent, async ({ gameId, team }: JoinTeamData) => {
     gameStateManager.verifyJoinTeamEvent(gameId);
     gameStateManager.getGame(gameId).joinTeam(socket.id, team);
