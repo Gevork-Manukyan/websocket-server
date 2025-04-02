@@ -4,9 +4,7 @@ import mongoose from "mongoose";
 import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData, DebugData, DebugEvent, ExitGameData, ExitGameEvent, RejoinGameData, RejoinGameEvent } from "./types";
 import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
 import { GameEventEmitter, GameStateManager, ValidationError, InvalidSpaceError, PlayersNotReadyError } from "./services";
-import { Player } from "./models";
 import { IS_PRODUCTION } from "./constants";
-import { gameDatabaseService } from "./services";
 
 const server = createServer();
 const io = new Server(server, {
