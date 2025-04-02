@@ -87,7 +87,6 @@ gameNamespace.on("connection", (socket) => {
     socket.emit(`${ClearTeamsEvent}--success`);
   }));
 
-  // Test
   socket.on(AllTeamsJoinedEvent, socketErrorHandler(socket, AllTeamsJoinedEvent, async ({ gameId }: AllTeamsJoinedData) => {
     gameStateManager.verifyAllTeamsJoinedEvent(gameId);
     await gameStateManager.allTeamsJoined(gameId);
@@ -98,28 +97,18 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(ToggleReadyStatusEvent, socketErrorHandler(socket, ToggleReadyStatusEvent, async ({ gameId }: ToggleReadyStatusData) => {
     gameStateManager.verifyToggleReadyStatusEvent(gameId);
-    const game = gameStateManager.getGame(gameId);
-    const currPlayer = game.getPlayer(socket.id);
-    if (!currPlayer.getSage()) throw new ValidationError("Cannot toggle ready. The sage has not been set.", "sage");
-    currPlayer.toggleReady();
-    
-    if (currPlayer.getIsReady()) {
-      game.incrementPlayersReady();
-      socket.emit("ready-status--ready");
-    } else {
-      game.decrementPlayersReady();
-      socket.emit("ready-status--not-ready");
-    }
+    const isReady = gameStateManager.toggleReadyStatus(gameId, socket.id);
     gameStateManager.processToggleReadyStatusEvent(gameId);
+    socket.emit(isReady ? "ready-status--ready" : "ready-status--not-ready");
     socket.emit(`${ToggleReadyStatusEvent}--success`);
   }));
 
+  // Test
   socket.on(StartGameEvent, socketErrorHandler(socket, StartGameEvent, async ({ gameId }: StartGameData) => {
     gameStateManager.verifyAllPlayersReadyEvent(gameId);
-    const game = gameStateManager.getGame(gameId);
-    game.initGame();
+    await gameStateManager.startGame(gameId);
     gameStateManager.processAllPlayersReadyEvent(gameId);
-    gameEventEmitter.emitPickWarriors(game.players);
+    gameEventEmitter.emitPickWarriors(gameId);
     socket.emit(`${StartGameEvent}--success`);
   }));
 

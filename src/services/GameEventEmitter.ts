@@ -1,6 +1,5 @@
 import { Server, Socket, Namespace } from "socket.io";
-import { Server as HttpServer } from "http";
-import { gameId, Sage, SpaceOption, ElementalCard } from "../types";
+import { gameId, Sage, SpaceOption } from "../types";
 import { Player, Team } from "../models";
 import { GameStateManager } from "./GameStateManager";
 
@@ -35,8 +34,9 @@ export class GameEventEmitter {
     });
   }
 
-  emitPickWarriors(players: Player[]) {
-    players.forEach(player => {
+  emitPickWarriors(gameId: gameId) {
+    const game = this.gameStateManager.getGame(gameId);
+    game.players.forEach(player => {
       this.emitToPlayer(player.socketId, "pick-warriors", player.getDecklist());
     })
   }

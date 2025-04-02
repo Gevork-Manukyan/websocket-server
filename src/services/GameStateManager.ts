@@ -1,5 +1,5 @@
 import { ConGame, GameState, ActiveConGame, Player } from "../models";
-import { gameId, GameStateInfo, RejoinGameEvent, TransitionEvent } from "../types";
+import { gameId, GameStateInfo, TransitionEvent } from "../types";
 import { ValidationError } from "./CustomError/BaseError";
 import { GameConflictError } from "./CustomError/GameError";
 import { gameDatabaseService } from "./GameDatabaseService";
@@ -84,6 +84,10 @@ export class GameStateManager {
         this.setGame(gameId, savedGame);
     }
 
+    /**
+     * Validates that all players have selected a sage
+     * @param gameId - The id of the game to validate
+     */
     async allPlayersSelectedSage(gameId: gameId): Promise<void> {
         const game = this.getGame(gameId);
         game.validateAllPlayersSeclectedSage();
@@ -91,9 +95,45 @@ export class GameStateManager {
         this.setGame(gameId, savedGame);
     }
 
+    /**
+     * Validates that all teams have joined
+     * @param gameId - The id of the game to validate
+     */
     async allTeamsJoined(gameId: gameId): Promise<void> {
         const game = this.getGame(gameId);
         game.validateAllTeamsJoined();
+        const savedGame = await gameDatabaseService.saveGame(game);
+        this.setGame(gameId, savedGame);
+    }
+
+    /**
+     * Toggles a player's ready status
+     * @param gameId - The ID of the game
+     * @param socketId - The socket ID of the player
+     * @returns The new ready status
+     */
+    toggleReadyStatus(gameId: gameId, socketId: string): boolean {
+        const game = this.getGame(gameId);
+        const currPlayer = game.getPlayer(socketId);
+        
+        if (!currPlayer.getSage()) {
+            throw new ValidationError("Cannot toggle ready. The sage has not been set.", "sage");
+        }
+
+        currPlayer.toggleReady();
+        
+        if (currPlayer.getIsReady()) {
+            game.incrementPlayersReady();
+        } else {
+            game.decrementPlayersReady();
+        }
+
+        return currPlayer.getIsReady();
+    }
+
+    async startGame(gameId: gameId): Promise<void> {
+        const game = this.getGame(gameId);
+        game.initGame();
         const savedGame = await gameDatabaseService.saveGame(game);
         this.setGame(gameId, savedGame);
     }
