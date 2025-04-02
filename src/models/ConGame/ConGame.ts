@@ -166,6 +166,15 @@ export class ConGame {
   }
 
   /**
+   * Checks if all teams have joined
+   * @returns True if all teams have joined, false otherwise
+   */
+  validateAllTeamsJoined() {
+    if (this.team1.getCurrentNumPlayers() !== this.numPlayersTotal / 2) throw new ValidationError(`Team 1 has ${this.numPlayersTotal / 2 - this.team1.getCurrentNumPlayers()} players`, "team1");
+    if (this.team2.getCurrentNumPlayers() !== this.numPlayersTotal / 2) throw new ValidationError(`Team 2 has ${this.numPlayersTotal / 2 - this.team2.getCurrentNumPlayers()} players`, "team2");
+  }
+
+  /**
    * Gets the team the player is on
    * @param playerId - The socket ID of the player to get the team of
    * @returns The team the player is on

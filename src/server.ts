@@ -1,7 +1,7 @@
 import { createServer } from "http"; 
 import { Server } from "socket.io";
 import mongoose from "mongoose";
-import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData, DebugData, DebugEvent, ExitGameData, ExitGameEvent, RejoinGameData, RejoinGameEvent } from "./types";
+import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData, DebugData, DebugEvent, ExitGameData, ExitGameEvent, RejoinGameData, RejoinGameEvent, AllTeamsJoinedData, AllTeamsJoinedEvent } from "./types";
 import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
 import { GameEventEmitter, GameStateManager, ValidationError, InvalidSpaceError, PlayersNotReadyError } from "./services";
 import { IS_PRODUCTION } from "./constants";
@@ -72,7 +72,6 @@ gameNamespace.on("connection", (socket) => {
     socket.emit(`${AllSagesSelectedEvent}--success`);
   }));
 
-  // Test
   socket.on(JoinTeamEvent, socketErrorHandler(socket, JoinTeamEvent, async ({ gameId, team }: JoinTeamData) => {
     gameStateManager.verifyJoinTeamEvent(gameId);
     gameStateManager.getGame(gameId).joinTeam(socket.id, team);
@@ -86,6 +85,15 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.getGame(gameId).clearTeams();
     gameStateManager.processClearTeamsEvent(gameId);
     socket.emit(`${ClearTeamsEvent}--success`);
+  }));
+
+  // Test
+  socket.on(AllTeamsJoinedEvent, socketErrorHandler(socket, AllTeamsJoinedEvent, async ({ gameId }: AllTeamsJoinedData) => {
+    gameStateManager.verifyAllTeamsJoinedEvent(gameId);
+    await gameStateManager.allTeamsJoined(gameId);
+    gameStateManager.processAllTeamsJoinedEvent(gameId);
+    gameEventEmitter.emitAllTeamsJoined(gameId);
+    socket.emit(`${AllTeamsJoinedEvent}--success`);
   }));
 
   socket.on(ToggleReadyStatusEvent, socketErrorHandler(socket, ToggleReadyStatusEvent, async ({ gameId }: ToggleReadyStatusData) => {

@@ -49,6 +49,10 @@ export class GameEventEmitter {
     this.emitToRoom(roomId, "all-sages-selected");
   }
 
+  emitAllTeamsJoined(roomId: gameId) {
+    this.emitToRoom(roomId, "all-teams-joined");
+  }
+
   emitTeamJoined(roomId: gameId, team: Team['teamNumber']) {
     this.emitToRoom(roomId, "team-joined", team);
   }

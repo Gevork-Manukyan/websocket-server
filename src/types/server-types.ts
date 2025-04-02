@@ -34,6 +34,10 @@ const clearTeamsSchema = z.object({
   gameId: z.string(),
 });
 
+const allTeamsJoinedSchema = z.object({
+  gameId: z.string(),
+});
+
 const startGameSchema = z.object({
   gameId: z.string(),
 });
@@ -96,6 +100,7 @@ export const AllSagesSelectedEvent = "all-sages-selected" as const;
 export const ToggleReadyStatusEvent = "toggle-ready-status" as const;
 export const JoinTeamEvent = "join-team" as const;
 export const ClearTeamsEvent = "clear-teams" as const;
+export const AllTeamsJoinedEvent = "all-teams-joined" as const;
 export const StartGameEvent = "start-game" as const;
 export const ChoseWarriorsEvent = "chose-warriors" as const;
 export const SwapWarriorsEvent = "swap-warriors" as const;
@@ -119,6 +124,7 @@ export const EventSchemas = {
   [ToggleReadyStatusEvent]: toggleReadyStatusSchema,
   [JoinTeamEvent]: joinTeamSchema,
   [ClearTeamsEvent]: clearTeamsSchema,
+  [AllTeamsJoinedEvent]: allTeamsJoinedSchema,
   [StartGameEvent]: startGameSchema,
   [ChoseWarriorsEvent]: choseWarriorsSchema,
   [SwapWarriorsEvent]: swapWarriorsSchema,
@@ -142,6 +148,7 @@ export type AllSagesSelectedData = z.infer<typeof allSagesSelectedSchema>;
 export type ToggleReadyStatusData = z.infer<typeof toggleReadyStatusSchema>;
 export type JoinTeamData = z.infer<typeof joinTeamSchema>;
 export type ClearTeamsData = z.infer<typeof clearTeamsSchema>;
+export type AllTeamsJoinedData = z.infer<typeof allTeamsJoinedSchema>;
 export type StartGameData = z.infer<typeof startGameSchema>;
 export type ChoseWarriorsData = z.infer<typeof choseWarriorsSchema>;
 export type SwapWarriorsData = z.infer<typeof swapWarriorsSchema>;
@@ -165,6 +172,7 @@ export type SocketEventMap = {
   [ToggleReadyStatusEvent]: ToggleReadyStatusData;
   [JoinTeamEvent]: JoinTeamData;
   [ClearTeamsEvent]: ClearTeamsData;
+  [AllTeamsJoinedEvent]: AllTeamsJoinedData;
   [StartGameEvent]: StartGameData;
   [ChoseWarriorsEvent]: ChoseWarriorsData;
   [SwapWarriorsEvent]: SwapWarriorsData;

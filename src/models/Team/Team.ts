@@ -70,6 +70,13 @@ export class Team {
     }
 
     /**
+     * @returns The number of players on the team
+     */
+    getCurrentNumPlayers() {
+        return this.players.length;
+    }
+
+    /**
      * @returns The gold the team has
      */
     getGold() {

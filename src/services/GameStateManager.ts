@@ -91,8 +91,15 @@ export class GameStateManager {
         this.setGame(gameId, savedGame);
     }
 
+    async allTeamsJoined(gameId: gameId): Promise<void> {
+        const game = this.getGame(gameId);
+        game.validateAllTeamsJoined();
+        const savedGame = await gameDatabaseService.saveGame(game);
+        this.setGame(gameId, savedGame);
+    }
+
     /**
-     * Loads all existing games from the database into the GameStateManager
+     * Loads all existing games and their states from the database into the GameStateManager
      */
     async loadExistingGames(): Promise<void> {
         try {
@@ -282,6 +289,15 @@ export class GameStateManager {
 
     async processClearTeamsEvent(gameId: gameId) {
         await this.processEventAndSaveState(gameId, TransitionEvent.CLEAR_TEAMS);
+    }
+
+    // ###### All Teams Joined ######
+    verifyAllTeamsJoinedEvent(gameId: gameId) {
+        this.getGameState(gameId).verifyEvent(TransitionEvent.ALL_TEAMS_JOINED);
+    }
+
+    async processAllTeamsJoinedEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.ALL_TEAMS_JOINED);
     }
 
     // ###### Toggle Ready Status ######
