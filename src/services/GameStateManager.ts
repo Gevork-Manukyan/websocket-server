@@ -77,6 +77,13 @@ export class GameStateManager {
         this.setGame(gameId, savedGame);
     }
 
+    async allPlayersSelectedSage(gameId: gameId): Promise<void> {
+        const game = this.getGame(gameId);
+        game.validateAllPlayersSeclectedSage();
+        const savedGame = await gameDatabaseService.saveGame(game);
+        this.setGame(gameId, savedGame);
+    }
+
     /**
      * Loads all existing games from the database into the GameStateManager
      */
@@ -214,138 +221,152 @@ export class GameStateManager {
 
     /* -------- PROCESSING GAME STATE -------- */
 
-    // Player Joined
+    /**
+     * Helper method to process an event and save its state
+     * @param gameId - The ID of the game
+     * @param event - The event to process
+     */
+    private async processEventAndSaveState(gameId: gameId, event: TransitionEvent): Promise<void> {
+        const savedGameState = await this.getGameState(gameId).processEvent(event);
+        await gameDatabaseService.saveGameState(gameId, savedGameState);
+        this.setGameState(gameId, savedGameState);
+    }
+
+    // ###### Player Joined ######
     verifyJoinGameEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.PLAYER_JOINED);
     }
 
-    processJoinGameEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.PLAYER_JOINED);
+    async processJoinGameEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.PLAYER_JOINED);
     }
 
-    // Player Selected Sage
+    // ###### Player Selected Sage ######
     verifySelectSageEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.PLAYER_SELECTED_SAGE);
     }
 
-    processSelectSageEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.PLAYER_SELECTED_SAGE);
+    async processSelectSageEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.PLAYER_SELECTED_SAGE);
     }
 
-    // All Sages Selected
+    // ###### All Sages Selected ######
     verifyAllSagesSelectedEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.ALL_SAGES_SELECTED);
     }
 
-    processAllSagesSelectedEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.ALL_SAGES_SELECTED);
+    async processAllSagesSelectedEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.ALL_SAGES_SELECTED);
     }
 
-    // Player Joined Team
+    // ###### Player Joined Team ######
     verifyJoinTeamEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.PLAYER_JOINED_TEAM);
     }
 
-    processJoinTeamEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.PLAYER_JOINED_TEAM);
+    async processJoinTeamEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.PLAYER_JOINED_TEAM);
     }
 
-    // Clear Teams
+    // ###### Clear Teams ######
     verifyClearTeamsEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.CLEAR_TEAMS);
     }
 
-    processClearTeamsEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.CLEAR_TEAMS);
+    async processClearTeamsEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.CLEAR_TEAMS);
     }
 
-    // Toggle Ready Status
+    // ###### Toggle Ready Status ######
     verifyToggleReadyStatusEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.TOGGLE_READY_STATUS);
     }
 
-    processToggleReadyStatusEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.TOGGLE_READY_STATUS);
+    async processToggleReadyStatusEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.TOGGLE_READY_STATUS);
     }
 
-    // All Players Ready
+    // ###### All Players Ready ######
     verifyAllPlayersReadyEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.ALL_PLAYERS_READY);
     }
 
-    processAllPlayersReadyEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.ALL_PLAYERS_READY);
+    async processAllPlayersReadyEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.ALL_PLAYERS_READY);
     }
 
-    // Choose Warriors
+    // ###### Choose Warriors ######
     verifyChooseWarriorsEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.CHOOSE_WARRIORS);
     }
 
-    processChooseWarriorsEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.CHOOSE_WARRIORS);
+    async processChooseWarriorsEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.CHOOSE_WARRIORS);
     }
 
-    // Swap Warriors
+    // ###### Swap Warriors ######
     verifySwapWarriorsEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.SWAP_WARRIORS);
     }
 
-    processSwapWarriorsEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.SWAP_WARRIORS);
+    async processSwapWarriorsEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.SWAP_WARRIORS);
     }
 
-    // Finished Setup
+    // ###### Finished Setup ######
     verifyFinishedSetupEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.PLAYER_FINISHED_SETUP);
     }
 
-    processFinishedSetupEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.PLAYER_FINISHED_SETUP);
+    async processFinishedSetupEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.PLAYER_FINISHED_SETUP);
     }
 
-    // Cancel Setup
+    // ###### Cancel Setup ######
     verifyCancelSetupEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.CANCEL_SETUP);
     }
 
-    processCancelSetupEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.CANCEL_SETUP);
+    async processCancelSetupEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.CANCEL_SETUP);
     }
 
-    // All Players Setup
+    // ###### All Players Setup ######
     verifyAllPlayersSetupEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.ALL_PLAYERS_SETUP_COMPLETE);
     }
 
-    processAllPlayersSetupEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.ALL_PLAYERS_SETUP_COMPLETE);
+    async processAllPlayersSetupEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.ALL_PLAYERS_SETUP_COMPLETE);
     }
 
-    // Get Day Break Cards
+    // ###### Get Day Break Cards ######
     verifyGetDayBreakCardsEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.GET_DAY_BREAK_CARDS);
     }
 
-    processGetDayBreakCardsEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.GET_DAY_BREAK_CARDS);
+    async processGetDayBreakCardsEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.GET_DAY_BREAK_CARDS);
     }
 
-    // Activate Day Break
+    // ###### Activate Day Break ######
     verifyActivateDayBreakEvent(gameId: gameId) {
         this.getGameState(gameId).verifyEvent(TransitionEvent.DAY_BREAK_CARD);
     }
 
-    processActivateDayBreakEvent(gameId: gameId) {
-        this.getGameState(gameId).processEvent(TransitionEvent.DAY_BREAK_CARD);
+    async processActivateDayBreakEvent(gameId: gameId) {
+        await this.processEventAndSaveState(gameId, TransitionEvent.DAY_BREAK_CARD);
     }
 
-    // Add method to get all games for testing
+
+    // ------ Testing Methods ------
+
+    // ###### Get All Games ######
     getAllGames(): { [key: gameId]: GameStateInfo } {
         return this.currentGames;
     }
 
-    // Add method to clear games for testing
+    // ###### Clear Games ######
     clearGames(): void {
         this.currentGames = {};
     }

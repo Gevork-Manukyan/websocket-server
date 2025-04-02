@@ -66,7 +66,7 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(AllSagesSelectedEvent, socketErrorHandler(socket, AllSagesSelectedEvent, async ({ gameId }: AllSagesSelectedData) => {
     gameStateManager.verifyAllSagesSelectedEvent(gameId);
-    gameStateManager.getGame(gameId).validateAllPlayersSeclectedSage();
+    await gameStateManager.allPlayersSelectedSage(gameId);
     gameStateManager.processAllSagesSelectedEvent(gameId);
     gameEventEmitter.emitAllSagesSelected(gameId);
     socket.emit(`${AllSagesSelectedEvent}--success`);

@@ -59,10 +59,10 @@ export class GameDatabaseService {
      * @param gameId - The ID of the game
      * @param gameState - The game state to save
      */
-    async saveGameState(gameId: string, gameState: GameState): Promise<void> {
+    async saveGameState(gameId: string, gameState: GameState): Promise<GameState> {
         console.debug('Saving game state for game:', gameId);
         try {
-            await this.gameStateService.updateGameStateByGameId(gameId, gameState);
+            return await this.gameStateService.updateGameStateByGameId(gameId, gameState);
         } catch (error) {
             console.error('Failed to save game state:', error);
             throw error;

@@ -18,7 +18,7 @@ export interface IPlayer extends Document {
 
 export const PlayerSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, required: true },
-    socketId: { type: String, required: true },
+    socketId: { type: String, unique: true, required: true },
     isReady: { type: Boolean, default: false },
     isSetup: { type: Boolean, default: false },
     hasChosenWarriors: { type: Boolean, default: false },

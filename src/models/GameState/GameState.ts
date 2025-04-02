@@ -105,7 +105,7 @@ export class GameState {
      * @param event The event to process
      * @throws GameStateError if the event is invalid for the current state
      */
-    processEvent(event: TransitionEvent) {
+    async processEvent(event: TransitionEvent) {
         const input = this.checkTransitionForEvent(event, this.currentTransition);
         if (!input) throw new GameStateError(`Invalid event: ${event} for current state: ${this.currentTransition.currentStateValue}`);
         
@@ -113,6 +113,7 @@ export class GameState {
         if (!nextTransition) throw new GameStateError(`Invalid next state: ${input.nextState}`);
 
         this.currentTransition = nextTransition;
+        return this;
     }
 
     // Convert from Mongoose document to runtime instance
