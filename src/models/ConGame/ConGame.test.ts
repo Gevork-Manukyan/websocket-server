@@ -117,7 +117,7 @@ describe("ConGame", () => {
         mockGame.team1.addPlayerToTeam = jest.fn()
         
         mockGame.joinTeam("player-1", 1);
-        expect(mockGame.team1.addPlayerToTeam).toHaveBeenCalledWith(player);
+        expect(mockGame.team1.addPlayerToTeam).toHaveBeenCalledWith(player.userId);
       });
   
       test("removes the player from the current team before joining a new one", () => {
@@ -131,8 +131,8 @@ describe("ConGame", () => {
 
         mockGame.joinTeam("player-1", 2);
 
-        expect(mockGame.team1.removePlayerFromTeam).toHaveBeenCalledWith(player);
-        expect(mockGame.team2.addPlayerToTeam).toHaveBeenCalledWith(player)
+        expect(mockGame.team1.removePlayerFromTeam).toHaveBeenCalledWith(player.userId);
+        expect(mockGame.team2.addPlayerToTeam).toHaveBeenCalledWith(player.userId)
       });
     });
 
@@ -253,20 +253,21 @@ describe("ConGame", () => {
         const player2 = new Player("player-2", "socket-2");
         mockGame.addPlayer(player1);
         mockGame.addPlayer(player2);
-        mockGame.team1.addPlayerToTeam(player1);
-        mockGame.team2.addPlayerToTeam(player2);
+        mockGame.team1.addPlayerToTeam(player1.userId);
+        mockGame.team2.addPlayerToTeam(player2.userId);
 
         const decklist1 = [TwigDeck]
         const decklist2 = [LeafDeck]
-        mockGame.team1.getAllPlayerDecklists = jest.fn().mockReturnValue(decklist1)
-        mockGame.team2.getAllPlayerDecklists = jest.fn().mockReturnValue(decklist2)
+        mockGame.getTeamDecklists = jest.fn()
+          .mockReturnValueOnce(decklist1)
+          .mockReturnValueOnce(decklist2)
         mockGame.team1.initBattlefield = jest.fn()
         mockGame.team2.initBattlefield = jest.fn()
 
         mockGame.initPlayerFields();
 
-        expect(mockGame.team1.getAllPlayerDecklists).toHaveBeenCalled()
-        expect(mockGame.team2.getAllPlayerDecklists).toHaveBeenCalled()
+        expect(mockGame.getTeamDecklists).toHaveBeenCalledWith(mockGame.team1)
+        expect(mockGame.getTeamDecklists).toHaveBeenCalledWith(mockGame.team2)
         expect(mockGame.team1.initBattlefield).toHaveBeenCalledWith(decklist1)
         expect(mockGame.team2.initBattlefield).toHaveBeenCalledWith(decklist2)
       })

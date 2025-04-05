@@ -1,9 +1,11 @@
 import { ConflictError, NotFoundError, ValidationError } from "../../services";
 import { Battlefield, Player, Team } from "../../models";
 import { ALL_CARDS, LeafDeck, TwigDeck } from "../../constants";
+import { ConGame } from "../ConGame/ConGame";
 const { AcornSquire, Cedar, Porella, QuillThornback, Sprout, Timber } = ALL_CARDS;
 
 const testSocketId = "socket123"
+const testUserId = "user123"
 
 jest.mock("../Battlefield", () => {
     return {
@@ -24,9 +26,7 @@ describe("Team", () => {
     })
 
     test("should create a default Team object", (done) => {
-        const { players } = mockTeam
-
-        expect(players).toEqual([])
+        expect(mockTeam.userIds).toEqual([])
         expect(mockTeam.getBattlefield()).toBeDefined();
         expect(mockTeam.getTeamNumber()).toBe(1)
         expect(mockTeam.getTeamSize()).toBe(1)
@@ -69,7 +69,7 @@ describe("Team", () => {
         test("should remove all players and create new battlefield", () => {
             const initialBattlefield = mockTeam.getBattlefield();
             mockTeam.resetTeam()
-            expect(mockTeam.players).toEqual([])
+            expect(mockTeam.userIds).toEqual([])
             expect(mockTeam.getBattlefield()).not.toBe(initialBattlefield); 
             expect(Battlefield).toHaveBeenCalledWith(mockTeam.getTeamSize()); 
         })
@@ -77,51 +77,31 @@ describe("Team", () => {
 
     describe("addPlayerToTeam method", () => {
         test("should add player to team", () => {
-            mockTeam.addPlayerToTeam(new Player("testPlayerId_1", testSocketId))
-            expect(mockTeam.players[0].userId).toBe("testPlayerId_1")
+            mockTeam.addPlayerToTeam(testUserId)
+            expect(mockTeam.userIds[0]).toBe(testUserId)
         })
 
         test("should throw error if team is full", () => {
-            mockTeam.addPlayerToTeam(new Player("testPlayerId_1", testSocketId))
-            expect(() => mockTeam.addPlayerToTeam(new Player("testPlayerId_2", testSocketId))).toThrow(ConflictError)
+            mockTeam.addPlayerToTeam(testUserId)
+            expect(() => mockTeam.addPlayerToTeam("user456")).toThrow(ConflictError)
         })
     })
 
     describe("removePlayerFromTeam method", () => {
         test("should remove player from the team", () => {
-            const playerId = "testPlayerId_1"
-            const player = new Player(playerId, testSocketId)
-            mockTeam.addPlayerToTeam(player)
-            expect(mockTeam.players[0].userId).toBe(playerId)
-            mockTeam.removePlayerFromTeam(player)
-            expect(mockTeam.players.length).toBe(0)
+            mockTeam.addPlayerToTeam(testUserId)
+            expect(mockTeam.userIds[0]).toBe(testUserId)
+            mockTeam.removePlayerFromTeam(testUserId)
+            expect(mockTeam.userIds.length).toBe(0)
         })
 
         test("should return unchanged team if player doesn't exist on team", () => {
-            const player = new Player("testPlayerId_1", testSocketId)
-            mockTeam.addPlayerToTeam(player)
-            expect(mockTeam.players[0].userId).toBe("testPlayerId_1")
-            mockTeam.removePlayerFromTeam(new Player("testPlayerId_2", testSocketId))
-            expect(mockTeam.players.length).toBe(1)
-            expect(mockTeam.players[0].userId).toBe("testPlayerId_1")
+            mockTeam.addPlayerToTeam(testUserId)
+            expect(mockTeam.userIds[0]).toBe(testUserId)
+            mockTeam.removePlayerFromTeam("user456")
+            expect(mockTeam.userIds.length).toBe(1)
+            expect(mockTeam.userIds[0]).toBe(testUserId)
         })
-    })
-
-    describe("getAllPlayerDecklists method", () => {
-        test("should return all player decklists", () => {
-            const player = new Player("testPlayerId_1", testSocketId);
-            player.getDecklist = jest.fn().mockReturnValue({ id: "decklist_1" });
-            mockTeam.addPlayerToTeam(player);
-            const decklists = mockTeam.getAllPlayerDecklists();
-            expect(decklists).toEqual([{ id: "decklist_1" }]);
-        });
-    
-        test("should throw error if a player has no decklist", () => {
-            const player = new Player("testPlayerId_1", testSocketId);
-            player.getDecklist = jest.fn().mockReturnValue(null);
-            mockTeam.addPlayerToTeam(player);
-            expect(() => mockTeam.getAllPlayerDecklists()).toThrow(NotFoundError);
-        });
     })
 
     describe("initBattlefield method", () => {
@@ -163,86 +143,121 @@ describe("Team", () => {
         })
     })
 
-    describe("initWarriors method", () => {
+    describe("chooseWarriors method", () => {
         test("should initialize warriors for one-player team", () => {
-            mockTeam.initWarriors([AcornSquire, QuillThornback])
+            const mockPlayer = {
+                getHasChosenWarriors: jest.fn().mockReturnValue(false),
+                getDecklist: jest.fn().mockReturnValue({
+                    warriors: [AcornSquire, QuillThornback]
+                }),
+                setHasChosenWarriors: jest.fn(),
+                addCardToDeck: jest.fn(),
+                userId: testUserId
+            };
+            mockTeam.addPlayerToTeam(testUserId);
+            mockTeam.chooseWarriors(mockPlayer as unknown as Player, [AcornSquire, QuillThornback]);
 
-            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(AcornSquire, 4)
-            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(QuillThornback, 6)
-        })
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(AcornSquire, 4);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(QuillThornback, 6);
+        });
 
         test("should initialize warriors for two-player team (left side)", () => {
             mockTeam = new Team(2, 1);
+            const mockPlayer = {
+                getHasChosenWarriors: jest.fn().mockReturnValue(false),
+                getDecklist: jest.fn().mockReturnValue({
+                    warriors: [AcornSquire, QuillThornback]
+                }),
+                setHasChosenWarriors: jest.fn(),
+                addCardToDeck: jest.fn(),
+                userId: testUserId
+            };
 
             mockTeam.getBattlefield().getCard = jest
-            .fn()
-            .mockImplementation((position) => (position === 8 ? Cedar : null));
+                .fn()
+                .mockImplementation((position) => (position === 8 ? Cedar : null));
 
-            mockTeam.initWarriors([AcornSquire, QuillThornback])
-            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(AcornSquire, 7)
-            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(QuillThornback, 9)
-        })
+            mockTeam.addPlayerToTeam(testUserId);
+            mockTeam.chooseWarriors(mockPlayer as unknown as Player, [AcornSquire, QuillThornback]);
+
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(AcornSquire, 7);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(QuillThornback, 9);
+        });
 
         test("should initialize warriors for two-player team (right side)", () => {
             mockTeam = new Team(2, 1);
+            const mockPlayer = {
+                getHasChosenWarriors: jest.fn().mockReturnValue(false),
+                getDecklist: jest.fn().mockReturnValue({
+                    warriors: [AcornSquire, QuillThornback]
+                }),
+                setHasChosenWarriors: jest.fn(),
+                addCardToDeck: jest.fn(),
+                userId: testUserId
+            };
 
             mockTeam.getBattlefield().getCard = jest
-            .fn()
-            .mockImplementation((position) => (position === 11 ? Cedar : null));
+                .fn()
+                .mockImplementation((position) => (position === 11 ? Cedar : null));
 
-            mockTeam.initWarriors([AcornSquire, QuillThornback])
-            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(AcornSquire, 10)
-            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(QuillThornback, 12)
-        })
-    })
+            mockTeam.addPlayerToTeam(testUserId);
+            mockTeam.chooseWarriors(mockPlayer as unknown as Player, [AcornSquire, QuillThornback]);
+
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(AcornSquire, 10);
+            expect(mockTeam.getBattlefield().addCard).toHaveBeenCalledWith(QuillThornback, 12);
+        });
+    });
 
     describe("swapWarriors method", () => {
-        let mockPlayer: Player;
-
-        beforeEach(() => {
-            mockPlayer = new Player("testPlayerId_1", testSocketId)
-            mockTeam.getBattlefield().swapCards = jest.fn()
-        })
-
         test("should swap warriors in a single-player team", () => {
-            mockTeam.getTeamSize = jest.fn().mockReturnValue(1)
+            const mockPlayer = {
+                getElement: jest.fn().mockReturnValue("twig"),
+                userId: testUserId
+            };
+            mockTeam.addPlayerToTeam(testUserId);
+            mockTeam.swapWarriors(mockPlayer as unknown as Player);
 
-            mockTeam.swapWarriors(mockPlayer)
-
-            expect(mockTeam.getTeamSize).toHaveBeenCalled()
-            expect(mockTeam.getBattlefield().swapCards).toHaveBeenCalledWith(4, 6)
+            expect(mockTeam.getBattlefield().swapCards).toHaveBeenCalledWith(4, 6);
         });
     
         test("should swap warriors for the left-side player in a two-player team", () => {
-            mockTeam.getTeamSize = jest.fn().mockReturnValue(2)
-            mockPlayer.getElement = jest.fn().mockReturnValue(Cedar.element)
-            mockTeam.getBattlefield().getCard = jest.fn().mockReturnValue(Cedar)
+            mockTeam = new Team(2, 1);
+            const mockPlayer = {
+                getElement: jest.fn().mockReturnValue(Cedar.element),
+                userId: testUserId
+            };
+            mockTeam.getBattlefield().getCard = jest.fn().mockReturnValue(Cedar);
             
-            mockTeam.swapWarriors(mockPlayer)
+            mockTeam.addPlayerToTeam(testUserId);
+            mockTeam.swapWarriors(mockPlayer as unknown as Player);
             
-            expect(mockTeam.getTeamSize).toHaveBeenCalled()
-            expect(mockTeam.getBattlefield().swapCards).toHaveBeenCalledWith(7, 9)
+            expect(mockTeam.getBattlefield().swapCards).toHaveBeenCalledWith(7, 9);
         });
     
         test("should swap warriors for the right-side player in a two-player team", () => {
-            mockTeam.getTeamSize = jest.fn().mockReturnValue(2)
-            mockPlayer.getElement = jest.fn()
-                .mockReturnValueOnce("leaf")
-                .mockReturnValueOnce(Cedar.element)
-            mockTeam.getBattlefield().getCard = jest.fn().mockReturnValue(Cedar)
+            mockTeam = new Team(2, 1);
+            const mockPlayer = {
+                getElement: jest.fn().mockReturnValue(Cedar.element),
+                userId: testUserId
+            };
+            mockTeam.getBattlefield().getCard = jest.fn().mockReturnValue(Cedar);
             
-            mockTeam.swapWarriors(mockPlayer)
+            mockTeam.addPlayerToTeam(testUserId);
+            mockTeam.swapWarriors(mockPlayer as unknown as Player);
             
-            expect(mockTeam.getTeamSize).toHaveBeenCalled()
-            expect(mockTeam.getBattlefield().swapCards).toHaveBeenCalledWith(10, 12)
+            expect(mockTeam.getBattlefield().swapCards).toHaveBeenCalledWith(10, 12);
         });
     
         test("should throw an error if the element does not match any sage", () => {
-            mockTeam.getTeamSize = jest.fn().mockReturnValue(2)
-            mockPlayer.getElement = jest.fn().mockReturnValueOnce("leaf")
-            mockTeam.getBattlefield().getCard = jest.fn().mockReturnValue(Cedar)
+            mockTeam = new Team(2, 1);
+            const mockPlayer = {
+                getElement: jest.fn().mockReturnValue("leaf"),
+                userId: testUserId
+            };
+            mockTeam.getBattlefield().getCard = jest.fn().mockReturnValue(Cedar);
 
-            expect(() => (mockTeam.swapWarriors(mockPlayer))).toThrow(ValidationError)
+            mockTeam.addPlayerToTeam(testUserId);
+            expect(() => mockTeam.swapWarriors(mockPlayer as unknown as Player)).toThrow(ValidationError);
         });
     });
-})
+});

@@ -432,7 +432,7 @@ describe("Server.ts", () => {
         });
 
         test("should confirm all players setup, if all players are ready (2-players)", (done) => {
-            mockTeam.addPlayerToTeam(mockPlayer)
+            mockTeam.addPlayerToTeam(mockPlayer.userId)
             mockGame.getTeamGoingFirst = jest.fn().mockReturnValue(mockTeam)
             mockGame.getTeamGoingSecond = jest.fn().mockReturnValue(mockTeam)
 
@@ -447,7 +447,7 @@ describe("Server.ts", () => {
         });
 
         test("should confirm all players setup, if all players are ready (4-players)", (done) => {
-            mockTeam.addPlayerToTeam(mockPlayer)
+            mockTeam.addPlayerToTeam(mockPlayer.userId)
             mockGame.numPlayersTotal = 4
 
             clientSocket.emit(AllPlayersSetupEvent, { gameId: testGameId })
