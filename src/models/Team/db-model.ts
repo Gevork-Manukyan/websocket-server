@@ -1,11 +1,10 @@
 import { Document, Schema } from 'mongoose';
-import { PlayerSchema, IPlayer } from '../Player/db-model';
 import { IBattlefield, BattlefieldSchema } from '../Battlefield/db-model';
 import { Card } from '../../types';
 
 // Define the base type
 type TeamBase = {
-    players: IPlayer[];
+    userIds: string[]; 
     battlefield: IBattlefield;
     teamNumber: 1 | 2;
     teamSize: 1 | 2;
@@ -19,7 +18,7 @@ export interface ITeam extends Document, TeamBase {}
 
 // Define the schema
 export const TeamSchema = new Schema({
-    players: { type: [PlayerSchema], required: true },
+    userIds: { type: [String], required: true }, 
     battlefield: { type: BattlefieldSchema, required: true },
     teamNumber: { type: Number, required: true, enum: [1, 2] },
     teamSize: { type: Number, required: true, enum: [1, 2] },

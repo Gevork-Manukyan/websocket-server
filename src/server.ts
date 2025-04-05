@@ -1,7 +1,7 @@
 import { createServer } from "http"; 
 import { Server } from "socket.io";
 import mongoose from "mongoose";
-import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, CurrentGameStateEvent, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, CurrentGameStateData, GetDayBreakCardsEvent, GetDayBreakCardsData, DebugData, DebugEvent, ExitGameData, ExitGameEvent, RejoinGameData, RejoinGameEvent, AllTeamsJoinedData, AllTeamsJoinedEvent } from "./types";
+import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, GetDayBreakCardsEvent, GetDayBreakCardsData, DebugData, DebugEvent, ExitGameData, ExitGameEvent, RejoinGameData, RejoinGameEvent, AllTeamsJoinedData, AllTeamsJoinedEvent } from "./types";
 import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
 import { GameEventEmitter, GameStateManager, ValidationError, InvalidSpaceError, PlayersNotReadyError } from "./services";
 import { IS_PRODUCTION } from "./constants";
@@ -154,7 +154,7 @@ gameNamespace.on("connection", (socket) => {
     if (game.numPlayersFinishedSetup !== game.players.length) throw new ValidationError("All players have not finished setup", "players");
     const activeGame = gameStateManager.beginBattle(game);
     gameStateManager.processAllPlayersSetupEvent(gameId);
-    gameEventEmitter.emitStartTurn(activeGame.getActiveTeam(), activeGame.getWaitingTeam());
+    gameEventEmitter.emitStartTurn(activeGame.getActiveTeamPlayers(), activeGame.getWaitingTeamPlayers());
     socket.emit(`${AllPlayersSetupEvent}--success`);
   }));
 
@@ -188,19 +188,12 @@ gameNamespace.on("connection", (socket) => {
   }));
 
   /* -------- GAME BATTLING -------- */
-
-  socket.on(CurrentGameStateEvent, socketErrorHandler(socket, CurrentGameStateEvent, async ({ gameId }: CurrentGameStateData) => {
-    const game = gameStateManager.getActiveGame(gameId);
-    const gameState = game.getGameState(socket.id);
-    socket.emit(CurrentGameStateEvent, gameState);
-  }));
-
   socket.on(GetDayBreakCardsEvent, socketErrorHandler(socket, GetDayBreakCardsEvent, async ({ gameId }: GetDayBreakCardsData) => {
     gameStateManager.verifyGetDayBreakCardsEvent(gameId);
     const game = gameStateManager.getActiveGame(gameId);
     const dayBreakCards = game.getDayBreakCards(socket.id);
     gameStateManager.processGetDayBreakCardsEvent(gameId);
-    gameEventEmitter.emitDayBreakCards(game.getActiveTeam(), dayBreakCards);
+    gameEventEmitter.emitDayBreakCards(game.getActiveTeamPlayers(), dayBreakCards);
   }));
 
   socket.on(ActivateDayBreakEvent, socketErrorHandler(socket, ActivateDayBreakEvent, async ({ gameId, spaceOption }: ActivateDayBreakData) => {

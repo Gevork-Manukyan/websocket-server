@@ -24,14 +24,14 @@ export class GameEventEmitter {
     this.io.to(playerId).emit(eventName, data);
   }
 
-  emitToRoom(roomId: gameId, eventName: string, data: any = null) {
-    this.io.in(roomId).emit(eventName, data);
-  }
-
-  emitToTeam(team: Team, eventName: string, data: any = null) {
-    team.players.forEach(player => {
+  emitToPlayers(players: Player[], eventName: string, data: any = null) {
+    players.forEach(player => {
       this.emitToPlayer(player.socketId, eventName, data);
     });
+  }
+
+  emitToRoom(roomId: gameId, eventName: string, data: any = null) {
+    this.io.in(roomId).emit(eventName, data);
   }
 
   emitPickWarriors(gameId: gameId) {
@@ -57,12 +57,12 @@ export class GameEventEmitter {
     this.emitToRoom(roomId, "team-joined", team);
   }
   
-  emitStartTurn(activeTeam: Team, waitingTeam: Team) {
-    this.emitToTeam(activeTeam, "start-turn");
-    this.emitToTeam(waitingTeam, "waiting-turn");
+  emitStartTurn(activePlayers: Player[], waitingPlayers: Player[]) {
+    this.emitToPlayers(activePlayers, "start-turn");
+    this.emitToPlayers(waitingPlayers, "waiting-turn");
   }
 
-  emitDayBreakCards(activeTeam: Team, dayBreakCards: SpaceOption[]) {
-    this.emitToTeam(activeTeam, "day-break-cards", dayBreakCards);
+  emitDayBreakCards(activePlayers: Player[], dayBreakCards: SpaceOption[]) {
+    this.emitToPlayers(activePlayers, "day-break-cards", dayBreakCards);
   }
 }

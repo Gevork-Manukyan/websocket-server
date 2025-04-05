@@ -1,15 +1,17 @@
-import { ConflictError, NotFoundError, ValidationError } from "../../services";
+import { NotFoundError, ValidationError } from "../../services";
 import { Card, Decklist, ElementalWarriorStarterCard, SpaceOption } from "../../types";
 import { Battlefield } from "../Battlefield/Battlefield";
-import { Player } from "../Player/Player";
 import { ITeam } from './db-model';
+import { ConGame } from '../ConGame/ConGame';
+import { ElementalWarriorCard } from "../../types/card-types";
+import { Player } from "../Player";
 
 /**
  * Represents a team in the Command of Nature game
  * @class Team
  */
 export class Team {
-    players: Player[];
+    userIds: Player['userId'][];
     private battlefield: Battlefield;
     private teamNumber: 1 | 2;
     private teamSize: 1 | 2;
@@ -23,7 +25,7 @@ export class Team {
      * @param {1 | 2} teamNumber - The team's number (1 or 2)
      */
     constructor(teamSize: Team['teamSize'], teamNumber: Team['teamNumber']) {
-        this.players = [];
+        this.userIds = [];
         this.battlefield = new Battlefield(teamSize);
         this.teamNumber = teamNumber;
         this.teamSize = teamSize;
@@ -44,8 +46,8 @@ export class Team {
      * Resets the team by removing all players and resetting the battlefield
      */
     resetTeam() {
-        this.players = []
-        this.battlefield = new Battlefield(this.teamSize)
+        this.userIds = [];
+        this.battlefield = new Battlefield(this.teamSize);
     }
 
     /**
@@ -73,7 +75,7 @@ export class Team {
      * @returns The number of players on the team
      */
     getCurrentNumPlayers() {
-        return this.players.length;
+        return this.userIds.length;
     }
 
     /**
@@ -113,39 +115,31 @@ export class Team {
     }
 
     /**
-     * @param playerId The socket ID of the player to check if they are on the team
-     * @returns Whether the player is on the team
+     * Checks if a player is on the team
+     * @param userId - The user ID of the player to check
+     * @returns True if the player is on the team, false otherwise
      */
-    isPlayerOnTeam(playerId: Player["socketId"]) {
-        return this.players.some(player => player.socketId === playerId)
+    isPlayerOnTeam(userId: Player['userId']) {
+        return this.userIds.includes(userId);
     }
 
     /**
      * Adds a player to the team
-     * @param player The player to add to the team
+     * @param userId - The user ID of the player to add
      */
-    addPlayerToTeam(player: Player) {
-        if (this.players.length === (this.teamSize)) throw new ConflictError(`Team ${this.teamNumber} is full`);
-        this.players.push(player)
+    addPlayerToTeam(userId: Player['userId']) {
+        if (this.userIds.length >= this.teamSize) {
+            throw new ValidationError(`Team ${this.teamNumber} is full`, "team");
+        }
+        this.userIds.push(userId);
     }
 
     /**
      * Removes a player from the team
-     * @param player The player to remove from the team
+     * @param userId - The user ID of the player to remove
      */
-    removePlayerFromTeam(player: Player) {
-        this.players = Player.filterOutPlayerById(this.players, player.socketId);
-    }
-
-    /**
-     * @returns The players on the team
-     */
-    getAllPlayerDecklists() {
-        return this.players.map(player => {
-            const decklist = player.getDecklist();
-            if (decklist === null) throw new NotFoundError("Decklist", `Player ${player.socketId}'s decklist is not set`);
-            return decklist;    
-        });
+    removePlayerFromTeam(userId: Player['userId']) {
+        this.userIds = this.userIds.filter(id => id !== userId);
     }
 
     /**
@@ -179,6 +173,7 @@ export class Team {
             this.battlefield.addCard(basicStarter, 3)
             this.battlefield.addCard(decklist1.sage, 5)
         }
+        
         // 4 Players (2 team members)
         else if (decklist2 !== undefined && this.teamSize === 2) {
             const basicStarter1 = decklist1.basic
@@ -198,15 +193,16 @@ export class Team {
     }
 
     /**
-     * Chooses the warriors for a player
-     * @param player The player to choose the warriors for
-     * @param choices The choices of ElementalWarriorStarterCards to choose from
+     * Chooses warriors for a player
+     * @param player - The player choosing warriors
+     * @param choices - The warrior choices
      */
     chooseWarriors(player: Player, choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
         // If player is not on team
-        if (!this.isPlayerOnTeam(player.socketId))
-            throw new ValidationError("Player is not on team", "INVALID_INPUT")
-        
+        if (!this.isPlayerOnTeam(player.userId)) {
+            throw new ValidationError(`Player ${player.userId} is not on team ${this.teamNumber}`, "team");
+        }
+
         // If player has already chosen warriors
         if (player.getHasChosenWarriors())
             throw new ValidationError("Player has already chosen warriors", "INVALID_INPUT")
@@ -224,8 +220,8 @@ export class Team {
         if (!decklistWariors.includes(choice1) || !decklistWariors.includes(choice2)) 
             throw new ValidationError("Invalid warrior(s) passed for chosen deck", "INVALID_INPUT")
         
-        this.initWarriors(choices)
-        player.setHasChosenWarriors(true)
+        this.initWarriors(choices);
+        player.setHasChosenWarriors(true);
 
         // Add the non-chosen card to the player's deck
         decklist.warriors.forEach(card => {
@@ -238,14 +234,14 @@ export class Team {
      * Initializes the battlefield with the ElementalWarriorStarterCards given
      * @param choices The choices of ElementalWarriorStarterCards to initialize the battlefield with
      */
-    initWarriors(choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
+    private initWarriors(choices: [ElementalWarriorStarterCard, ElementalWarriorStarterCard]) {
         const [choice1, choice2] = choices;
 
         if (this.teamSize === 1) {
-            this.battlefield.addCard(choice1, 4)
-            this.battlefield.addCard(choice2, 6)
+            this.battlefield.addCard(choice1, 4);
+            this.battlefield.addCard(choice2, 6);
         } else {
-            this.initWarriors2Decks(choices)
+            this.initWarriors2Decks(choices);
         }
     }
 
@@ -258,42 +254,42 @@ export class Team {
         
         // If cards given are same class as left sage then place on left side
         if (choice1.element === this.battlefield.getCard(8)?.element) {
-            this.battlefield.addCard(choice1, 7)
-            this.battlefield.addCard(choice2, 9)
+            this.battlefield.addCard(choice1, 7);
+            this.battlefield.addCard(choice2, 9);
         }
         else if (choice1.element === this.battlefield.getCard(11)?.element) {
-            this.battlefield.addCard(choice1, 10)
-            this.battlefield.addCard(choice2, 12)
+            this.battlefield.addCard(choice1, 10);
+            this.battlefield.addCard(choice2, 12);
         }
     }
 
     /**
-     * Swaps the warriors of the player on the team
-     * @param player The player to swap the warriors of
+     * Swaps warriors for a player
+     * @param player - The player swapping warriors
      */
     swapWarriors(player: Player) {
         // If player is not on team
-        if (!this.isPlayerOnTeam(player.socketId))
-            throw new ValidationError("Player is not on team", "INVALID_INPUT")
-        
+        if (!this.isPlayerOnTeam(player.userId)) {
+            throw new ValidationError(`Player ${player.userId} is not on team ${this.teamNumber}`, "team");
+        }
+
         // One player on Team
-        if (this.getTeamSize() === 1) {
-            this.battlefield.swapCards(4, 6)
+        if (this.teamSize === 1) {
+            this.battlefield.swapCards(4, 6);
             return;
         }
 
         // Two players on Team
         if (player.getElement() === this.battlefield.getCard(8)?.element) {
-            this.battlefield.swapCards(7, 9)
+            this.battlefield.swapCards(7, 9);
         }
         else if (player.getElement() === this.battlefield.getCard(11)?.element) {
-            this.battlefield.swapCards(10, 12)
+            this.battlefield.swapCards(10, 12);
         } 
         else {
-            throw new ValidationError("Player can only swap their own warriors", "element")
+            throw new ValidationError("Player can only swap their own warriors", "element");
         }
     }
-
 
     /* ----- GAMEPLAY ----- */
 
@@ -330,26 +326,24 @@ export class Team {
     // Convert from Mongoose document to runtime instance
     static fromMongoose(doc: ITeam | Omit<ITeam, '_id'>): Team {
         const team = new Team(doc.teamSize, doc.teamNumber);
-
-        team.players = doc.players.map(p => Player.fromMongoose(p));
-        team.battlefield = Battlefield.fromMongoose(doc.battlefield);
+        team.userIds = doc.userIds;
         team.gold = doc.gold;
         team.maxGold = doc.maxGold;
         team.removedCards = doc.removedCards;
-
+        team.battlefield = Battlefield.fromMongoose(doc.battlefield);
         return team;
     }
 
     // Convert runtime instance to plain object for Mongoose
     toMongoose(): Omit<ITeam, '_id'> {
         return {
-            players: this.players.map(p => p.toMongoose()),
-            battlefield: this.battlefield.toMongoose(),
+            userIds: this.userIds,
             teamNumber: this.teamNumber,
             teamSize: this.teamSize,
             gold: this.gold,
             maxGold: this.maxGold,
-            removedCards: this.removedCards
+            removedCards: this.removedCards,
+            battlefield: this.battlefield.toMongoose()
         } as Omit<ITeam, '_id'>;
     }
 }

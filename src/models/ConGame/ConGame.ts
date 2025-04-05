@@ -13,6 +13,7 @@ import { ALL_CARDS, processAbility } from "../../constants";
 import { IConGame, ConGameModel, ConGameService } from './';
 import { GameStateManager } from '../../services/GameStateManager';
 import { GameStateService, GameStateModel } from '../GameState';
+import { Decklist } from "../../types/card-types";
 
 const { BambooBerserker, Bruce, CackleRipclaw, CamouChameleon, CurrentConjurer, Dewy, DistantDoubleStrike, ElementalIncantation, ElementalSwap, ExchangeOfNature, FarsightFrenzy, Flint, FocusedFury, ForageThumper, Herbert, HummingHerald, IguanaGuard, LumberClaw, MagicEtherStrike, MeleeShield, MossViper, Mush, NaturalDefense, NaturesWrath, OakLumbertron, Obliterate, PineSnapper, PrimitiveStrike, ProjectileBlast, RangedBarrier, Redstone, ReinforcedImpact, RoamingRazor, Rocco, RubyGuardian, RunePuma, ShrubBeetle, SplashBasilisk, SplinterStinger, StoneDefender, SurgesphereMonk, TerrainTumbler, TwineFeline, TyphoonFist, Wade, WhirlWhipper, Willow } = ALL_CARDS;
 
@@ -145,6 +146,15 @@ export class ConGame {
   }
 
   /**
+   * Gets a player from the game by their user ID
+   * @param userId - The user ID of the player to get
+   * @returns The player
+   */
+    getPlayerByUserId(userId: string): Player | null {
+      return this.players.find((item) => item.userId === userId) || null;
+    }
+
+  /**
    * Sets the sage for a player
    * @param playerId - The socket ID of the player to set the sage for
    * @param sage - The sage to set
@@ -180,9 +190,10 @@ export class ConGame {
    * @returns The team the player is on
    */
   getPlayerTeam(playerId: Player["socketId"]) {
+    const player = this.getPlayer(playerId);
     const playerTeam = 
-      this.team1.isPlayerOnTeam(playerId) ? this.team1 : 
-      this.team2.isPlayerOnTeam(playerId) ? this.team2 : null;
+      this.team1.isPlayerOnTeam(player.userId) ? this.team1 : 
+      this.team2.isPlayerOnTeam(player.userId) ? this.team2 : null;
 
     if (!playerTeam) throw new NotFoundError("Team", "Player does not have a team")
     return playerTeam;
@@ -194,11 +205,15 @@ export class ConGame {
    * @returns The teammate of the player
    */
   getPlayerTeammate(playerId: Player["socketId"]) {
+    const player = this.getPlayer(playerId);
     const playerTeam = this.getPlayerTeam(playerId);
-    if (playerTeam.players.length === 1) throw new ValidationError("Player has no teammates", "playerTeammate")
-    const teammate = Player.findOtherPlayerById(playerTeam.players, playerId);
-    if (!teammate) throw new NotFoundError("Player", "Could not find teammate");
-    return teammate;
+    const teammateId = playerTeam.getTeammateId(player.userId);
+
+    if (!teammateId) {
+      throw new NotFoundError("Teammate", `Player ${playerId} has no teammate`);
+    }
+
+    return this.getPlayerByUserId(teammateId);
   }
 
   /**
@@ -300,15 +315,14 @@ export class ConGame {
    */
   joinTeam(playerId: Player['socketId'], teamNumber: Team['teamNumber']) {
     const teamSelected = teamNumber === 1 ? this.team1 : this.team2;
-    const player = this.getPlayer(playerId);
 
     if (this.team1.isPlayerOnTeam(playerId)) {
-      this.team1.removePlayerFromTeam(player);
+      this.team1.removePlayerFromTeam(playerId);
     } else if (this.team2.isPlayerOnTeam(playerId)) {
-      this.team2.removePlayerFromTeam(player);
+      this.team2.removePlayerFromTeam(playerId);
     }
 
-    teamSelected.addPlayerToTeam(player);
+    teamSelected.addPlayerToTeam(playerId);
   }
 
   /**
@@ -404,11 +418,25 @@ export class ConGame {
    * Initializes the player fields
    */
   initPlayerFields() {
-    const team1Decklists = this.team1.getAllPlayerDecklists()
-    const team2Decklists = this.team2.getAllPlayerDecklists()
+    const team1Decklists = this.getTeamDecklists(this.team1)
+    const team2Decklists = this.getTeamDecklists(this.team2)
 
     this.team1.initBattlefield(team1Decklists)
     this.team2.initBattlefield(team2Decklists)
+  }
+
+  getTeamDecklists(team: Team) {
+    const teamPlayers = this.players.filter(player => team.isPlayerOnTeam(player.userId))
+    const decklists = teamPlayers.map(player => player.getDecklist())
+
+    // Filter out null values and ensure we have valid decklists
+    const validDecklists = decklists.filter((decklist): decklist is Decklist => decklist !== null);
+    
+    if (validDecklists.length !== teamPlayers.length) {
+      throw new ValidationError(`Not all players in team have decklists set`, "decklists");
+    }
+
+    return validDecklists;
   }
 
   /**
@@ -606,6 +634,7 @@ export class ConGame {
       isActive: false
     } as Omit<IConGame, '_id'>;
   }
+
 }
 
 
@@ -630,46 +659,20 @@ export class ActiveConGame extends ConGame {
     this.actionPoints = this.maxActionPoints;
   }
 
-  getGameState(playerId: Player['socketId']) {
-    const isFourPlayers = this.numPlayersTotal === 4;
-
-    const player = this.getPlayer(playerId);
-    const teammate = this.getPlayerTeammate(playerId);
-    const team = this.getPlayerTeam(playerId);
-
-    const enemyTeam = team === this.team1 ? this.team2 : this.team1;
-    const enemyTeamPlayer1 = enemyTeam.players[0];
-    const enemyTeamPlayer2 = enemyTeam.players[1];
-
-    const gameState = {
-      game: {
-        isTurn: this.getActiveTeam() === team,
-        currentPhase: this.currentPhase,
-        actionPoints: this.actionPoints,
-        creatureShop: this.currentCreatureShopCards,
-        itemShop: this.currentItemShopCards
-      },
-      team: team.getTeamState(),
-      player: player.getPlayerState(),
-      // If 4 players then add teammate info
-      ...(isFourPlayers ? { teammate: teammate.getPlayerState() } : {}),
-      enemyTeam: {
-        team: enemyTeam.getTeamState(),
-        player1: enemyTeamPlayer1.getPlayerState(),
-        // If 4 players then add enemy player 2 info
-        ...(isFourPlayers ? { player2: enemyTeamPlayer2.getPlayerState() } : {})
-      }
-    }
-    
-    return gameState;
-  }
-
   /**
    * Gets the currently active team
    * @returns The active team
    */
   getActiveTeam(): Team {
     return this.teamOrder[this.activeTeam];
+  }
+
+  getActiveTeamPlayers(): Player[] {
+    return this.players.filter(player => this.getActiveTeam().isPlayerOnTeam(player.userId));
+  }
+
+  getWaitingTeamPlayers(): Player[] {
+    return this.players.filter(player => this.getWaitingTeam().isPlayerOnTeam(player.userId));
   }
 
   getWaitingTeam() {
