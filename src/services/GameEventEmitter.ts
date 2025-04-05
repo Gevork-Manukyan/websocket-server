@@ -30,8 +30,8 @@ export class GameEventEmitter {
     });
   }
 
-  emitToRoom(roomId: gameId, eventName: string, data: any = null) {
-    this.io.in(roomId).emit(eventName, data);
+  emitToAllPlayers(gameId: gameId, eventName: string, data: any = null) {
+    this.io.in(gameId).emit(eventName, data);
   }
 
   emitPickWarriors(gameId: gameId) {
@@ -40,29 +40,9 @@ export class GameEventEmitter {
       this.emitToPlayer(player.socketId, "pick-warriors", player.getDecklist());
     })
   }
-
-  emitSageSelected(socket: Socket, roomId: gameId, sage: Sage) {
-    socket.to(roomId).emit("sage-selected", sage);
-  }
-
-  emitAllSagesSelected(roomId: gameId) {
-    this.emitToRoom(roomId, "all-sages-selected");
-  }
-
-  emitAllTeamsJoined(roomId: gameId) {
-    this.emitToRoom(roomId, "all-teams-joined");
-  }
-
-  emitTeamJoined(roomId: gameId, team: Team['teamNumber']) {
-    this.emitToRoom(roomId, "team-joined", team);
-  }
   
   emitStartTurn(activePlayers: Player[], waitingPlayers: Player[]) {
     this.emitToPlayers(activePlayers, "start-turn");
     this.emitToPlayers(waitingPlayers, "waiting-turn");
-  }
-
-  emitDayBreakCards(activePlayers: Player[], dayBreakCards: SpaceOption[]) {
-    this.emitToPlayers(activePlayers, "day-break-cards", dayBreakCards);
   }
 }

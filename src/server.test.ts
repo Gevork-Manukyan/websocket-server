@@ -428,7 +428,7 @@ describe("Server.ts", () => {
             mockGame.numPlayersFinishedSetup = 1;
             mockGame.players = [player1];
     
-            gameEventEmitter.emitToRoom = jest.fn();
+            gameEventEmitter.emitToAllPlayers = jest.fn();
         });
 
         test("should confirm all players setup, if all players are ready (2-players)", (done) => {
@@ -439,8 +439,7 @@ describe("Server.ts", () => {
             clientSocket.emit(AllPlayersSetupEvent, { gameId: testGameId });
     
             setTimeout(() => {
-                expect(gameEventEmitter.emitToRoom).toHaveBeenCalled();
-                expect(gameEventEmitter.emitToRoom).toHaveBeenCalled();
+                expect(gameEventEmitter.emitToAllPlayers).toHaveBeenCalled();
                 expect(mockGame.getHasFinishedSetup()).toBe(true);
                 done();
             }, 50);
@@ -453,7 +452,7 @@ describe("Server.ts", () => {
             clientSocket.emit(AllPlayersSetupEvent, { gameId: testGameId })
 
             setTimeout(() => {
-                expect(gameEventEmitter.emitToRoom).toHaveBeenCalled();
+                expect(gameEventEmitter.emitToAllPlayers).toHaveBeenCalled();
                 expect(mockGame.getHasFinishedSetup()).toBe(true);
                 done();
             }, 50);

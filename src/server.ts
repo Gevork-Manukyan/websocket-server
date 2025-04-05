@@ -54,12 +54,13 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.processJoinGameEvent(gameId);
     socket.join(gameId);
     socket.emit(`${JoinGameEvent}--success`, gameId);
+    gameEventEmitter.emitToAllPlayers(gameId, "player-joined", { userId });
   }));
 
   socket.on(SelectSageEvent, socketErrorHandler(socket, SelectSageEvent, async ({ gameId, sage }: SelectSageData) => {
     gameStateManager.verifySelectSageEvent(gameId);
     gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage);
-    gameEventEmitter.emitSageSelected(socket, gameId, sage);
+    gameEventEmitter.emitToAllPlayers(gameId, "sage-selected", sage);
     gameStateManager.processSelectSageEvent(gameId);
     socket.emit(`${SelectSageEvent}--success`);
   }));
@@ -68,14 +69,14 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.verifyAllSagesSelectedEvent(gameId);
     await gameStateManager.allPlayersSelectedSage(gameId);
     gameStateManager.processAllSagesSelectedEvent(gameId);
-    gameEventEmitter.emitAllSagesSelected(gameId);
+    gameEventEmitter.emitToAllPlayers(gameId, "all-sages-selected");
     socket.emit(`${AllSagesSelectedEvent}--success`);
   }));
 
   socket.on(JoinTeamEvent, socketErrorHandler(socket, JoinTeamEvent, async ({ gameId, team }: JoinTeamData) => {
     gameStateManager.verifyJoinTeamEvent(gameId);
     gameStateManager.getGame(gameId).joinTeam(socket.id, team);
-    gameEventEmitter.emitTeamJoined(gameId, team);
+    gameEventEmitter.emitToAllPlayers(gameId, "team-joined", team);
     gameStateManager.processJoinTeamEvent(gameId);
     socket.emit(`${JoinTeamEvent}--success`);
   }));
@@ -91,7 +92,7 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.verifyAllTeamsJoinedEvent(gameId);
     await gameStateManager.allTeamsJoined(gameId);
     gameStateManager.processAllTeamsJoinedEvent(gameId);
-    gameEventEmitter.emitAllTeamsJoined(gameId);
+    gameEventEmitter.emitToAllPlayers(gameId, "all-teams-joined");
     socket.emit(`${AllTeamsJoinedEvent}--success`);
   }));
 
@@ -193,7 +194,7 @@ gameNamespace.on("connection", (socket) => {
     const game = gameStateManager.getActiveGame(gameId);
     const dayBreakCards = game.getDayBreakCards(socket.id);
     gameStateManager.processGetDayBreakCardsEvent(gameId);
-    gameEventEmitter.emitDayBreakCards(game.getActiveTeamPlayers(), dayBreakCards);
+    gameEventEmitter.emitToPlayers(game.getActiveTeamPlayers(), "day-break-cards", dayBreakCards);
   }));
 
   socket.on(ActivateDayBreakEvent, socketErrorHandler(socket, ActivateDayBreakEvent, async ({ gameId, spaceOption }: ActivateDayBreakData) => {
