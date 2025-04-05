@@ -667,16 +667,16 @@ export class ActiveConGame extends ConGame {
     return this.teamOrder[this.activeTeam];
   }
 
+  getWaitingTeam() {
+    return this.teamOrder[this.activeTeam === "first" ? "second" : "first"];
+  }
+
   getActiveTeamPlayers(): Player[] {
     return this.players.filter(player => this.getActiveTeam().isPlayerOnTeam(player.userId));
   }
 
   getWaitingTeamPlayers(): Player[] {
     return this.players.filter(player => this.getWaitingTeam().isPlayerOnTeam(player.userId));
-  }
-
-  getWaitingTeam() {
-    return this.teamOrder[this.activeTeam === "first" ? "second" : "first"];
   }
 
   toggleActiveTeam() {

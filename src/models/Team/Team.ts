@@ -323,6 +323,15 @@ export class Team {
         return isDead;
     }
 
+    /**
+     * Gets the ID of a player's teammate
+     * @param userId - The user ID of the player to find the teammate for
+     * @returns The user ID of the teammate, or undefined if no teammate exists
+     */
+    getTeammateId(userId: Player['userId']): string | undefined {
+        return this.userIds.find(id => id !== userId);
+    }
+
     // Convert from Mongoose document to runtime instance
     static fromMongoose(doc: ITeam | Omit<ITeam, '_id'>): Team {
         const team = new Team(doc.teamSize, doc.teamNumber);
