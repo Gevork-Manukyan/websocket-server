@@ -315,14 +315,16 @@ export class ConGame {
    */
   joinTeam(playerId: Player['socketId'], teamNumber: Team['teamNumber']) {
     const teamSelected = teamNumber === 1 ? this.team1 : this.team2;
+    const player = this.getPlayer(playerId);
+    const playerUserId = player.userId;
 
-    if (this.team1.isPlayerOnTeam(playerId)) {
-      this.team1.removePlayerFromTeam(playerId);
-    } else if (this.team2.isPlayerOnTeam(playerId)) {
-      this.team2.removePlayerFromTeam(playerId);
+    if (this.team1.isPlayerOnTeam(playerUserId)) {
+      this.team1.removePlayerFromTeam(playerUserId);
+    } else if (this.team2.isPlayerOnTeam(playerUserId)) {
+      this.team2.removePlayerFromTeam(playerUserId);
     }
 
-    teamSelected.addPlayerToTeam(playerId);
+    teamSelected.addPlayerToTeam(playerUserId);
   }
 
   /**
