@@ -14,12 +14,12 @@ const io = new Server(server, {
   }
 });
 
-// Initialize services
-const gameEventEmitter = GameEventEmitter.getInstance(io);
-const gameStateManager = GameStateManager.getInstance();
-
 // Creates the gameplay namespace that will handle all gameplay connections
 const gameNamespace = io.of("/gameplay");
+
+// Initialize services
+const gameEventEmitter = GameEventEmitter.getInstance(gameNamespace);
+const gameStateManager = GameStateManager.getInstance();
 
 gameNamespace.on("connection", (socket) => {
 
@@ -38,7 +38,11 @@ gameNamespace.on("connection", (socket) => {
   // TODO: FOR DEBUGING
   socket.on(DebugEvent, socketErrorHandler(socket, DebugEvent, async ({ gameId }: DebugData) => {
     const game = gameStateManager.getGame(gameId);
-    socket.emit(DebugEvent, game);
+    // Make sure socket is in the room
+    if (!socket.rooms.has(gameId)) {
+      socket.join(gameId);
+    }
+    gameEventEmitter.emitToAllPlayers(gameId, DebugEvent, game);
   }));
 
   socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ userId, numPlayers }: CreateGameData) => {      
@@ -52,16 +56,18 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.verifyJoinGameEvent(gameId);
     await gameStateManager.addPlayerToGame(userId, socket.id, gameId, false);
     gameStateManager.processJoinGameEvent(gameId);
+    
     socket.join(gameId);
+    gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, "player-joined", { userId });
     socket.emit(`${JoinGameEvent}--success`, gameId);
-    gameEventEmitter.emitToAllPlayers(gameId, "player-joined", { userId });
   }));
 
   socket.on(SelectSageEvent, socketErrorHandler(socket, SelectSageEvent, async ({ gameId, sage }: SelectSageData) => {
     gameStateManager.verifySelectSageEvent(gameId);
     gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage);
-    gameEventEmitter.emitToAllPlayers(gameId, "sage-selected", sage);
     gameStateManager.processSelectSageEvent(gameId);
+
+    gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, `sage-selected`, { sage });
     socket.emit(`${SelectSageEvent}--success`);
   }));
 
@@ -69,15 +75,18 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.verifyAllSagesSelectedEvent(gameId);
     await gameStateManager.allPlayersSelectedSage(gameId);
     gameStateManager.processAllSagesSelectedEvent(gameId);
-    gameEventEmitter.emitToAllPlayers(gameId, "all-sages-selected");
-    socket.emit(`${AllSagesSelectedEvent}--success`);
+
+    gameEventEmitter.emitToAllPlayers(gameId, `${AllSagesSelectedEvent}--success`);
   }));
 
   socket.on(JoinTeamEvent, socketErrorHandler(socket, JoinTeamEvent, async ({ gameId, team }: JoinTeamData) => {
     gameStateManager.verifyJoinTeamEvent(gameId);
-    gameStateManager.getGame(gameId).joinTeam(socket.id, team);
-    gameEventEmitter.emitToAllPlayers(gameId, "team-joined", team);
+    const game = gameStateManager.getGame(gameId);
+    game.joinTeam(socket.id, team);
     gameStateManager.processJoinTeamEvent(gameId);
+    
+    const player = game.getPlayer(socket.id);
+    gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, "team-joined", { id: player.userId, team });
     socket.emit(`${JoinTeamEvent}--success`);
   }));
 
@@ -85,34 +94,39 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.verifyClearTeamsEvent(gameId);
     gameStateManager.getGame(gameId).clearTeams();
     gameStateManager.processClearTeamsEvent(gameId);
-    socket.emit(`${ClearTeamsEvent}--success`);
+
+    gameEventEmitter.emitToAllPlayers(gameId, `${ClearTeamsEvent}--success`);
   }));
 
   socket.on(AllTeamsJoinedEvent, socketErrorHandler(socket, AllTeamsJoinedEvent, async ({ gameId }: AllTeamsJoinedData) => {
     gameStateManager.verifyAllTeamsJoinedEvent(gameId);
     await gameStateManager.allTeamsJoined(gameId);
     gameStateManager.processAllTeamsJoinedEvent(gameId);
-    gameEventEmitter.emitToAllPlayers(gameId, "all-teams-joined");
-    socket.emit(`${AllTeamsJoinedEvent}--success`);
+
+    gameEventEmitter.emitToAllPlayers(gameId, `${AllTeamsJoinedEvent}--success`);
   }));
 
   socket.on(ToggleReadyStatusEvent, socketErrorHandler(socket, ToggleReadyStatusEvent, async ({ gameId }: ToggleReadyStatusData) => {
     gameStateManager.verifyToggleReadyStatusEvent(gameId);
     const isReady = gameStateManager.toggleReadyStatus(gameId, socket.id);
     gameStateManager.processToggleReadyStatusEvent(gameId);
-    socket.emit(isReady ? "ready-status--ready" : "ready-status--not-ready");
-    socket.emit(`${ToggleReadyStatusEvent}--success`);
+
+    const player = gameStateManager.getGame(gameId).getPlayer(socket.id);
+    const eventName = isReady ? "ready-status--ready" : "ready-status--not-ready";
+    gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, eventName, { id: player.userId, isReady });
+    socket.emit(eventName);
   }));
 
-  // Test
   socket.on(StartGameEvent, socketErrorHandler(socket, StartGameEvent, async ({ gameId }: StartGameData) => {
     gameStateManager.verifyAllPlayersReadyEvent(gameId);
     await gameStateManager.startGame(gameId);
     gameStateManager.processAllPlayersReadyEvent(gameId);
+    
     gameEventEmitter.emitPickWarriors(gameId);
     socket.emit(`${StartGameEvent}--success`);
   }));
 
+  // Test
   socket.on(ChoseWarriorsEvent, socketErrorHandler(socket, ChoseWarriorsEvent, async ({ gameId, choices }: ChoseWarriorsData) => {
     gameStateManager.verifyChooseWarriorsEvent(gameId);
     const game = gameStateManager.getGame(gameId);
@@ -174,6 +188,7 @@ gameNamespace.on("connection", (socket) => {
     await gameStateManager.playerRejoinedGame(gameId, userId, socket.id);
     socket.join(gameId);
     socket.emit(`${RejoinGameEvent}--success`);
+    gameEventEmitter.emitToAllPlayers(gameId, "player-rejoined", { userId });
   }));
 
   /**
