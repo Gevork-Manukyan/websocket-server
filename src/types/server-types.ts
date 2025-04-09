@@ -4,7 +4,10 @@ import { ElementalWarriorStarterCardSchema, SageSchema } from "./card-types";
 
 const createGameSchema = z.object({
   userId: z.string(),
+  gameName: z.string(),
   numPlayers: z.union([z.literal(2), z.literal(4)]),
+  isPrivate: z.boolean().default(false),
+  password: z.string().optional(),
 })
 
 const joinGameSchema = z.object({

@@ -24,10 +24,10 @@ export class GameDatabaseService {
      * @param numPlayersTotal - The number of players in the game
      * @returns The newly created/saved game and game state
      */
-    async saveNewGame(numPlayersTotal: ConGame['numPlayersTotal']): Promise<GameStateInfo> {
+    async saveNewGame(numPlayersTotal: ConGame['numPlayersTotal'], gameName: ConGame['gameName'], isPrivate: ConGame['isPrivate'], password: ConGame['password']): Promise<GameStateInfo> {
         try {
             // First save the game to get its ID
-            const savedGame = await this.conGameService.createGame(numPlayersTotal);
+            const savedGame = await this.conGameService.createGame(numPlayersTotal, gameName, isPrivate, password);
             
             // Create and save the game state with the new game ID
             const savedGameState = await this.gameStateService.createGameState(savedGame.id);

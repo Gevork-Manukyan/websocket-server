@@ -28,7 +28,7 @@ describe('GameDatabaseService', () => {
         // Create the service with mocked dependencies
         gameDatabaseService = GameDatabaseService.getInstance(conGameService, gameStateService);
 
-        mockGame = new ConGame(numPlayers);
+        mockGame = new ConGame(numPlayers, 'test-game', false, '');
         mockGame.setId(testGameId);
         mockGameState = new GameState(testGameId);
     });
@@ -39,10 +39,10 @@ describe('GameDatabaseService', () => {
             conGameService.createGame.mockResolvedValue(mockGame);
             gameStateService.createGameState.mockResolvedValue(mockGameState);
 
-            const result = await gameDatabaseService.saveNewGame(numPlayers);
+            const result = await gameDatabaseService.saveNewGame(numPlayers, 'test-game', false, '');
 
             // Verify both services were called
-            expect(conGameService.createGame).toHaveBeenCalledWith(numPlayers);
+            expect(conGameService.createGame).toHaveBeenCalledWith(numPlayers, 'test-game', false, '');
             expect(gameStateService.createGameState).toHaveBeenCalledWith(testGameId);
             
             // Verify the result
@@ -55,7 +55,7 @@ describe('GameDatabaseService', () => {
 
             // The error should be caught and logged
             const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-            await expect(gameDatabaseService.saveNewGame(numPlayers)).rejects.toThrow(mockError);
+            await expect(gameDatabaseService.saveNewGame(numPlayers, 'test-game', false, '')).rejects.toThrow(mockError);
             consoleSpy.mockRestore();
 
             expect(consoleSpy).toHaveBeenCalledWith('Failed to save new game:', mockError);

@@ -23,8 +23,8 @@ export class ConGameService {
         return docs.map(doc => ConGame.fromMongoose(doc));
     }
 
-    async createGame(numPlayers: ConGame['numPlayersTotal']): Promise<ConGame> {
-        const game = new ConGame(numPlayers);
+    async createGame(numPlayers: ConGame['numPlayersTotal'], gameName: ConGame['gameName'], isPrivate: ConGame['isPrivate'], password: ConGame['password']): Promise<ConGame> {
+        const game = new ConGame(numPlayers, gameName, isPrivate, password);
         const doc = await this.model.create(game.toMongoose());
         return ConGame.fromMongoose(doc);
     }

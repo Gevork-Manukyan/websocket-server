@@ -5,6 +5,9 @@ import { ITeam, TeamSchema } from '../Team/db-model';
 
 // Define the base type
 type ConGameBase = {
+    gameName: string;
+    isPrivate: boolean;
+    password: string;
     isStarted: boolean;
     hasFinishedSetup: boolean;
     numPlayersTotal: 2 | 4;

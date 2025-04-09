@@ -24,6 +24,9 @@ type ShopIndex = 0 | 1 | 2;
  */
 type ConGameData = {
   id: string;
+  gameName: string;
+  isPrivate: boolean;
+  password: string;
   isStarted: boolean;
   hasFinishedSetup: boolean;
   numPlayersTotal: 2 | 4;
@@ -55,6 +58,9 @@ type ActiveConGameData = ConGameData & {
  */
 export class ConGame {
   id!: gameId;
+  gameName: string;
+  isPrivate: boolean;
+  password: string;
   isStarted: boolean = false;
   protected hasFinishedSetup: boolean = false;
   numPlayersTotal: 2 | 4;
@@ -73,9 +79,12 @@ export class ConGame {
    * Creates a new ConGame instance
    * @param {2 | 4} numPlayers - The total number of players in the game
    */
-  constructor(numPlayers: ConGame['numPlayersTotal'], id?: gameId) {
+  constructor(numPlayers: ConGame['numPlayersTotal'], gameName: ConGame['gameName'], isPrivate: ConGame['isPrivate'], password: ConGame['password'], id?: gameId) {
     if (id) this.id = id;
     this.numPlayersTotal = numPlayers;
+    this.gameName = gameName;
+    this.isPrivate = isPrivate;
+    this.password = password;
     
     const teamSize = (numPlayers / 2) as Team['teamSize'];
     this.team1 = new Team(teamSize, 1)
@@ -562,6 +571,9 @@ export class ConGame {
   protected static getBaseDataFromMongoose(doc: IConGame): ConGameData {
     return {
       id: doc._id.toString(),
+      gameName: doc.gameName,
+      isPrivate: doc.isPrivate,
+      password: doc.password,
       isStarted: doc.isStarted,
       hasFinishedSetup: doc.hasFinishedSetup,
       numPlayersTotal: doc.numPlayersTotal,
@@ -593,7 +605,7 @@ export class ConGame {
    * @returns A new ConGame instance
    */
   static fromData(data: ConGameData): ConGame {
-    const game = new ConGame(data.numPlayersTotal, data.id);
+    const game = new ConGame(data.numPlayersTotal, data.gameName, data.isPrivate, data.password, data.id);
     
     // Copy all properties
     Object.assign(game, {
@@ -654,7 +666,7 @@ export class ActiveConGame extends ConGame {
   private gameDatabaseService: GameDatabaseService;
 
   constructor(conGame: ConGame, gameDatabaseService: GameDatabaseService) {
-    super(conGame.numPlayersTotal);
+    super(conGame.numPlayersTotal, conGame.gameName, conGame.isPrivate, conGame.password);
     this.gameDatabaseService = gameDatabaseService;
 
     this.maxActionPoints = this.numPlayersTotal === 2 ? 3 : 6;

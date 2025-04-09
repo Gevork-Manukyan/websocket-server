@@ -45,8 +45,8 @@ describe('Server Game Loading', () => {
     describe('Game Loading on Server Start', () => {
         it('should load all games from database into GameStateManager', async () => {
             // Create multiple games with different states
-            const game1 = await conGameService.createGame(2);
-            const game2 = await conGameService.createGame(4);
+            const game1 = await conGameService.createGame(2, 'test-game-1', false, '');
+            const game2 = await conGameService.createGame(4, 'test-game-2', false, '');
             const gameState1 = await gameStateService.createGameState('game1');
             const gameState2 = await gameStateService.createGameState('game2');
 
@@ -80,7 +80,7 @@ describe('Server Game Loading', () => {
 
         it('should handle missing game states gracefully', async () => {
             // Create a game without a game state
-            const game = await conGameService.createGame(2);
+            const game = await conGameService.createGame(2, 'test-game-1', false, '');
 
             // Simulate server start by loading games
             const games = await conGameService.findAllGames();
@@ -101,7 +101,7 @@ describe('Server Game Loading', () => {
 
         it('should maintain game state transitions after loading', async () => {
             // Create a game and its state
-            const game = await conGameService.createGame(2);
+            const game = await conGameService.createGame(2, 'test-game-1', false, '');
             const gameState = await gameStateService.createGameState(testGameId);
 
             // Update game state with multiple transitions

@@ -6,7 +6,7 @@ describe("ConGame", () => {
     let mockGame: ConGame;
   
     beforeEach(() => {
-      mockGame = new ConGame(4);
+      mockGame = new ConGame(4, 'test-game', false, '');
       mockGame.setId("game-1");
     });
   

@@ -41,7 +41,7 @@ describe('Database Integration Tests', () => {
     describe('Game Creation and Retrieval', () => {
         it('should create and retrieve a game', async () => {
             // Create a game
-            const game = await conGameService.createGame(2);
+            const game = await conGameService.createGame(2, 'test-game', false, '');
             expect(game).toBeInstanceOf(ConGame);
             expect(game.id).toBe(testGameId);
 
@@ -69,7 +69,7 @@ describe('Database Integration Tests', () => {
     describe('Game Save Service', () => {
         it('should save and retrieve complete game state', async () => {
             // Create a game and its state
-            const game = await conGameService.createGame(2);
+            const game = await conGameService.createGame(2, 'test-game', false, '');
             const gameState = await gameStateService.createGameState(testGameId);
 
             // Update game state
@@ -92,7 +92,7 @@ describe('Database Integration Tests', () => {
     describe('Game Deletion', () => {
         it('should delete a game and its associated state', async () => {
             // Create a game and its state
-            const game = await conGameService.createGame(2);
+            const game = await conGameService.createGame(2, 'test-game', false, '');
             const gameState = await gameStateService.createGameState(testGameId);
 
             // Delete the game

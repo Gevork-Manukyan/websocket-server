@@ -45,8 +45,8 @@ gameNamespace.on("connection", (socket) => {
     gameEventEmitter.emitToAllPlayers(gameId, DebugEvent, game);
   }));
 
-  socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ userId, numPlayers }: CreateGameData) => {      
-      const { game } = await gameStateManager.createGame(numPlayers);
+  socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ userId, numPlayers, gameName, isPrivate, password }: CreateGameData) => {      
+      const { game } = await gameStateManager.createGame(numPlayers, gameName, isPrivate, password || '');
       gameStateManager.addPlayerToGame(userId, socket.id, game.id, true);
       socket.join(game.id);
       socket.emit(`${CreateGameEvent}--success`, game.id);
