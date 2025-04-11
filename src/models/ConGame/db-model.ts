@@ -7,7 +7,7 @@ import { ITeam, TeamSchema } from '../Team/db-model';
 type ConGameBase = {
     gameName: string;
     isPrivate: boolean;
-    password: string;
+    password?: string;
     isStarted: boolean;
     hasFinishedSetup: boolean;
     numPlayersTotal: 2 | 4;
@@ -36,6 +36,9 @@ export interface IConGame extends Document<Types.ObjectId>, ConGameBase {}
 // Define the schema
 export const ConGameSchema = new Schema({
     _id: { type: Schema.Types.ObjectId, auto: true },
+    gameName: { type: String, required: true },
+    isPrivate: { type: Boolean, required: true },
+    password: { type: String, required: false },
     isStarted: { type: Boolean, required: true },
     hasFinishedSetup: { type: Boolean, required: true },
     numPlayersTotal: { type: Number, required: true, enum: [2, 4] },

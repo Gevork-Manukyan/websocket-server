@@ -26,7 +26,7 @@ type ConGameData = {
   id: string;
   gameName: string;
   isPrivate: boolean;
-  password: string;
+  password?: string;
   isStarted: boolean;
   hasFinishedSetup: boolean;
   numPlayersTotal: 2 | 4;
@@ -60,7 +60,7 @@ export class ConGame {
   id!: gameId;
   gameName: string;
   isPrivate: boolean;
-  password: string;
+  password?: string;
   isStarted: boolean = false;
   protected hasFinishedSetup: boolean = false;
   numPlayersTotal: 2 | 4;
@@ -79,12 +79,12 @@ export class ConGame {
    * Creates a new ConGame instance
    * @param {2 | 4} numPlayers - The total number of players in the game
    */
-  constructor(numPlayers: ConGame['numPlayersTotal'], gameName: ConGame['gameName'], isPrivate: ConGame['isPrivate'], password: ConGame['password'], id?: gameId) {
+  constructor(numPlayers: ConGame['numPlayersTotal'], gameName: ConGame['gameName'], isPrivate: ConGame['isPrivate'], password?: ConGame['password'], id?: gameId) {
     if (id) this.id = id;
     this.numPlayersTotal = numPlayers;
     this.gameName = gameName;
     this.isPrivate = isPrivate;
-    this.password = password;
+    this.password = password || "";
     
     const teamSize = (numPlayers / 2) as Team['teamSize'];
     this.team1 = new Team(teamSize, 1)
@@ -573,7 +573,7 @@ export class ConGame {
       id: doc._id.toString(),
       gameName: doc.gameName,
       isPrivate: doc.isPrivate,
-      password: doc.password,
+      password: doc.password || "",
       isStarted: doc.isStarted,
       hasFinishedSetup: doc.hasFinishedSetup,
       numPlayersTotal: doc.numPlayersTotal,
@@ -632,6 +632,9 @@ export class ConGame {
    */
   toMongoose(): Omit<IConGame, '_id'> {
     return {
+      gameName: this.gameName,
+      isPrivate: this.isPrivate,
+      password: this.password,
       isStarted: this.isStarted,
       hasFinishedSetup: this.hasFinishedSetup,
       numPlayersTotal: this.numPlayersTotal,

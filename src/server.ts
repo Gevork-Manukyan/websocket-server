@@ -1,12 +1,21 @@
 import { createServer } from "http"; 
 import { Server } from "socket.io";
 import mongoose from "mongoose";
+import express from "express";
+import cors from "cors";
+import gamesRouter from "./routes/games";
 import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, GetDayBreakCardsEvent, GetDayBreakCardsData, DebugData, DebugEvent, ExitGameData, ExitGameEvent, RejoinGameData, RejoinGameEvent, AllTeamsJoinedData, AllTeamsJoinedEvent } from "./types";
 import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
 import { GameEventEmitter, GameStateManager, ValidationError, InvalidSpaceError, PlayersNotReadyError } from "./services";
-import { IS_PRODUCTION } from "./constants";
 
-const server = createServer();
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Add API routes
+app.use('/api/games', gamesRouter);
+
+const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -261,22 +270,20 @@ gameNamespace.on("connection", (socket) => {
   */
 });
 
-// Start the server if not in test mode
-if (IS_PRODUCTION) {
-  // Connect to MongoDB first
-  mongoose.connect(process.env.DATABASE_URL || "mongodb://localhost:27017/command_of_nature")
-    .then(() => {
-      console.debug('Connected to MongoDB');
-      // Start the server after successful database connection
-      server.listen(PORT, async () => {
-        console.debug(`WebSocket server running on http://localhost:${PORT}`);
-        await gameStateManager.loadExistingGames();
-      });
-    })
-    .catch((error) => {
-      console.error('MongoDB connection error:', error);
-      process.exit(1);
-    });
-}
+
+// Connect to MongoDB first
+mongoose.connect(process.env.DATABASE_URL || "mongodb://localhost:27017/command_of_nature")
+  .then(() => {
+    console.debug('Connected to MongoDB');
+    // Start the server after successful database connection
+    server.listen(PORT, async () => {
+      console.debug(`WebSocket server running on http://localhost:${PORT}`);
+      await gameStateManager.loadExistingGames();
+    ""});
+  })
+  .catch((error) => {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
+  });
 
 export { server, io };
