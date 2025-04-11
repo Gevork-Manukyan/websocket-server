@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
         const games = await ConGameModel.find(query);
         const cleanedGames: GameListing[] = games.map((game) => {
             return {
-                id: game.id.toString().slice(-6),
+                id: game.id,
                 gameName: game.gameName,
                 isPrivate: game.isPrivate,
                 numPlayersTotal: game.numPlayersTotal,

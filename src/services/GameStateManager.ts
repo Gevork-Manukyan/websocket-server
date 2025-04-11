@@ -38,8 +38,11 @@ export class GameStateManager {
      * @param gameId - The id of the game to add the player to
      * @param isHost - Whether the player is the host
      */
-    async addPlayerToGame(userId: string, socketId: string, gameId: gameId, isHost: boolean): Promise<void> {
+    async playerJoinGame(userId: string, socketId: string, gameId: gameId, isHost: boolean, password?: string): Promise<void> {
         const game = this.getGame(gameId);
+        if (game.isPrivate && password !== game.password) {
+            throw new ValidationError("Incorrect password", "password");
+        }
         
         // Check if player already exists with same socket ID
         const existingPlayer = game.players.find(p => p.socketId === socketId);

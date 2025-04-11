@@ -13,6 +13,7 @@ const createGameSchema = z.object({
 const joinGameSchema = z.object({
   userId: z.string(),
   gameId: z.string(),
+  password: z.string().optional(),
 });
 
 const selectSageSchema = z.object({

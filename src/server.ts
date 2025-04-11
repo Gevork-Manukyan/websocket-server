@@ -56,10 +56,10 @@ gameNamespace.on("connection", (socket) => {
 
   socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ userId, numPlayers, gameName, isPrivate, password }: CreateGameData) => {      
       const { game } = await gameStateManager.createGame(numPlayers, gameName, isPrivate, password || '');
-      gameStateManager.addPlayerToGame(userId, socket.id, game.id, true);
+      gameStateManager.playerJoinGame(userId, socket.id, game.id, true);
       socket.join(game.id);
       const gameListing: GameListing = {
-        id: game.id.toString().slice(-6),
+        id: game.id,
         gameName: game.gameName,
         isPrivate: game.isPrivate,
         numPlayersTotal: game.numPlayersTotal,
@@ -68,14 +68,22 @@ gameNamespace.on("connection", (socket) => {
       socket.emit(`${CreateGameEvent}--success`, gameListing);
   }));
 
-  socket.on(JoinGameEvent, socketErrorHandler(socket, JoinGameEvent, async ({ userId, gameId }: JoinGameData) => {
+  socket.on(JoinGameEvent, socketErrorHandler(socket, JoinGameEvent, async ({ userId, gameId, password }: JoinGameData) => {
     gameStateManager.verifyJoinGameEvent(gameId);
-    await gameStateManager.addPlayerToGame(userId, socket.id, gameId, false);
+    await gameStateManager.playerJoinGame(userId, socket.id, gameId, false, password);
     gameStateManager.processJoinGameEvent(gameId);
+    const game = gameStateManager.getGame(gameId);
+    const gameListing: GameListing = {
+      id: gameId.toString().slice(-6),
+      gameName: game.gameName,
+      isPrivate: game.isPrivate,
+      numPlayersTotal: game.numPlayersTotal,
+      numCurrentPlayers: game.players.length,
+    }
     
     socket.join(gameId);
     gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, "player-joined", { userId });
-    socket.emit(`${JoinGameEvent}--success`, gameId);
+    socket.emit(`${JoinGameEvent}--success`, gameListing);
   }));
 
   socket.on(SelectSageEvent, socketErrorHandler(socket, SelectSageEvent, async ({ gameId, sage }: SelectSageData) => {
