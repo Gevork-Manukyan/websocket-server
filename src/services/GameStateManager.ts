@@ -41,8 +41,23 @@ export class GameStateManager {
     async addPlayerToGame(userId: string, socketId: string, gameId: gameId, isHost: boolean): Promise<void> {
         const game = this.getGame(gameId);
         
-        if (game.players.some(p => p.socketId === socketId || p.userId === userId)) 
-            throw new ValidationError("A player with this socket ID or user ID already exists in the game", "socketId");
+        // Check if player already exists with same socket ID
+        const existingPlayer = game.players.find(p => p.socketId === socketId);
+        if (existingPlayer) {
+            // If it's the same user, just update their socket ID
+            if (existingPlayer.userId === userId) {
+                existingPlayer.updateSocketId(socketId);
+                const savedGame = await gameDatabaseService.saveGame(game);
+                this.setGame(gameId, savedGame);
+                return;
+            }
+            throw new ValidationError("A player with this socket ID already exists in the game", "socketId");
+        }
+        
+        // Check if player already exists with same user ID
+        if (game.players.some(p => p.userId === userId)) {
+            throw new ValidationError("You are already in this game", "userId");
+        }
         
         if (game.players.length >= game.numPlayersTotal) 
             throw new ValidationError("Cannot add more players", "players");

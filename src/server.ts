@@ -7,7 +7,7 @@ import gamesRouter from "./routes/games";
 import { AllSpaceOptionsSchema, CancelSetupData, CancelSetupEvent, ChoseWarriorsData, ChoseWarriorsEvent, ClearTeamsData, ClearTeamsEvent, CreateGameData, CreateGameEvent, PlayerFinishedSetupData, PlayerFinishedSetupEvent, JoinGameData, JoinGameEvent, JoinTeamData, JoinTeamEvent, LeaveGameData, LeaveGameEvent, SelectSageData, SelectSageEvent, SocketEventMap, StartGameData, StartGameEvent, SwapWarriorsData, SwapWarriorsEvent, ToggleReadyStatusData, ToggleReadyStatusEvent, AllPlayersSetupEvent, AllPlayersSetupData, AllSagesSelectedData, AllSagesSelectedEvent, ActivateDayBreakEvent, ActivateDayBreakData, GetDayBreakCardsEvent, GetDayBreakCardsData, DebugData, DebugEvent, ExitGameData, ExitGameEvent, RejoinGameData, RejoinGameEvent, AllTeamsJoinedData, AllTeamsJoinedEvent } from "./types";
 import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
 import { GameEventEmitter, GameStateManager, ValidationError, InvalidSpaceError, PlayersNotReadyError } from "./services";
-
+import { GameListing } from "@command-of-nature/shared-types";
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -58,7 +58,14 @@ gameNamespace.on("connection", (socket) => {
       const { game } = await gameStateManager.createGame(numPlayers, gameName, isPrivate, password || '');
       gameStateManager.addPlayerToGame(userId, socket.id, game.id, true);
       socket.join(game.id);
-      socket.emit(`${CreateGameEvent}--success`, game.id);
+      const gameListing: GameListing = {
+        id: game.id.toString().slice(-6),
+        gameName: game.gameName,
+        isPrivate: game.isPrivate,
+        numPlayersTotal: game.numPlayersTotal,
+        numCurrentPlayers: game.players.length,
+      }
+      socket.emit(`${CreateGameEvent}--success`, gameListing);
   }));
 
   socket.on(JoinGameEvent, socketErrorHandler(socket, JoinGameEvent, async ({ userId, gameId }: JoinGameData) => {

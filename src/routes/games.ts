@@ -1,5 +1,6 @@
 import express from 'express';
 import { ConGameModel } from '../models/ConGame/db-model';
+import { GameListing } from '@command-of-nature/shared-types';
 
 const router = express.Router();
 
@@ -14,9 +15,9 @@ router.get('/', async (req, res) => {
         }
     
         const games = await ConGameModel.find(query);
-        const cleanedGames = games.map((game) => {
+        const cleanedGames: GameListing[] = games.map((game) => {
             return {
-                id: game.id,
+                id: game.id.toString().slice(-6),
                 gameName: game.gameName,
                 isPrivate: game.isPrivate,
                 numPlayersTotal: game.numPlayersTotal,
