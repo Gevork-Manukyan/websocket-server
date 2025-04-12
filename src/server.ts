@@ -57,7 +57,6 @@ gameNamespace.on("connection", (socket) => {
   socket.on(CreateGameEvent, socketErrorHandler(socket, CreateGameEvent, async ({ userId, numPlayers, gameName, isPrivate, password }: CreateGameData) => {      
       const { game } = await gameStateManager.createGame(numPlayers, gameName, isPrivate, password || '');
       gameStateManager.playerJoinGame(userId, socket.id, game.id, true);
-      socket.join(game.id);
       const gameListing: GameListing = {
         id: game.id,
         gameName: game.gameName,
@@ -65,6 +64,8 @@ gameNamespace.on("connection", (socket) => {
         numPlayersTotal: game.numPlayersTotal,
         numCurrentPlayers: game.players.length,
       }
+
+      socket.join(game.id);
       socket.emit(`${CreateGameEvent}--success`, gameListing);
   }));
 
@@ -74,7 +75,7 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.processJoinGameEvent(gameId);
     const game = gameStateManager.getGame(gameId);
     const gameListing: GameListing = {
-      id: gameId.toString().slice(-6),
+      id: gameId,
       gameName: game.gameName,
       isPrivate: game.isPrivate,
       numPlayersTotal: game.numPlayersTotal,
@@ -219,9 +220,9 @@ gameNamespace.on("connection", (socket) => {
    * Leave the game
    */
   // TODO: db is not updated when a player leaves the game
+  // TODO: what if host leaves? How to handle if someone leaves the game midway through?
+  // If host leaves before game starts, set new host
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {
-    // TODO: what if host leaves? How to handle if someone leaves the game midway through?
-    // If host leaves before game starts, set new host
     await gameStateManager.removePlayerFromGame(gameId, socket.id);
     socket.leave(gameId);
     socket.emit(`${LeaveGameEvent}--success`);
