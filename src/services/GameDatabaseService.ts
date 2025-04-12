@@ -89,6 +89,13 @@ export class GameDatabaseService {
     async findGameStateByGameId(gameId: string): Promise<GameState> {
         return this.gameStateService.findGameStateByGameId(gameId);
     }
+
+    /**
+     * Deletes a game by ID from the database
+     */
+    async deleteGame(gameId: string): Promise<void> {
+        return this.conGameService.deleteGame(gameId);
+    }
 } 
 
 const conGameService = new ConGameService(ConGameModel);

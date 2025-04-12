@@ -98,8 +98,15 @@ export class GameStateManager {
     async removePlayerFromGame(gameId: gameId, socketId: string): Promise<void> {
         const game = this.getGame(gameId);
         game.removePlayer(socketId);
-        const savedGame = await gameDatabaseService.saveGame(game);
-        this.setGame(gameId, savedGame);
+
+        if (game.players.length === 0) {
+            await gameDatabaseService.deleteGame(gameId);
+            this.deleteGame(gameId);
+            
+        } else {
+            const savedGame = await gameDatabaseService.saveGame(game);
+            this.setGame(gameId, savedGame);
+        }
     }
 
     /**
