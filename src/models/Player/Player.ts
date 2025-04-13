@@ -72,6 +72,10 @@ export class Player {
     return this.isGameHost;
   }
 
+  setIsGameHost(value: boolean) {
+    this.isGameHost = value;
+  }
+
   getSage() {
     return this.sage;
   }

@@ -219,7 +219,6 @@ gameNamespace.on("connection", (socket) => {
   /**
    * Leave the game
    */
-  // TODO: db is not updated when a player leaves the game
   // TODO: what if host leaves? How to handle if someone leaves the game midway through?
   // If host leaves before game starts, set new host
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {

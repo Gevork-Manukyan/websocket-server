@@ -134,6 +134,12 @@ export class ConGame {
    * @param playerId - The socket ID of the player to remove
    */
   removePlayer(playerId: Player["socketId"]) {
+    // If the host is leaving, set a new host
+    if (this.getPlayer(playerId).getIsGameHost()) {
+      const newHost = this.players.find(player => player.socketId !== playerId);
+      if (newHost) newHost.setIsGameHost(true);
+    }
+
     this.players = Player.filterOutPlayerById(this.players, playerId);
     return this.players;
   }

@@ -99,14 +99,15 @@ export class GameStateManager {
         const game = this.getGame(gameId);
         game.removePlayer(socketId);
 
+        // If there are no players left, delete the game
         if (game.players.length === 0) {
             await gameDatabaseService.deleteGame(gameId);
             this.deleteGame(gameId);
-            
-        } else {
-            const savedGame = await gameDatabaseService.saveGame(game);
-            this.setGame(gameId, savedGame);
+            return;
         }
+
+        const savedGame = await gameDatabaseService.saveGame(game);
+        this.setGame(gameId, savedGame);
     }
 
     /**
