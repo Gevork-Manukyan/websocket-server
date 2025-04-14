@@ -1,16 +1,11 @@
 import Client, { Socket } from "socket.io-client";
+import { io } from "./server";
 import { PORT } from "./lib";
 import { GameStateManager, GameEventEmitter } from "./services";
 import { ConGame, Player, Team } from "./models";
-import { 
-  AllPlayersSetupEvent, CancelSetupEvent, ChoseWarriorsEvent, 
-  ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, 
-  PlayerFinishedSetupEvent, SelectSageData, StartGameEvent, 
-  SwapWarriorsEvent, 
-  ToggleReadyStatusData
-} from "./types";
+import { ClearTeamsData, CreateGameData, JoinTeamData, LeaveGameData, SelectSageData, ToggleReadyStatusData } from "./types";
+import { AllPlayersSetupEvent, CancelSetupEvent, ChoseWarriorsEvent, PlayerFinishedSetupEvent, StartGameEvent, SwapWarriorsEvent } from "@command-of-nature/shared-types";
 import { ALL_CARDS } from "./constants";
-import { io } from "./server";
 const { AcornSquire, QuillThornback } = ALL_CARDS;
 
 let clientSocket: Socket;

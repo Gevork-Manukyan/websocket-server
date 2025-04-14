@@ -1,9 +1,9 @@
-import { AllSagesSelectedEvent, AllTeamsJoinedEvent, Card, ExitGameEvent, gameId, Sage } from "../types";
 import { DropletDeck, IS_PRODUCTION, LeafDeck, PebbleDeck, TwigDeck } from "../constants";
 import { CustomError, NotFoundError, ValidationError, HostOnlyActionError, InvalidSageError, InvalidDataError } from "../services";
-import { AllPlayersSetupEvent, ClearTeamsEvent, EventSchemas, SocketEventMap, StartGameEvent } from "../types";
+import { EventSchemas, SocketEventMap, Card, Sage } from "../types";
 import { Socket } from "socket.io";
 import { GameStateManager } from "../services/GameStateManager";
+import { AllSagesSelectedEvent, AllTeamsJoinedEvent, StartGameEvent, ClearTeamsEvent, AllPlayersSetupEvent, ExitGameEvent } from "@command-of-nature/shared-types";
 
 /* -------- PRE-GAME -------- */
 
@@ -92,7 +92,10 @@ export function processEventMiddleware<T extends keyof SocketEventMap>(socket: S
     const HOST_ONLY_EVENTS = [AllSagesSelectedEvent, AllTeamsJoinedEvent, StartGameEvent, ClearTeamsEvent, AllPlayersSetupEvent, ExitGameEvent];
     for (const event of HOST_ONLY_EVENTS) {
       if (eventName === event) {
-        const eventData = data as SocketEventMap[typeof event];
+        const eventData = data as SocketEventMap[typeof eventName];
+        if (!('gameId' in eventData)) {
+          throw new ValidationError(`Event ${eventName} requires a gameId property`, "data");
+        }
         const player = GameStateManager.getInstance().getGame(eventData.gameId).getPlayer(socket.id);
 
         if (!player || !player.getIsGameHost()) {

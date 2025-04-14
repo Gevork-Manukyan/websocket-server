@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { AllSpaceOptionsSchema } from "./types";
 import { ElementalWarriorStarterCardSchema, SageSchema } from "./card-types";
+import { CreateGameEvent, JoinGameEvent, SelectSageEvent, AllSagesSelectedEvent, ToggleReadyStatusEvent, JoinTeamEvent, ClearTeamsEvent, AllTeamsJoinedEvent, StartGameEvent, ChoseWarriorsEvent, SwapWarriorsEvent, PlayerFinishedSetupEvent, CancelSetupEvent, AllPlayersSetupEvent, ExitGameEvent, RejoinGameEvent, LeaveGameEvent, GetDayBreakCardsEvent, ActivateDayBreakEvent, DebugEvent } from "@command-of-nature/shared-types";
 
 const createGameSchema = z.object({
   userId: z.string(),
@@ -92,27 +93,6 @@ const activateDayBreakSchema = z.object({
 const debugSchema = z.object({
   gameId: z.string(),
 });
-
-export const CreateGameEvent = "create-game" as const;
-export const JoinGameEvent = "join-game" as const;
-export const SelectSageEvent = "select-sage" as const;
-export const AllSagesSelectedEvent = "all-sages-selected" as const;
-export const ToggleReadyStatusEvent = "toggle-ready-status" as const;
-export const JoinTeamEvent = "join-team" as const;
-export const ClearTeamsEvent = "clear-teams" as const;
-export const AllTeamsJoinedEvent = "all-teams-joined" as const;
-export const StartGameEvent = "start-game" as const;
-export const ChoseWarriorsEvent = "chose-warriors" as const;
-export const SwapWarriorsEvent = "swap-warriors" as const;
-export const PlayerFinishedSetupEvent = "player-finished-setup" as const;
-export const CancelSetupEvent = "cancel-setup" as const;
-export const AllPlayersSetupEvent = "all-players-setup" as const;
-export const ExitGameEvent = "exit-game" as const;
-export const RejoinGameEvent = "rejoin-game" as const;
-export const LeaveGameEvent = "leave-game" as const;
-export const GetDayBreakCardsEvent = "get-day-break-cards" as const;
-export const ActivateDayBreakEvent = "activate-day-break" as const;
-export const DebugEvent = "debug" as const;
 
 // Define EventSchemas record
 export const EventSchemas = {
