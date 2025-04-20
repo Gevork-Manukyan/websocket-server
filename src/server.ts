@@ -7,7 +7,7 @@ import gamesRouter from "./routes/games";
 import { AllSpaceOptionsSchema, CancelSetupData, ChoseWarriorsData, ClearTeamsData, CreateGameData, PlayerFinishedSetupData, JoinGameData, JoinTeamData, LeaveGameData, SelectSageData, SocketEventMap, StartGameData, SwapWarriorsData, ToggleReadyStatusData, AllPlayersSetupData, AllSagesSelectedData, ActivateDayBreakData, GetDayBreakCardsData, DebugData, ExitGameData, RejoinGameData, AllTeamsJoinedData } from "./types";
 import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
 import { GameEventEmitter, GameStateManager, ValidationError, InvalidSpaceError } from "./services";
-import { ActivateDayBreakEvent, AllPlayersSetupEvent, AllSagesSelectedEvent, AllTeamsJoinedEvent, CancelSetupEvent, ChoseWarriorsEvent, ClearTeamsEvent, CreateGameEvent, DebugEvent, ExitGameEvent, GameListing, GetDayBreakCardsEvent, JoinGameEvent, JoinTeamEvent, LeaveGameEvent, PlayerFinishedSetupEvent, PlayerJoinedEvent, PlayerRejoinedEvent, ReadyStatusNotReadyEvent, ReadyStatusReadyEvent, RejoinGameEvent, SageSelectedEvent, SelectSageEvent, StartGameEvent, SwapWarriorsEvent, TeamJoinedEvent, ToggleReadyStatusEvent } from "@command-of-nature/shared-types";
+import { ActivateDayBreakEvent, AllPlayersSetupEvent, AllSagesSelectedEvent, AllTeamsJoinedEvent, CancelSetupEvent, ChoseWarriorsEvent, ClearTeamsEvent, CreateGameEvent, DebugEvent, ExitGameEvent, GameListing, GetDayBreakCardsEvent, JoinGameEvent, JoinTeamEvent, LeaveGameEvent, PlayerFinishedSetupEvent, PlayerJoinedEvent, PlayerLeftEvent, PlayerRejoinedEvent, ReadyStatusNotReadyEvent, ReadyStatusReadyEvent, RejoinGameEvent, SageSelectedEvent, SelectSageEvent, StartGameEvent, SwapWarriorsEvent, TeamJoinedEvent, ToggleReadyStatusEvent } from "@command-of-nature/shared-types";
 
 const app = express();
 app.use(cors());
@@ -222,9 +222,10 @@ gameNamespace.on("connection", (socket) => {
    */
   // TODO: How to handle if someone leaves the game midway through?
   socket.on(LeaveGameEvent, socketErrorHandler(socket, LeaveGameEvent, async ({ gameId }: LeaveGameData) => {
-    await gameStateManager.removePlayerFromGame(gameId, socket.id);
+    const removedPlayer = await gameStateManager.removePlayerFromGame(gameId, socket.id);
     socket.leave(gameId);
     socket.emit(`${LeaveGameEvent}--success`);
+    gameEventEmitter.emitToAllPlayers(gameId, PlayerLeftEvent, { userId: removedPlayer.userId });
   }));
 
   /* -------- GAME BATTLING -------- */

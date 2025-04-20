@@ -94,20 +94,25 @@ export class GameStateManager {
      * Removes a player from a game and saves the game state to the database
      * @param gameId - The id of the game to remove the player from
      * @param socketId - The id of the socket to remove
+     * @returns The player that was removed
      */
-    async removePlayerFromGame(gameId: gameId, socketId: string): Promise<void> {
+    async removePlayerFromGame(gameId: gameId, socketId: string): Promise<Player> {
         const game = this.getGame(gameId);
-        game.removePlayer(socketId);
+        const removedPlayer = game.removePlayer(socketId);
 
         // If there are no players left, delete the game
         if (game.players.length === 0) {
             await gameDatabaseService.deleteGame(gameId);
             this.deleteGame(gameId);
-            return;
         }
 
-        const savedGame = await gameDatabaseService.saveGame(game);
-        this.setGame(gameId, savedGame);
+        // If there are still players left, save the game
+        else {
+            const savedGame = await gameDatabaseService.saveGame(game);
+            this.setGame(gameId, savedGame);
+        }
+
+        return removedPlayer;
     }
 
     /**
