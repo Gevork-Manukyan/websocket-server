@@ -2,6 +2,7 @@ import { Server, Namespace } from "socket.io";
 import { gameId } from "../types";
 import { Player } from "../models";
 import { GameStateManager } from "./GameStateManager";
+import { PickWarriorsEvent, WaitingTurnEvent, StartTurnEvent } from "@command-of-nature/shared-types";
 
 export class GameEventEmitter {
   private static instance: GameEventEmitter;
@@ -70,7 +71,7 @@ export class GameEventEmitter {
   emitPickWarriors(gameId: gameId) {
     const game = this.gameStateManager.getGame(gameId);
     game.players.forEach(player => {
-      this.emitToPlayer(player.socketId, "pick-warriors", player.getDecklist());
+      this.emitToPlayer(player.socketId, PickWarriorsEvent, player.getDecklist());
     })
   }
 
@@ -80,7 +81,7 @@ export class GameEventEmitter {
    * @param waitingPlayers - The waiting players
    */
   emitStartTurn(activePlayers: Player[], waitingPlayers: Player[]) {
-    this.emitToPlayers(activePlayers, "start-turn");
-    this.emitToPlayers(waitingPlayers, "waiting-turn");
+    this.emitToPlayers(activePlayers, StartTurnEvent);
+    this.emitToPlayers(waitingPlayers, WaitingTurnEvent);
   }
 }

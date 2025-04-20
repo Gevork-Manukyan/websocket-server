@@ -18,14 +18,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@command-of-nature/shared-types": "file:../shared-types",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "mongodb": "^6.14.2",
     "mongoose": "^8.12.1",
     "socket.io": "^4.8.1",
-    "zod": "^3.24.1",
-    "@command-of-nature/shared-types": "../shared-types"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",

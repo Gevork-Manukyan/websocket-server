@@ -7,7 +7,7 @@ import gamesRouter from "./routes/games";
 import { AllSpaceOptionsSchema, CancelSetupData, ChoseWarriorsData, ClearTeamsData, CreateGameData, PlayerFinishedSetupData, JoinGameData, JoinTeamData, LeaveGameData, SelectSageData, SocketEventMap, StartGameData, SwapWarriorsData, ToggleReadyStatusData, AllPlayersSetupData, AllSagesSelectedData, ActivateDayBreakData, GetDayBreakCardsData, DebugData, ExitGameData, RejoinGameData, AllTeamsJoinedData } from "./types";
 import { PORT, processEventMiddleware, socketErrorHandler } from "./lib";
 import { GameEventEmitter, GameStateManager, ValidationError, InvalidSpaceError } from "./services";
-import { ActivateDayBreakEvent, AllPlayersSetupEvent, AllSagesSelectedEvent, AllTeamsJoinedEvent, CancelSetupEvent, ChoseWarriorsEvent, ClearTeamsEvent, CreateGameEvent, DebugEvent, ExitGameEvent, GameListing, GetDayBreakCardsEvent, JoinGameEvent, JoinTeamEvent, LeaveGameEvent, PlayerFinishedSetupEvent, RejoinGameEvent, SelectSageEvent, StartGameEvent, SwapWarriorsEvent, ToggleReadyStatusEvent } from "@command-of-nature/shared-types";
+import { ActivateDayBreakEvent, AllPlayersSetupEvent, AllSagesSelectedEvent, AllTeamsJoinedEvent, CancelSetupEvent, ChoseWarriorsEvent, ClearTeamsEvent, CreateGameEvent, DebugEvent, ExitGameEvent, GameListing, GetDayBreakCardsEvent, JoinGameEvent, JoinTeamEvent, LeaveGameEvent, PlayerFinishedSetupEvent, PlayerJoinedEvent, PlayerRejoinedEvent, ReadyStatusNotReadyEvent, ReadyStatusReadyEvent, RejoinGameEvent, SageSelectedEvent, SelectSageEvent, StartGameEvent, SwapWarriorsEvent, TeamJoinedEvent, ToggleReadyStatusEvent } from "@command-of-nature/shared-types";
 
 const app = express();
 app.use(cors());
@@ -84,7 +84,7 @@ gameNamespace.on("connection", (socket) => {
     }
     
     socket.join(gameId);
-    gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, "player-joined", { userId });
+    gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, PlayerJoinedEvent, { userId });
     socket.emit(`${JoinGameEvent}--success`, gameListing);
   }));
 
@@ -93,7 +93,7 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage);
     gameStateManager.processSelectSageEvent(gameId);
 
-    gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, `sage-selected`, { sage });
+    gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, SageSelectedEvent, { sage });
     socket.emit(`${SelectSageEvent}--success`);
   }));
 
@@ -112,7 +112,7 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.processJoinTeamEvent(gameId);
     
     const player = game.getPlayer(socket.id);
-    gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, "team-joined", { id: player.userId, team });
+    gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, TeamJoinedEvent, { id: player.userId, team });
     socket.emit(`${JoinTeamEvent}--success`);
   }));
 
@@ -138,7 +138,7 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.processToggleReadyStatusEvent(gameId);
 
     const player = gameStateManager.getGame(gameId).getPlayer(socket.id);
-    const eventName = isReady ? "ready-status--ready" : "ready-status--not-ready";
+    const eventName = isReady ? ReadyStatusReadyEvent : ReadyStatusNotReadyEvent;
     gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, eventName, { id: player.userId, isReady });
     socket.emit(eventName);
   }));
@@ -214,7 +214,7 @@ gameNamespace.on("connection", (socket) => {
     await gameStateManager.playerRejoinedGame(gameId, userId, socket.id);
     socket.join(gameId);
     socket.emit(`${RejoinGameEvent}--success`);
-    gameEventEmitter.emitToAllPlayers(gameId, "player-rejoined", { userId });
+    gameEventEmitter.emitToAllPlayers(gameId, PlayerRejoinedEvent, { userId });
   }));
 
   /**
