@@ -93,8 +93,8 @@ gameNamespace.on("connection", (socket) => {
     gameStateManager.getGame(gameId).setPlayerSage(socket.id, sage);
     gameStateManager.processSelectSageEvent(gameId);
 
-    gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, SageSelectedEvent, { sage });
     socket.emit(`${SelectSageEvent}--success`);
+    gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, SageSelectedEvent, { sage });
   }));
 
   socket.on(AllSagesSelectedEvent, socketErrorHandler(socket, AllSagesSelectedEvent, async ({ gameId }: AllSagesSelectedData) => {
@@ -140,7 +140,7 @@ gameNamespace.on("connection", (socket) => {
     const player = gameStateManager.getGame(gameId).getPlayer(socket.id);
     const eventName = isReady ? ReadyStatusReadyEvent : ReadyStatusNotReadyEvent;
     gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, eventName, { id: player.userId, isReady });
-    socket.emit(eventName);
+    socket.emit(`${ToggleReadyStatusEvent}--success`);
   }));
 
   socket.on(StartGameEvent, socketErrorHandler(socket, StartGameEvent, async ({ gameId }: StartGameData) => {
@@ -174,10 +174,12 @@ gameNamespace.on("connection", (socket) => {
   socket.on(PlayerFinishedSetupEvent, socketErrorHandler(socket, PlayerFinishedSetupEvent, async ({ gameId }: PlayerFinishedSetupData) => {
     gameStateManager.verifyFinishedSetupEvent(gameId);
     const game = gameStateManager.getGame(gameId);
-    game.getPlayer(socket.id).finishPlayerSetup();
+    const player = game.getPlayer(socket.id);
+    player.finishPlayerSetup();
     game.incrementPlayersFinishedSetup();
     gameStateManager.processFinishedSetupEvent(gameId);
     socket.emit(`${PlayerFinishedSetupEvent}--success`)
+    gameEventEmitter.emitToOtherPlayersInRoom(gameId, socket.id, PlayerFinishedSetupEvent, { id: player.userId });
   }));
 
   socket.on(CancelSetupEvent, socketErrorHandler(socket, CancelSetupEvent, async ({ gameId }: CancelSetupData) => {
@@ -195,8 +197,8 @@ gameNamespace.on("connection", (socket) => {
     if (game.numPlayersFinishedSetup !== game.players.length) throw new ValidationError("All players have not finished setup", "players");
     const activeGame = gameStateManager.beginBattle(game);
     gameStateManager.processAllPlayersSetupEvent(gameId);
-    gameEventEmitter.emitStartTurn(activeGame.getActiveTeamPlayers(), activeGame.getWaitingTeamPlayers());
     socket.emit(`${AllPlayersSetupEvent}--success`);
+    gameEventEmitter.emitStartTurn(activeGame.getActiveTeamPlayers(), activeGame.getWaitingTeamPlayers());
   }));
 
   /**
