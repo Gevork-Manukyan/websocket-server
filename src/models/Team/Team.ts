@@ -2,8 +2,6 @@ import { NotFoundError, ValidationError } from "../../services";
 import { Card, Decklist, ElementalWarriorStarterCard, SpaceOption } from "../../types";
 import { Battlefield } from "../Battlefield/Battlefield";
 import { ITeam } from './db-model';
-import { ConGame } from '../ConGame/ConGame';
-import { ElementalWarriorCard } from "../../types/card-types";
 import { Player } from "../Player";
 
 /**
